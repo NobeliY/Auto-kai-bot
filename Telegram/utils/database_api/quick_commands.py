@@ -1,0 +1,77 @@
+from asyncpg import UniqueViolationError
+
+from utils.database_api.database_gino import database
+from utils.database_api.schemas.application import Application
+from utils.database_api.schemas.date_quality import DateQuality
+from utils.database_api.schemas.user import User
+
+
+# TODO -------------- Application
+async def add_application(user_id: int, fully_name: str, email: str, group: str, state_number: str):
+    try:
+        application = Application(id=user_id, fully_name=fully_name, email=email, group=group, state_number=state_number)
+        await application.create()
+    except UniqueViolationError:
+        print("Application not created!")
+
+
+async def get_count_of_applications(admin_id: int) -> int | None:
+    if await check_admin(admin_id=admin_id):
+        applications_count = await database.func.count(Application.id).gino.scalar()
+        return applications_count
+    return None
+
+
+# TODO -------------- User
+async def get_users_info(admin_id: int) -> User | None:
+    if await check_admin(admin_id=admin_id):
+        return await User.query.gino.all()
+    return None
+
+
+async def add_user(id: int, initials: str, email: str, phone_number: str, group: str, state_number: str, access: str):
+    try:
+        user = User(id=id, initials=initials, email=email, phoneNumber=phone_number, group=group,
+                    stateNumber=state_number, access=access)
+        await user.create()
+    except UniqueViolationError:
+        print("User not created! ")
+
+
+async def get_user(user_id: int) -> User | None:
+    user = await User.query.where(User.id == user_id).gino.first()
+    return user if user is not None else None
+
+
+# TODO -------------- Date Quality
+async def get_date_quality_from_user(user_id: int) -> DateQuality | None:
+    return await DateQuality.query.where(DateQuality.id == user_id).gino.first()
+
+
+async def set_date_quality_from_user(user_id: int, count: int) -> bool | dict:
+    try:
+        date_quality = DateQuality(id=user_id, count=count)
+        await date_quality.create()
+        return True
+    except UniqueViolationError:
+        dict_error = {
+            'error': 500,
+        }
+        return dict_error
+
+
+async def update_date_quality(user_id: int) -> bool:
+    preview_date_quality = await get_date_quality_from_user(user_id=user_id)
+    if preview_date_quality.count == 3:
+        return False
+    await preview_date_quality.update(count=preview_date_quality.count + 1).apply()
+    return True
+
+
+async def check_admin(admin_id: int) -> bool:
+    user = await User.query.where(User.id == admin_id).gino.first()
+    try:
+        return True if user.access == 'A' else False
+    except AttributeError:
+        return False
+

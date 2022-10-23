@@ -1,0 +1,32 @@
+#! /bin/bash
+echo "Bot running..."
+export BOT_TOKEN="2087412404:AAFg-yxiGL9kURZDR5DLsDmhdI4cALeQqpM"
+export ADMIN_ID="834865678 124 1234214 124124 14124124"
+export PG_DATABASE="autokaibot"
+export PG_HOST="localhost"
+export PG_USER="autokaibot"
+export PG_PASSWORD="0314159265"
+
+
+export REQUEST_ESP="http://192.168.3.168
+tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw
+test"
+#export REQUEST_ESP_URI="http://192.168.3.168"
+#export FIRST_SECRET_KEY="tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw"
+
+
+echo "$BOT_TOKEN and ${ADMIN_ID[*]}"
+source venv/bin/activate
+
+# shellcheck disable=SC2120
+function pause(){
+    # shellcheck disable=SC2162
+    read -p "$*"
+}
+
+ python app.py
+#python test.py
+#python database_test.py
+
+
+pause
