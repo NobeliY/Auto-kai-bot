@@ -74,10 +74,7 @@ async def start(message: types.Message, state: FSMContext):
     user = await get_user(message.from_id)
 
     if user is None:
-        await message.answer(f"Добро пожаловать! \n"
-                             f"Вы <b>не зарегистрированы</b>."
-                             f"Пожалуйста, отправьте заявку: <b>/application</b>.",
-                             parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
+        await message.answer(return_user_checked(False), parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
     else:
         await message.answer(f"Добро пожаловать! \n"
@@ -91,6 +88,9 @@ async def start(message: types.Message, state: FSMContext):
 # TODO: Reply Text
 @dp.message_handler(state=UserState.in_active)
 async def keyboard_on_registered_users(message: types.Message, state: FSMContext):
+    activate_on_level = ['E', 'A']
+    request_controller = RequestController(message.from_id)
+
     match message.text:
         case "Выйти":
             await state.finish()
@@ -99,24 +99,31 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
             if user_opened:
                 await sleep(20)
                 user_opened = False
-            request_controller = RequestController(message.from_id)
             access = await request_controller.check_user_on_database()
             if access is not None:
                 if await request_controller.check_time(access):
-                    await message.answer(F"Открыл!")
+                    await message.answer(return_user_checked(True))
                     user_opened = True
                 else:
                     await message.answer(f" Диапазон от 6 до 23")
             else:
-                await message.answer(f"Добро пожаловать! \n"
-                                     f"Вы <strong>не зарегистрированы</strong>."
-                                     f"Пожалуйста, отправьте заявку: <strong>/application</strong>.",
+                await message.answer(return_user_checked(False),
                                      parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
 
         case "Открыть 1 уровень":
-            pass
+            access = await request_controller.check_user_on_database()
+            if access is not None and access in activate_on_level:
+                await message.answer(f"{return_user_checked(True)} 1")
+            else:
+                await message.answer(return_user_checked(False),
+                                     parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
+
         case "Открыть 2 уровень":
-            pass
+            access = await request_controller.check_user_on_database()
+            if access is not None and access in activate_on_level:
+                await message.answer(f"{return_user_checked(user_registered=True)} 2")
+            else:
+                await message.answer(return_user_checked(False))
         case "Информация о себе":
             user = await get_user(message.from_id)
             await message.answer(
@@ -135,6 +142,12 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
         case "Получить ключ":
             pass
     # await state.finish()
+
+
+def return_user_checked(user_registered: bool) -> str:
+    return f"Открыл!" if user_registered else f"Добро пожаловать! \n" \
+           f"Вы <b>не зарегистрированы</b>." \
+           f"Пожалуйста, отправьте заявку: <b>/application</b>."
 
 
 # TODO: Application

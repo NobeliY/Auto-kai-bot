@@ -1,9 +1,7 @@
 import datetime
 
 from Data.config import TIME_RANGE
-from utils.database_api.database_gino import database
 from utils.database_api.quick_commands import get_user
-from utils.database_api.schemas.user import User
 
 
 class RequestController:
