@@ -1,3 +1,5 @@
+from datetime import timezone, timedelta, datetime
+
 from asyncpg import UniqueViolationError
 
 from utils.database_api.database_gino import database
@@ -44,26 +46,37 @@ async def get_user(user_id: int) -> User | None:
 
 
 # TODO -------------- Date Quality
-async def get_date_quality_from_user(user_id: int) -> DateQuality | None:
-    return await DateQuality.query.where(DateQuality.id == user_id).gino.first()
+offset = timezone(timedelta(hours=3))
 
 
-async def set_date_quality_from_user(user_id: int, count: int) -> bool | dict:
+async def get_date_quality_from_user(user_id: int):
+    date_quality = await DateQuality.query.where(DateQuality.id == user_id).gino.first()
+    return date_quality
+
+
+async def rebase_date_quality_from_user(user_id: int):
+    date_quality = await get_date_quality_from_user(user_id=user_id)
+    await date_quality.delete()
+    return True
+
+
+async def set_date_quality_from_user(user_id: int, count: int = 1) -> bool:
     try:
-        date_quality = DateQuality(id=user_id, count=count)
+        time_now = datetime.now(tz=offset).strftime("%d %m %Y %H %M")
+        date_quality = DateQuality(id=user_id, times=time_now, count=count)
         await date_quality.create()
         return True
     except UniqueViolationError:
-        dict_error = {
-            'error': 500,
-        }
-        return dict_error
-
-
-async def update_date_quality(user_id: int) -> bool:
-    preview_date_quality = await get_date_quality_from_user(user_id=user_id)
-    if preview_date_quality.count == 3:
         return False
+
+
+async def update_date_quality(user_id: int, reset: bool = False) -> bool:
+    preview_date_quality = await get_date_quality_from_user(user_id=user_id)
+    if preview_date_quality.count == 3 and not reset:
+        return False
+    if reset:
+        await set_date_quality_from_user(user_id=user_id)
+        return True
     await preview_date_quality.update(count=preview_date_quality.count + 1).apply()
     return True
 

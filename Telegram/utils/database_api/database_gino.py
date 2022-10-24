@@ -43,3 +43,7 @@ class TimeDatabaseModel(BaseModel):
 async def on_startup(dispatcher: Dispatcher):
     print(Fore.BLUE + "Подключение к БД PostgreSQL Server")
     await database.set_bind(POSTGRES_URL)
+
+
+async def on_close(dispatcher: Dispatcher):
+    await database.pop_bind()

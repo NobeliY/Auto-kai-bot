@@ -24,9 +24,9 @@ function pause(){
     read -p "$*"
 }
 
- python app.py
 #python test.py
 #python database_test.py
+ python app.py
 
 
 pause

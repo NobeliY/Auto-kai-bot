@@ -17,7 +17,7 @@ async def database_test():
         phone_number='+79083385215',
         group='20-00',
         state_number='A363МА|116',
-        access='A'
+        access='S'
     )
     await commands.add_user(
         id=665722525,

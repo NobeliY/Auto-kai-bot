@@ -1,6 +1,9 @@
+import asyncio
 import datetime
 import re
-from asyncio import sleep
+import threading
+from time import sleep
+from typing import Any
 
 from Keyboard import student_menu, teacher_menu, employee_menu, admin_menu
 # TODO: Import a Custom Modules
@@ -17,14 +20,23 @@ import aiogram.utils.exceptions as exceptions
 # TODO: Import and Init Colorama
 from colorama import Fore
 
-from utils.database_api.database_gino import on_startup
+from utils.database_api.database_gino import on_startup, on_close
 from utils.database_api.quick_commands import get_user
 from utils.request_api.Request_controller import RequestController
 
-user_opened = False
+
+def user_opened_task():
+    sleep(20)
+
+
+opened_loop = threading.Thread(target=user_opened_task)
 
 
 async def get_default_commands(dp: Dispatcher):
+    try:
+        await on_close(dp)
+    except:
+        print("On Close Exception")
     await on_startup(dp)
     await bot.set_my_commands(
         [
@@ -74,7 +86,8 @@ async def start(message: types.Message, state: FSMContext):
     user = await get_user(message.from_id)
 
     if user is None:
-        await message.answer(return_user_checked(False), parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
+        await message.answer(return_user_checked(False), parse_mode=types.ParseMode.HTML,
+                             reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
     else:
         await message.answer(f"Добро пожаловать! \n"
@@ -90,25 +103,27 @@ async def start(message: types.Message, state: FSMContext):
 async def keyboard_on_registered_users(message: types.Message, state: FSMContext):
     activate_on_level = ['E', 'A']
     request_controller = RequestController(message.from_id)
-
+    global opened_loop
     match message.text:
         case "Выйти":
             await state.finish()
         case "Открыть":
-            global user_opened
-            if user_opened:
-                await sleep(20)
-                user_opened = False
-            access = await request_controller.check_user_on_database()
-            if access is not None:
-                if await request_controller.check_time(access):
-                    await message.answer(return_user_checked(True))
-                    user_opened = True
-                else:
-                    await message.answer(f" Диапазон от 6 до 23")
+            if opened_loop.is_alive():
+                await message.answer(F"Уже открыт")
             else:
-                await message.answer(return_user_checked(False),
-                                     parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
+                access = await request_controller.check_user_on_database()
+                if access is not None:
+                    if await request_controller.check_time(access):
+                        test = await request_controller.check_date_quality()
+                        print(f"------------ \n {test} \n -------------")
+                        await message.answer(return_user_checked(True))
+
+                        opened_loop.start()
+                    else:
+                        await message.answer(f" Диапазон от 6 до 23")
+                else:
+                    await message.answer(return_user_checked(False),
+                                         parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
 
         case "Открыть 1 уровень":
             access = await request_controller.check_user_on_database()
@@ -146,8 +161,8 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
 
 def return_user_checked(user_registered: bool) -> str:
     return f"Открыл!" if user_registered else f"Добро пожаловать! \n" \
-           f"Вы <b>не зарегистрированы</b>." \
-           f"Пожалуйста, отправьте заявку: <b>/application</b>."
+                                              f"Вы <b>не зарегистрированы</b>." \
+                                              f"Пожалуйста, отправьте заявку: <b>/application</b>."
 
 
 # TODO: Application
