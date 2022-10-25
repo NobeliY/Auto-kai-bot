@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import re
 import threading
+from threading import Thread
 from time import sleep
 from typing import Any
 
@@ -29,7 +30,7 @@ def user_opened_task():
     sleep(20)
 
 
-opened_loop = threading.Thread(target=user_opened_task)
+opened_loop = Thread(target=user_opened_task)
 
 
 async def get_default_commands(dp: Dispatcher):
@@ -118,6 +119,7 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
                         print(f"------------ \n {test} \n -------------")
                         await message.answer(return_user_checked(True))
 
+                        opened_loop = Thread(target=user_opened_task)
                         opened_loop.start()
                     else:
                         await message.answer(f" Диапазон от 6 до 23")

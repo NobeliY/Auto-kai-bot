@@ -28,6 +28,15 @@ async def database_test():
         state_number='А123АА|116',
         access='T'
     )
+    await commands.add_user(
+        id=541842024,
+        initials='Шигапов Руслан Ринатович',
+        email='test@gmail.com',
+        phone_number='+79172617052',
+        group='кмт',
+        state_number='В847КР|716',
+        access='S'
+    )
 
     await commands.add_application(user_id=2, fully_name='hi de', email='hi_de@er.er',
                                    group='23222', state_number='a123aa|123')
