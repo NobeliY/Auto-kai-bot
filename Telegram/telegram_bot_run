@@ -7,6 +7,13 @@ export PG_HOST="localhost"
 export PG_USER="autokaibot"
 export PG_PASSWORD="0314159265"
 
+export EMAIL_LOGIN="autokaibot@mail.ru"
+export EMAIL_PASSWORD="9H1H5DHNdEjLH6CLk30f"
+export EMAIL_SERVER="smtp.mail.ru"
+#port 465
+export EMAIL_PORT=25
+export SMTP_TO="it@alf-kai.ru"
+
 
 export REQUEST_ESP="http://192.168.3.168
 tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw
@@ -24,9 +31,10 @@ function pause(){
     read -p "$*"
 }
 
-#python test.py
-python database_test.py
- python app.py
 
+python database_test.py
+python app.py
+
+#python test.py
 
 pause

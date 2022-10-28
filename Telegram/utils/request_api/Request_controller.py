@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta, timezone
-from asyncpg import UniqueViolationError
 
 from Data.config import TIME_RANGE
 from utils.database_api.quick_commands import get_user, get_date_quality_from_user, set_date_quality_from_user, \
     update_date_quality, rebase_date_quality_from_user
-from utils.database_api.schemas.date_quality import DateQuality
+from utils.request_api.SMTP_controller import SMTPController
 
 
 class RequestController:
@@ -30,12 +29,9 @@ class RequestController:
     async def check_date_quality(self) -> dict:
         preview_date_quality_from_user = await get_date_quality_from_user(self.user_id)
         if preview_date_quality_from_user is None:
-            print("None preview")
             if await set_date_quality_from_user(user_id=self.user_id):
-                print(self.return_status_message("200-S"))
                 return self.return_status_message("200-S")
             else:
-                print(self.return_status_message("200-C"))
                 return self.return_status_message("500-C")
 
         time_now = datetime.now(tz=self.offset).strftime("%d %m %Y %H %M")
@@ -48,35 +44,40 @@ class RequestController:
         if preview_time["day"] != time_now_split["day"] \
                 or preview_time["month"] != time_now_split["month"] \
                 or preview_time["year"] != time_now_split["year"]:
-            print("Not d m Y")
             await update_date_quality(user_id=self.user_id, reset=True)
             return self.return_status_message("200-R")
 
         if time_now_split["minute"] > preview_time["minute"]:
-            print(f"time_now['minute']: {time_now_split['minute']} | prev_time['minute']: {preview_time['minute']}")
             if time_now_split["minute"] - preview_time["minute"] > 3:
-                print(">3")
                 await update_date_quality(user_id=self.user_id, reset=True)
                 return self.return_status_message("200-U")
             if not await update_date_quality(user_id=self.user_id):
                 """
                 Место под отправку письма на почту по причине Abuse.
                 """
-                print("Mailer")
+                user = await get_user(self.user_id)
+                smtp = SMTPController(
+                    fully_name=user.initials,
+                    group=user.group,
+                    date=f"{time_now_split['day']}.{time_now_split['month']}.{time_now_split['year']}",
+                    first_time=f"{preview_time['hour']}:{preview_time['minute']}",
+                    second_time=f"{time_now_split['hour']}:{time_now_split['minute']}",
+                    phone=user.phoneNumber,
+                    state_number=user.stateNumber,
+                    email=user.email
+                )
+                smtp.build_message()
+                smtp.send_message()
+
                 await rebase_date_quality_from_user(user_id=self.user_id)
-                return self.return_status_message("500-M")
-            print("IF IF Passed")
+                return self.return_status_message("200-M")
         elif time_now_split["minute"] < preview_time["minute"]:
-            print("Minute < prev")
             if time_now_split["hour"] - preview_time["hour"] > 1:
-                print("H > 1")
                 await update_date_quality(user_id=self.user_id, reset=True)
                 return self.return_status_message("200-R")
             if 60 - preview_time["minute"] + time_now_split["minute"] > 3:
-                print("60 - prev + Minute")
                 await update_date_quality(user_id=self.user_id, reset=True)
                 return self.return_status_message("200-R")
-            print("Minute <  else all")
             await update_date_quality(user_id=self.user_id)
             return self.return_status_message("200-U")
         await update_date_quality(user_id=self.user_id)
@@ -102,6 +103,11 @@ class RequestController:
                         return {
                             "status": 200,
                             "message": "Re-create to Date Quality tables"
+                        }
+                    case "M":
+                        return {
+                            "status": 200,
+                            "message": "Mail sent."
                         }
             case "400":
                 pass

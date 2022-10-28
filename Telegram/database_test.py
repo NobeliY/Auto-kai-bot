@@ -11,7 +11,7 @@ async def database_test():
     await database.gino.create_all()
 
     await commands.add_user(
-        id=834865678,
+        user_id=834865678,
         initials='Гильметдинов Инсаф Нафисович',
         email='nobeliylord@gmail.com',
         phone_number='+79083385215',
@@ -20,7 +20,7 @@ async def database_test():
         access='S'
     )
     await commands.add_user(
-        id=665722525,
+        user_id=665722525,
         initials='Астафьев Олег Валерьевич',
         email='nrd@gmail.com',
         phone_number='+79172993502',
@@ -29,13 +29,22 @@ async def database_test():
         access='T'
     )
     await commands.add_user(
-        id=541842024,
+        user_id=541842024,
         initials='Шигапов Руслан Ринатович',
         email='test@gmail.com',
         phone_number='+79172617052',
         group='кмт',
         state_number='В847КР|716',
         access='S'
+    )
+    await commands.add_user(
+        user_id=931611739,
+        initials='Мокшин Владимир Васильевич',
+        email='test@gmail.com',
+        phone_number='+79270322877',
+        group='Преподаватель',
+        state_number='В885ТЕ|716',
+        access='T'
     )
 
     await commands.add_application(user_id=2, fully_name='hi de', email='hi_de@er.er',

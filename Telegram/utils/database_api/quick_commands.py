@@ -11,7 +11,8 @@ from utils.database_api.schemas.user import User
 # TODO -------------- Application
 async def add_application(user_id: int, fully_name: str, email: str, group: str, state_number: str):
     try:
-        application = Application(id=user_id, fully_name=fully_name, email=email, group=group, state_number=state_number)
+        application = Application(id=user_id, fully_name=fully_name,
+                                  email=email, group=group, state_number=state_number)
         await application.create()
     except UniqueViolationError:
         print("Application not created!")
@@ -31,9 +32,10 @@ async def get_users_info(admin_id: int) -> User | None:
     return None
 
 
-async def add_user(id: int, initials: str, email: str, phone_number: str, group: str, state_number: str, access: str):
+async def add_user(user_id: int, initials: str, email: str,
+                   phone_number: str, group: str, state_number: str, access: str):
     try:
-        user = User(id=id, initials=initials, email=email, phoneNumber=phone_number, group=group,
+        user = User(id=user_id, initials=initials, email=email, phoneNumber=phone_number, group=group,
                     stateNumber=state_number, access=access)
         await user.create()
     except UniqueViolationError:
@@ -50,8 +52,7 @@ offset = timezone(timedelta(hours=3))
 
 
 async def get_date_quality_from_user(user_id: int):
-    date_quality = await DateQuality.query.where(DateQuality.id == user_id).gino.first()
-    return date_quality
+    return await DateQuality.query.where(DateQuality.id == user_id).gino.first()
 
 
 async def rebase_date_quality_from_user(user_id: int):
@@ -72,7 +73,7 @@ async def set_date_quality_from_user(user_id: int, count: int = 1) -> bool:
 
 async def update_date_quality(user_id: int, reset: bool = False) -> bool:
     preview_date_quality = await get_date_quality_from_user(user_id=user_id)
-    if preview_date_quality.count == 3 and not reset:
+    if preview_date_quality.count == 2 and not reset:
         return False
     if reset:
         await set_date_quality_from_user(user_id=user_id)
@@ -87,4 +88,3 @@ async def check_admin(admin_id: int) -> bool:
         return True if user.access == 'A' else False
     except AttributeError:
         return False
-

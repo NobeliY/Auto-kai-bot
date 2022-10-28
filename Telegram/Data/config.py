@@ -16,3 +16,9 @@ def get_postgres_uri():
 
 
 TIME_RANGE = [time(6, 0), time(23, 0)]
+
+SMTP_SERVER = os.getenv("EMAIL_SERVER")
+SMTP_PORT = os.getenv("EMAIL_PORT")
+SMTP_FROM_LOGIN = os.getenv("EMAIL_LOGIN")
+SMTP_FROM_PASSWORD = os.getenv("EMAIL_PASSWORD")
+SMTP_TO = os.getenv("EMAIL_TO")
