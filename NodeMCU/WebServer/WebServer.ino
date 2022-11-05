@@ -2,11 +2,13 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
-IPAddress ip( 192, 168, 2, 187 );
-IPAddress gateway( 192, 168, 2, 1 );
+IPAddress ip( 192, 168, 3, 187 );
+IPAddress gateway( 192, 168, 3, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
 
 #ifndef STASSID
+// #define STASSID "Zet_SH256_RTS_Wi-Fi5"
+// #define STAPSK "58469989"
 #define STASSID "ALF-KAI.RU"
 #define STAPSK "knitukai"
 #endif
@@ -50,8 +52,10 @@ void handlePostForm()
     digitalWrite(led, 1);
     
     Serial.println("ArgName: " + server.argName(1) + " | Arg: " + server.arg("secret_key"));
-    if (server.arg("secret_key").equals(security_key))
+    if (server.arg("secret_key").equals(security_key)) {
       server.send(200, "application/json", "{\"value\": \"1\"}");
+      OpenANMotors();
+    }
     else
       server.send(200, "application/json", "{\"value\": \"0\"}");
     digitalWrite(led, 0);

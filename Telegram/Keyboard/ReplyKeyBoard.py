@@ -57,7 +57,7 @@ admin_menu = ReplyKeyboardMarkup(
             KeyboardButton(text="Информация о себе"),
         ],
         [
-            KeyboardButton(text="Получить ключ")
+            KeyboardButton(text="Панель для администратора.")
         ],
         [
             KeyboardButton(text="Открыть 2 уровень"),

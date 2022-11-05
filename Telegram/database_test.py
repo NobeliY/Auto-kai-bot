@@ -17,7 +17,7 @@ async def database_test():
         phone_number='+79083385215',
         group='20-00',
         state_number='A363МА|116',
-        access='S'
+        access='A'
     )
     await commands.add_user(
         user_id=665722525,
@@ -47,14 +47,14 @@ async def database_test():
         access='T'
     )
 
-    await commands.add_application(user_id=2, fully_name='hi de', email='hi_de@er.er',
-                                   group='23222', state_number='a123aa|123')
-    await commands.add_application(user_id=3, fully_name='shi de', email='hi_de@easdr.er',
-                                   group='23222', state_number='a123ta|123')
-    await commands.add_application(user_id=4, fully_name='hasdi de', email='hiasd_de@er.er',
-                                   group='23222', state_number='a123sa|123')
-    await commands.add_application(user_id=5, fully_name='hi dade', email='hadi_de@er.er',
-                                   group='23222', state_number='a123wa|123')
+    await commands.add_application(user_id=2, initials='hi de', email='hi_de@er.er',
+                                   group='23222', phone_number="8989898989", state_number='a123aa|123')
+    await commands.add_application(user_id=3, initials='shi de', email='hi_de@easdr.er',
+                                   group='23222', phone_number="8989898989", state_number='a123ta|123')
+    await commands.add_application(user_id=4, initials='hasdi de', email='hiasd_de@er.er',
+                                   group='23222', phone_number="8989898989", state_number='a123sa|123')
+    await commands.add_application(user_id=5, initials='hi dade', email='hadi_de@er.er',
+                                   group='23222', phone_number="8989898989", state_number='a123wa|123')
 
     users = await commands.get_users_info(834865678)
     print(users)

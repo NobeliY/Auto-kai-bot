@@ -62,3 +62,7 @@ def return_user_checked(user_registered: bool) -> str:
     return f"Открыл!" if user_registered else f"Добро пожаловать! \n" \
                                               f"Вы <b>не зарегистрированы</b>." \
                                               f"Пожалуйста, отправьте заявку: <b>/application</b>."
+
+
+async def soon_info() -> str:
+    return "Эта функция скоро появится."
