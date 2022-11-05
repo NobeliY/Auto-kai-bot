@@ -2,11 +2,11 @@ import React, {useState, useEffect, useContext, createContext} from "react";
 import {useRouter} from "next/router";
 import cookie from 'cookie';
 
-const authContext = createContext();
+const authContext = createContext(null);
 
 export function ProvideAuth({ children }) {
     const auth = useProvideAuth();
-    return <authContext:Provider value={auth}>{children}</authContext:Provider>
+    return <authContext.Provider value={auth}>{children}</authContext.Provider>
 }
 export const useAuth = () =>  {
     return useContext(authContext);
