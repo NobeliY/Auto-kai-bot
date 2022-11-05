@@ -1,0 +1,14 @@
+#! /bin/bash
+
+whoami
+service postgres start
+adduser postgres
+adduser --quiet --disabled-password --shell /bin/bash --home /home/www --gecos "www" www
+echo "www:www" | chpasswd
+
+su - postgres <<EOF
+psql -U postgres -c "create database www;" 
+psql -U postgres -c "create user www with encrypted password 'www';"
+psql -U postgres -c "grant ALL ON DATABASE www to www;"
+EOF
+su - www
