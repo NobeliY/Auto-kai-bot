@@ -1,8 +1,8 @@
-
 from threading import Thread
 from time import sleep
 
-
+from Handler import soon_info
+from Keyboard.InlineKeyboard import main_admin_menu
 # TODO: Import a Custom Modules
 from app import dp
 from Handler.bot_default import return_user_checked, get_access_level, get_reply_keyboard
@@ -78,11 +78,13 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
                                      parse_mode=types.ParseMode.HTML, reply_markup=types.ReplyKeyboardRemove())
 
         case "Открыть 2 уровень":
-            access = await request_controller.check_user_on_database()
-            if access is not None and access in activate_on_level:
-                await message.answer(f"{return_user_checked(user_registered=True)} 2")
-            else:
-                await message.answer(return_user_checked(False))
+            await message.answer(await soon_info())
+            # access = await request_controller.check_user_on_database()
+            # if access is not None and access in activate_on_level:
+            #     await message.answer(f"{return_user_checked(user_registered=True)} 2")
+            # else:
+            #     await message.answer(return_user_checked(False))
+
         case "Информация о себе":
             user = await get_user(message.from_id)
             await message.answer(
@@ -95,8 +97,17 @@ async def keyboard_on_registered_users(message: types.Message, state: FSMContext
                 f"Уровень: <b>{get_access_level(user.access)}</b>\n",
                 parse_mode=types.ParseMode.HTML
             )
-            pass
+
         case "Свободные места":
-            pass
-        case "Получить ключ":
-            pass
+            await message.answer(await soon_info())
+
+        case "Панель для администратора.":
+            if not await get_admin_level(request_controller=request_controller):
+                return
+            user = await get_user(message.from_id)
+            await message.answer(f"Добро пожаловать, <b>{user.initials}</b>!",
+                                 parse_mode=types.ParseMode.HTML, reply_markup=main_admin_menu)
+
+
+async def get_admin_level(request_controller: RequestController):
+    return await request_controller.check_user_on_database() == 'A'

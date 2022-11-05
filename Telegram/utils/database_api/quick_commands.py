@@ -9,10 +9,11 @@ from utils.database_api.schemas.user import User
 
 
 # TODO -------------- Application
-async def add_application(user_id: int, fully_name: str, email: str, group: str, state_number: str):
+async def add_application(user_id: int, initials: str, email: str,
+                          phone_number: str, group: str, state_number: str):
     try:
-        application = Application(id=user_id, fully_name=fully_name,
-                                  email=email, group=group, state_number=state_number)
+        application = Application(id=user_id, initials=initials, email=email,
+                                  phoneNumber=phone_number, group=group, stateNumber=state_number)
         await application.create()
     except UniqueViolationError:
         print("Application not created!")
