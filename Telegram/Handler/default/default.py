@@ -3,8 +3,9 @@ from datetime import datetime
 from colorama import Fore
 
 from Data import admins
-from Keyboard import student_menu, teacher_menu, employee_menu, admin_menu
-from app import bot, dp
+from Keyboard.Reply import student_menu, teacher_menu, employee_menu, admin_menu
+from app import bot
+from app import dp
 from aiogram import types, Dispatcher
 import aiogram.utils.exceptions as exceptions
 
@@ -24,6 +25,8 @@ async def get_default_commands(dp: Dispatcher):
             types.BotCommand("help", "Инструкция по эксплуатации.")
         ]
     )
+    # from Handler import register_handlers
+    # register_handlers(dp)
     print(Fore.GREEN + f"{datetime.now()}: Бот запущен" + Fore.RESET)
 
     for admin_id in admins:
@@ -58,7 +61,7 @@ def get_reply_keyboard(access: str) -> types.ReplyKeyboardMarkup:
             return admin_menu
 
 
-def return_user_checked(user_registered: bool) -> str:
+def return_user_checked(user_registered: bool = True) -> str:
     return f"Открыл!" if user_registered else f"Добро пожаловать! \n" \
                                               f"Вы <b>не зарегистрированы</b>." \
                                               f"Пожалуйста, отправьте заявку: <b>/application</b>."

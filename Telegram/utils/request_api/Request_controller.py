@@ -6,7 +6,16 @@ from utils.database_api.quick_commands import get_user, get_date_quality_from_us
 from utils.request_api.SMTP_controller import SMTPController
 
 
-class RequestController:
+class Singleton(object):
+    _instances = {}
+
+    def __new__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = object.__new__(cls)
+        return cls._instances[cls]
+
+
+class RequestController(Singleton):
     activate_on_level: list[str] = ['S', 'I']
     offset = timezone(timedelta(hours=3))
 

@@ -2,8 +2,8 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
-IPAddress ip( 192, 168, 3, 187 );
-IPAddress gateway( 192, 168, 3, 1 );
+IPAddress ip( 192, 168, 2, 187 );
+IPAddress gateway( 192, 168, 2, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
 
 #ifndef STASSID
@@ -15,6 +15,9 @@ IPAddress subnet( 255, 255, 255, 0 );
 
 const char* ssid = STASSID;
 const char* password = STAPSK;
+
+
+const String security_key = "tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw";
 
 ESP8266WebServer server(80);
 
@@ -48,7 +51,6 @@ void handlePostForm()
   }
   else
   {
-    String security_key = "tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw";
     digitalWrite(led, 1);
     
     Serial.println("ArgName: " + server.argName(1) + " | Arg: " + server.arg("secret_key"));

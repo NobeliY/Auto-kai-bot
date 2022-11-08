@@ -14,7 +14,7 @@ from utils.database_api.quick_commands import add_application
 
 
 @dp.message_handler(Command("application"), state="*")
-async def application(message: types.Message, state: FSMContext):
+async def set_application(message: types.Message, state: FSMContext):
     await state.reset_state()
     await state.update_data(user_id=message.from_id)
     await message.answer(f"<b>Вы начали подачу заявления</b> \n"
@@ -73,7 +73,7 @@ async def application_submission_academy_group(message: types.Message, state: FS
 
 
 @dp.message_handler(state=ApplicationSubmission.user_state_number)
-async def application_submission_user_state_number(message: types.Message, state: FSMContext):
+async def application_submission_state_number(message: types.Message, state: FSMContext):
     state_regex_compiled = re.compile(r"\w\d{3}\w{2}\|\d")
     if re.search(state_regex_compiled, message.text.lower()):
         await state.update_data(user_state_number=message.text)

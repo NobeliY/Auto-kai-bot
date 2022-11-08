@@ -1,4 +1,6 @@
 from datetime import timezone, timedelta, datetime
+import re
+from typing import List
 
 from asyncpg import UniqueViolationError
 
@@ -31,6 +33,33 @@ async def get_users_info(admin_id: int) -> User | None:
     if await check_admin(admin_id=admin_id):
         return await User.query.gino.all()
     return None
+
+
+async def get_users_shortly_info(admin_id: int) -> str | None:
+    access = await check_admin(admin_id)
+    if access:
+        users = await get_users_info(admin_id)
+        filtered_users = await filter_users_shortly_info(users)
+        return f"Всего в БД: <b>{await database.func.count(User.id).gino.scalar()}</b>\n" \
+               f"Из них: \n" \
+               f"Студенты: <b>{filtered_users['Студенты']}</b>\n" \
+               f"Преподаватели: <b>{filtered_users['Преподаватели']}</>\n" \
+               f"Сотрудники: <b>{filtered_users['Сотрудники']}</b>"
+    return None
+
+
+async def filter_users_shortly_info(users: List[User]) -> dict:
+    return {
+        'Студенты': sum(
+            [1 if re.findall(r"\d-\d", user.group) else 0 for user in users]
+        ),
+        'Преподаватели': sum(
+            [1 if re.findall(r"Преподаватель", user.group) else 0 for user in users]
+        ),
+        'Сотрудники': sum(
+            [0 if re.findall(r"\d-\d", user.group) or re.findall(r"Преподаватель", user.group) else 1 for user in users]
+        )
+    }
 
 
 async def add_user(user_id: int, initials: str, email: str,
