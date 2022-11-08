@@ -6,3 +6,4 @@ class UserState(StatesGroup):
         Ветка пользователя
     """
     in_active = State()
+    is_admin = State()

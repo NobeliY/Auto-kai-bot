@@ -1,0 +1,6 @@
+from .application_command import set_application
+from .application_command import application_submission_initials
+from .application_command import application_submission_email
+from .application_command import application_submission_phone
+from .application_command import application_submission_academy_group
+from .application_command import application_submission_state_number
