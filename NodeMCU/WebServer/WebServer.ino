@@ -2,7 +2,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
-IPAddress ip( 192, 168, 2, 187 );
+IPAddress ip( 192, 168, 2, 206 );
 IPAddress gateway( 192, 168, 2, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
 
@@ -55,8 +55,9 @@ void handlePostForm()
     
     Serial.println("ArgName: " + server.argName(1) + " | Arg: " + server.arg("secret_key"));
     if (server.arg("secret_key").equals(security_key)) {
-      server.send(200, "application/json", "{\"value\": \"1\"}");
       OpenANMotors();
+      server.send(200, "application/json", "{\"value\": \"1\"}");
+      
     }
     else
       server.send(200, "application/json", "{\"value\": \"0\"}");
@@ -102,11 +103,15 @@ void SendANMotors(long c1, long c2)
     delayMicroseconds(Pe * 10);
     // отправляем первую половину
     for (int i = 4 * 8; i > 0; i--) {
+      digitalWrite(led, HIGH);
       SendBit(bitRead(c1, i - 1));
+      digitalWrite(led, LOW);
     }
     // вторую половину
     for (int i = 4 * 8; i > 0; i--) {
+      digitalWrite(led, HIGH);
       SendBit(bitRead(c2, i - 1));
+      digitalWrite(led, LOW);
     }
     // и еще пару ненужных бит, которые означают батарейку и флаг повтора
     SendBit(1);
@@ -132,7 +137,8 @@ void setup()
   WiFi.config(ip, gateway, subnet);
   Serial.println("Connecting to WiFi");
 
-  while(WiFi.status() != WL_CONNECTED)
+  // while(WiFi.status() != WL_CONNECTED)
+  while (WiFi.isConnected())
   {
     delay(500);
     Serial.print(".");
