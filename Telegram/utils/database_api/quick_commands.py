@@ -62,6 +62,32 @@ async def filter_users_shortly_info(users: List[User]) -> dict:
     }
 
 
+async def delete_user_by_initials_command(initials):
+    try:
+        user = await User.query.where(User.initials == initials).gino.first()
+        print(f"Id: {user.id} | INIT: {user.initials} | group: {user.group}")
+        await user.delete()
+        return True
+    except AttributeError:
+        print("Not finded user with initials")
+        return None
+
+
+async def delete_users_by_group(group: str):
+
+    try:
+        users = await User.query.where(User.group == group).gino.all()
+        print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
+        [await user.delete() for user in users]
+        return True
+    except AttributeError as e_:
+        print(f"Nothing delete. Err: {e_}")
+        return None
+    except TypeError:
+        print("TYPE Err")
+        return None
+
+
 async def add_user(user_id: int, initials: str, email: str,
                    phone_number: str, group: str, state_number: str, access: str):
     try:

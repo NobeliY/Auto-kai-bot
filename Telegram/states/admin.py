@@ -7,6 +7,7 @@ class Admin(StatesGroup):
     """
     main_state = State()
     show_db_state = State()
+    show_fully_state = State()
 
     add_menu_state = State()
     auto_add_state = State()

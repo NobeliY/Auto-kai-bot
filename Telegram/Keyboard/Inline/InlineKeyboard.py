@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from states import Admin
 
 main_admin_menu = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -58,7 +57,15 @@ show_db_menu = InlineKeyboardMarkup(
             InlineKeyboardButton("Подробнее", callback_data="show_fully_information_from_db"),
         ],
         [
-            InlineKeyboardButton("Назад", callback_data="preview_step"),
+            InlineKeyboardButton("Назад", callback_data='preview_step'),
+        ],
+    ]
+)
+
+back_inline_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Назад", callback_data='preview_step'),
         ],
     ]
 )
