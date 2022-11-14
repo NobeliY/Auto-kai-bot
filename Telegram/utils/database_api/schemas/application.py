@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, String, sql
+from sqlalchemy import BigInteger, Column, String, select
 
 from utils.database_api.database_gino import TimeDatabaseModel
 
@@ -12,4 +12,4 @@ class Application(TimeDatabaseModel):
     group = Column(String, primary_key=True)
     stateNumber = Column(String, primary_key=True)
 
-    query: sql.insert
+    query: select

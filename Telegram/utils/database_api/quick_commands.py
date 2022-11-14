@@ -3,6 +3,7 @@ import re
 from typing import List
 
 from asyncpg import UniqueViolationError
+from overrides import override
 
 from utils.database_api.database_gino import database
 from utils.database_api.schemas.application import Application
@@ -21,11 +22,30 @@ async def add_application(user_id: int, initials: str, email: str,
         print("Application not created!")
 
 
+async def add_ready_application(application: Application):
+    try:
+        await application.create()
+    except UniqueViolationError:
+        print("Application not created!")
+
+
 async def get_count_of_applications(admin_id: int) -> int | None:
     if await check_admin(admin_id=admin_id):
         applications_count = await database.func.count(Application.id).gino.scalar()
         return applications_count
     return None
+
+
+async def get_application(admin_id: int) -> Application | None:
+    return await Application.query.gino.first() if await check_admin(admin_id) else None
+
+
+async def get_all_applications(admin_id: int) -> List[Application] | None:
+    return await Application.query.gino.all() if await check_admin(admin_id) else None
+
+
+async def drop_application(application: Application) -> bool:
+    return await application.delete()
 
 
 # TODO -------------- User
@@ -62,30 +82,21 @@ async def filter_users_shortly_info(users: List[User]) -> dict:
     }
 
 
-async def delete_user_by_initials_command(initials):
-    try:
-        user = await User.query.where(User.initials == initials).gino.first()
-        print(f"Id: {user.id} | INIT: {user.initials} | group: {user.group}")
-        await user.delete()
-        return True
-    except AttributeError:
-        print("Not finded user with initials")
-        return None
+async def get_users_by_initials(initials):
+    return await User.query.where(User.initials.like(f"%{initials}%")).gino.all()
 
 
-async def delete_users_by_group(group: str):
+async def delete_user_by_initials_command(user: User):
+    await user.delete()
 
-    try:
-        users = await User.query.where(User.group == group).gino.all()
-        print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
-        [await user.delete() for user in users]
-        return True
-    except AttributeError as e_:
-        print(f"Nothing delete. Err: {e_}")
-        return None
-    except TypeError:
-        print("TYPE Err")
-        return None
+
+async def get_users_by_group(group: str) -> List[User] | None:
+    return await User.query.where(User.group == group).gino.all()
+
+
+async def delete_users_by_group(users: List[User]):
+    print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
+    [await user.delete() for user in users]
 
 
 async def add_user(user_id: int, initials: str, email: str,

@@ -1,4 +1,5 @@
 import asyncio
+import json
 import re
 
 from Data import POSTGRES_URL
@@ -29,24 +30,24 @@ async def database_test():
         state_number='А123АА|116',
         access='A'
     )
-    await commands.add_user(
-        user_id=541842024,
-        initials='Шигапов Руслан Ринатович',
-        email='test@gmail.com',
-        phone_number='+79172617052',
-        group='кмт',
-        state_number='В847КР|716',
-        access='S'
-    )
-    await commands.add_user(
-        user_id=931611739,
-        initials='Мокшин Владимир Васильевич',
-        email='test@gmail.com',
-        phone_number='+79270322877',
-        group='Преподаватель',
-        state_number='В885ТЕ|716',
-        access='T'
-    )
+    # await commands.add_user(
+    #     user_id=541842024,
+    #     initials='Шигапов Руслан Ринатович',
+    #     email='test@gmail.com',
+    #     phone_number='+79172617052',
+    #     group='кмт',
+    #     state_number='В847КР|716',
+    #     access='S'
+    # )
+    # await commands.add_user(
+    #     user_id=931611739,
+    #     initials='Мокшин Владимир Васильевич',
+    #     email='test@gmail.com',
+    #     phone_number='+79270322877',
+    #     group='Преподаватель',
+    #     state_number='В885ТЕ|716',
+    #     access='T'
+    # )
 
     await commands.add_application(user_id=2, initials='hi de', email='hi_de@er.er',
                                    group='232-22', phone_number="8989898989", state_number='a123aa|123')
@@ -65,6 +66,23 @@ async def database_test():
     print("Applications test")
     applications = await commands.get_count_of_applications(834865678)
     print(applications)
+
+    with open("Data/Refactored_DB.json", "r") as file:
+        json_dict = json.load(file)
+        for access_level, user_list in json_dict.items():
+            for user in user_list:
+                await commands.add_user(
+                    user_id=int(user['user_id']),
+                    initials=user['initials'],
+                    phone_number=user['phone_number'],
+                    group=user['group'],
+                    state_number=user['state_number'],
+
+                    access='S' if access_level == 'Студент'
+                    else 'T' if access_level == 'Преподаватель'
+                    else 'E',
+                    email=""
+                )
 
 
 loop = asyncio.get_event_loop().run_until_complete(database_test())
