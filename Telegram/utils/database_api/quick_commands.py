@@ -1,4 +1,9 @@
+from datetime import timezone, timedelta, datetime
+import re
+from typing import List
+
 from asyncpg import UniqueViolationError
+from overrides import override
 
 from utils.database_api.database_gino import database
 from utils.database_api.schemas.application import Application
@@ -7,9 +12,18 @@ from utils.database_api.schemas.user import User
 
 
 # TODO -------------- Application
-async def add_application(user_id: int, fully_name: str, email: str, group: str, state_number: str):
+async def add_application(user_id: int, initials: str, email: str,
+                          phone_number: str, group: str, state_number: str):
     try:
-        application = Application(id=user_id, fully_name=fully_name, email=email, group=group, state_number=state_number)
+        application = Application(id=user_id, initials=initials, email=email,
+                                  phoneNumber=phone_number, group=group, stateNumber=state_number)
+        await application.create()
+    except UniqueViolationError:
+        print("Application not created!")
+
+
+async def add_ready_application(application: Application):
+    try:
         await application.create()
     except UniqueViolationError:
         print("Application not created!")
@@ -22,6 +36,18 @@ async def get_count_of_applications(admin_id: int) -> int | None:
     return None
 
 
+async def get_application(admin_id: int) -> Application | None:
+    return await Application.query.gino.first() if await check_admin(admin_id) else None
+
+
+async def get_all_applications(admin_id: int) -> List[Application] | None:
+    return await Application.query.gino.all() if await check_admin(admin_id) else None
+
+
+async def drop_application(application: Application) -> bool:
+    return await application.delete()
+
+
 # TODO -------------- User
 async def get_users_info(admin_id: int) -> User | None:
     if await check_admin(admin_id=admin_id):
@@ -29,9 +55,54 @@ async def get_users_info(admin_id: int) -> User | None:
     return None
 
 
-async def add_user(id: int, initials: str, email: str, phone_number: str, group: str, state_number: str, access: str):
+async def get_users_shortly_info(admin_id: int) -> str | None:
+    access = await check_admin(admin_id)
+    if access:
+        users = await get_users_info(admin_id)
+        filtered_users = await filter_users_shortly_info(users)
+        return f"Всего в БД: <b>{await database.func.count(User.id).gino.scalar()}</b>\n" \
+               f"Из них: \n" \
+               f"Студенты: <b>{filtered_users['Студенты']}</b>\n" \
+               f"Преподаватели: <b>{filtered_users['Преподаватели']}</>\n" \
+               f"Сотрудники: <b>{filtered_users['Сотрудники']}</b>"
+    return None
+
+
+async def filter_users_shortly_info(users: List[User]) -> dict:
+    return {
+        'Студенты': sum(
+            [1 if re.findall(r"\d-\d", user.group) else 0 for user in users]
+        ),
+        'Преподаватели': sum(
+            [1 if re.findall(r"Преподаватель", user.group) else 0 for user in users]
+        ),
+        'Сотрудники': sum(
+            [0 if re.findall(r"\d-\d", user.group) or re.findall(r"Преподаватель", user.group) else 1 for user in users]
+        )
+    }
+
+
+async def get_users_by_initials(initials):
+    return await User.query.where(User.initials.like(f"%{initials}%")).gino.all()
+
+
+async def delete_user_by_initials_command(user: User):
+    await user.delete()
+
+
+async def get_users_by_group(group: str) -> List[User] | None:
+    return await User.query.where(User.group == group).gino.all()
+
+
+async def delete_users_by_group(users: List[User]):
+    print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
+    [await user.delete() for user in users]
+
+
+async def add_user(user_id: int, initials: str, email: str,
+                   phone_number: str, group: str, state_number: str, access: str):
     try:
-        user = User(id=id, initials=initials, email=email, phoneNumber=phone_number, group=group,
+        user = User(id=user_id, initials=initials, email=email, phoneNumber=phone_number, group=group,
                     stateNumber=state_number, access=access)
         await user.create()
     except UniqueViolationError:
@@ -44,26 +115,36 @@ async def get_user(user_id: int) -> User | None:
 
 
 # TODO -------------- Date Quality
-async def get_date_quality_from_user(user_id: int) -> DateQuality | None:
+offset = timezone(timedelta(hours=3))
+
+
+async def get_date_quality_from_user(user_id: int):
     return await DateQuality.query.where(DateQuality.id == user_id).gino.first()
 
 
-async def set_date_quality_from_user(user_id: int, count: int) -> bool | dict:
+async def rebase_date_quality_from_user(user_id: int):
+    date_quality = await get_date_quality_from_user(user_id=user_id)
+    await date_quality.delete()
+    return True
+
+
+async def set_date_quality_from_user(user_id: int, count: int = 1) -> bool:
     try:
-        date_quality = DateQuality(id=user_id, count=count)
+        time_now = datetime.now(tz=offset).strftime("%d %m %Y %H %M")
+        date_quality = DateQuality(id=user_id, times=time_now, count=count)
         await date_quality.create()
         return True
     except UniqueViolationError:
-        dict_error = {
-            'error': 500,
-        }
-        return dict_error
-
-
-async def update_date_quality(user_id: int) -> bool:
-    preview_date_quality = await get_date_quality_from_user(user_id=user_id)
-    if preview_date_quality.count == 3:
         return False
+
+
+async def update_date_quality(user_id: int, reset: bool = False) -> bool:
+    preview_date_quality = await get_date_quality_from_user(user_id=user_id)
+    if preview_date_quality.count == 2 and not reset:
+        return False
+    if reset:
+        await set_date_quality_from_user(user_id=user_id)
+        return True
     await preview_date_quality.update(count=preview_date_quality.count + 1).apply()
     return True
 
@@ -74,4 +155,3 @@ async def check_admin(admin_id: int) -> bool:
         return True if user.access == 'A' else False
     except AttributeError:
         return False
-
