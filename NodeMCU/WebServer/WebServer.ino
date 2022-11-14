@@ -45,14 +45,11 @@ void handlePostForm()
 {
   if (server.method() != HTTP_POST)
   {
-    digitalWrite(led, 1);
     server.send(405, "text/plain", "Method Not Allowed");
-    digitalWrite(led, 0);  
   }
   else
   {
     digitalWrite(led, 1);
-    
     Serial.println("ArgName: " + server.argName(1) + " | Arg: " + server.arg("secret_key"));
     if (server.arg("secret_key").equals(security_key)) {
       OpenANMotors();
@@ -67,9 +64,7 @@ void handlePostForm()
 
 void handleRoot()
 {
-  digitalWrite(led, 1);
   server.send(200, "text/html", postForms);
-  digitalWrite(led, 0);
 }
 
 // Transmitter Codes
@@ -138,7 +133,7 @@ void setup()
   Serial.println("Connecting to WiFi");
 
   // while(WiFi.status() != WL_CONNECTED)
-  while (WiFi.isConnected())
+  while (!WiFi.isConnected())
   {
     delay(500);
     Serial.print(".");
