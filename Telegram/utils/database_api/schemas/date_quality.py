@@ -1,12 +1,12 @@
-from sqlalchemy import Column, BigInteger, ForeignKey, TIMESTAMP, Integer, sql
+from sqlalchemy import Column, BigInteger, ForeignKey, Integer, sql, String
 
-from utils.database_api.database_gino import TimeDatabaseModel
+from utils.database_api.database_gino import BaseModel
 
 
-class DateQuality(TimeDatabaseModel):
+class DateQuality(BaseModel):
     __tablename__ = 'date_quality'
-    id = Column(BigInteger, ForeignKey('users.id'))
-    times = Column(TIMESTAMP)
-    count = Column(Integer)
+    id = Column(BigInteger, ForeignKey('users.id'), primary_key=True)
+    times = Column(String, primary_key=True)
+    count = Column(Integer, primary_key=True)
 
     query: sql.select
