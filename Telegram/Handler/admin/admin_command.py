@@ -1,8 +1,9 @@
+import csv
 from typing import List
 
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import CallbackQuery, Message, ParseMode
+from aiogram.types import CallbackQuery, Message, ParseMode, InputFile
 
 from Handler.default import get_admin_level, get_access_level
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
@@ -65,21 +66,34 @@ async def show_applications(query: CallbackQuery, state: FSMContext):
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admin.show_fully_state)
     users: List[User] = await get_users_info(query.message.chat.id)
-    fully_info__list: List[str] = [
-        f"Информация о пользователе! \n"
-        f"Telegram ID: <b>{user.id}</b>\n"
-        f"ФИО: <b>{user.initials}</b>\n"
-        f"Почта: <b>{user.email}</b>\n"
-        f"Номер телефона: <b>{user.phoneNumber}</b>\n"
-        f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
-        f"Уровень: <b>{get_access_level(user.access)}</b>\n" for user in users
+    fully_info_csv: List[List[str]] = [
+        [
+            "Telegram ID",
+            "ФИО",
+            "Почта",
+            "Группа",
+            "Номер телефона",
+            "Гос. номер используемого транспорта",
+            "Уровень"
+        ]
     ]
-    [
-        await query.message.answer(info_str, parse_mode=ParseMode.HTML, reply_markup=back_inline_menu)
-        if info_str == fully_info__list[-1]
-        else await query.message.answer(info_str, parse_mode=ParseMode.HTML)
-        for info_str in fully_info__list
-    ]
+    for user in users:
+        fully_info_csv.append([
+                str(user.id),
+                user.initials,
+                user.email,
+                user.group,
+                user.phoneNumber,
+                user.stateNumber,
+                get_access_level(user.access)
+            ])
+
+    with open('Data/users.csv', 'w', encoding='utf-8', newline='') as file:
+        csv_file = csv.writer(file)
+        csv_file.writerows(fully_info_csv)
+    await query.message.delete()
+    await query.message.answer_document(InputFile('Data/users.csv'),
+                                        reply_markup=back_inline_menu)
 
 
 @dp.callback_query_handler(Text(equals="preview_step"),
