@@ -27,7 +27,6 @@ async def delete_user_by_initials(query: CallbackQuery, state: FSMContext):
                     state=Admin.searched_user_delete_state)
 async def delete_user_by_initials_searched(message: Message, state: FSMContext):
     users = await get_users_by_initials(initials=message.text)
-    print(users)
     if not users:
         await message.answer("Нет пользователя с такими ФИО.", reply_markup=back_inline_menu)
         return

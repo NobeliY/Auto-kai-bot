@@ -15,7 +15,7 @@ export EMAIL_PORT=25
 export SMTP_TO="it@alf-kai.ru"
 
 
-export REQUEST_ESP="http://192.168.3.168
+export REQUEST_ESP="http://192.168.3.168/postform/
 tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw
 test"
 #export REQUEST_ESP_URI="http://192.168.3.168"
