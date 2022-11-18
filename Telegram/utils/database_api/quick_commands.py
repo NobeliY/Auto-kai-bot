@@ -3,7 +3,6 @@ import re
 from typing import List
 
 from asyncpg import UniqueViolationError
-from overrides import override
 
 from utils.database_api.database_gino import database
 from utils.database_api.schemas.application import Application
@@ -115,7 +114,7 @@ async def get_user(user_id: int) -> User | None:
 
 
 # TODO -------------- Date Quality
-offset = timezone(timedelta(hours=3))
+_offset = timezone(timedelta(hours=3))
 
 
 async def get_date_quality_from_user(user_id: int):
@@ -130,7 +129,7 @@ async def rebase_date_quality_from_user(user_id: int):
 
 async def set_date_quality_from_user(user_id: int, count: int = 1) -> bool:
     try:
-        time_now = datetime.now(tz=offset).strftime("%d %m %Y %H %M")
+        time_now = datetime.now(tz=_offset).strftime("%d %m %Y %H %M")
         date_quality = DateQuality(id=user_id, times=time_now, count=count)
         await date_quality.create()
         return True
