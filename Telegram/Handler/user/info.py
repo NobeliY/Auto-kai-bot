@@ -12,7 +12,6 @@ from utils.database_api.quick_commands import get_user
 @dp.message_handler(Text(equals="Информация о себе", ignore_case=True),
                     state=Admin.all_states)
 async def get_user_info(message: Message):
-    print("touched user info")
     user = await get_user(message.from_id)
     await message.answer(
         f"Информация о Вас! \n"

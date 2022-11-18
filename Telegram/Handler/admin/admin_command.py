@@ -122,13 +122,6 @@ async def preview_step(query: CallbackQuery, state: FSMContext):
     if state_level in _state_list['main']:
         await return_call_admin_panel(query=query, state=state)
     elif state_level in _state_list['add_menu']:
-        application_response_dict = await state.get_data()
-        print(application_response_dict)
-        # if application_response_dict:
-        #     await query.message.edit_text(await build_application_info(application=application_response_dict['data']),
-        #                                   parse_mode=ParseMode.HTML,
-        #                                   reply_markup=application_change_menu)
-        #     return
         await set_add_menu(query, state)
     elif state_level in _state_list['delete_menu']:
         await set_remove_menu(query, state)

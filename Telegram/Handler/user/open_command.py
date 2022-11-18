@@ -50,7 +50,6 @@ async def open_from_all_registered_users(message: Message):
                     state=Admin.all_states)
 async def open_first_level_from_employee(message: Message):
     request_controller = RequestController(message.from_id)
-    print(request_controller)
     access = await request_controller.check_user_on_database()
     if access is None or access not in activate_on_level:
         return
