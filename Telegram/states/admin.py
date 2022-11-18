@@ -19,3 +19,13 @@ class Admin(StatesGroup):
 
     show_applications_state = State()
     all_applications_state = State()
+
+
+class ManualAdd(StatesGroup):
+    id = State()
+    initials = State()
+    email = State()
+    phone_number = State()
+    academy_group = State()
+    state_number = State()
+

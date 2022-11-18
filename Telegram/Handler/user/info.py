@@ -1,16 +1,17 @@
-from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, ParseMode
 
 from Handler.default import get_access_level, soon_info
 from app import dp
-from states import UserState
+from states import UserState, Admin
 from utils.database_api.quick_commands import get_user
 
 
-@dp.message_handler(Text(equals="информация о себе", ignore_case=True),
+@dp.message_handler(Text(equals="Информация о себе", ignore_case=True),
                     state=UserState.all_states)
-async def get_user_info(message: Message, state: FSMContext):
+@dp.message_handler(Text(equals="Информация о себе", ignore_case=True),
+                    state=Admin.all_states)
+async def get_user_info(message: Message):
     print("touched user info")
     user = await get_user(message.from_id)
     await message.answer(
@@ -23,9 +24,13 @@ async def get_user_info(message: Message, state: FSMContext):
         f"Уровень: <b>{get_access_level(user.access)}</b>\n",
         parse_mode=ParseMode.HTML
     )
+    await message.delete()
 
 
 @dp.message_handler(Text(equals="свободные места", ignore_case=True),
                     state=UserState.all_states)
-async def get_free_positions(message: Message, state: FSMContext):
+@dp.message_handler(Text(equals="свободные места", ignore_case=True),
+                    state=Admin.all_states)
+async def get_free_positions(message: Message):
     await message.answer(await soon_info())
+    await message.delete()
