@@ -29,7 +29,7 @@ async def application_submission_initials(message: types.Message, state: FSMCont
         await state.finish()
         await Handler.start(message, state)
     else:
-        await state.update_data(user_initals=message.text)
+        await state.update_data(user_initials=message.text)
         await message.answer("<b>Введите E-mail: </b>",
                              parse_mode=types.ParseMode.HTML)
         await ApplicationSubmission.user_email.set()
@@ -82,7 +82,7 @@ async def application_submission_state_number(message: types.Message, state: FSM
             user_id=user_application['user_id'],
             initials=user_application['user_initials'],
             email=user_application['user_email'],
-            phone_number=user_application['phone_number'],
+            phone_number=user_application['user_phone_number'],
             group=user_application['user_academy_group'],
             state_number=user_application['user_state_number'],
 
