@@ -8,6 +8,7 @@ from Handler.default import return_user_checked, soon_info
 from app import dp
 from states import UserState, Admin
 from utils.request_api.Request_controller import RequestController
+from utils.request_api.request_to_ESP import send_first_level
 
 activate_on_level = ['E', 'A']
 
@@ -32,7 +33,12 @@ async def open_from_all_registered_users(message: Message):
     if access is not None:
         if await request_controller.check_time(access):
             await request_controller.check_date_quality()
-            await message.answer(return_user_checked())
+            request_data = await send_first_level(message.from_id)
+            try:
+                if request_data['value']:
+                    await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
+            except KeyError:
+                print("KeyError with request 1 level. (S|I|T)")
 
             opened_loop = Thread(target=user_opened_task)
             opened_loop.start()
@@ -55,7 +61,13 @@ async def open_first_level_from_employee(message: Message):
         return
     await request_controller.check_date_quality()
 
-    await message.answer(return_user_checked())
+    request_data = await send_first_level(message.from_id)
+    try:
+        if request_data['value']:
+            await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
+    except KeyError:
+        print("KeyError with request 1 level. (E|A)")
+
     await message.delete()
 
 

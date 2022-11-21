@@ -7,15 +7,27 @@ from aiogram.utils.exceptions import MessageNotModified
 from asyncpg import UniqueViolationError
 
 from Handler.admin.admin_command import preview_step
-from Keyboard.Inline import back_inline_menu, add_by_applications_menu, application_change_menu, \
-    application_or_manual_submit_menu, application_reject_menu, application_approve_level_menu, manual_add_menu, \
+from Keyboard.Inline import (
+    back_inline_menu,
+    add_by_applications_menu,
+    application_change_menu,
+    application_or_manual_submit_menu,
+    application_reject_menu,
+    application_approve_level_menu,
+    manual_add_menu,
     cancel_manual_add_menu
+)
 from Keyboard.Inline.InlineKeyboard import manual_approve_menu
 from app import dp, bot
 from states import Admin
 from states.admin import ManualAdd
-from utils.database_api.quick_commands import get_count_of_applications, get_all_applications, drop_application, \
-    add_ready_application, add_user
+from utils.database_api.quick_commands import (
+    get_count_of_applications,
+    get_all_applications,
+    drop_application,
+    add_ready_application,
+    add_user
+)
 from utils.database_api.schemas.application import Application
 
 _application_list_ = []

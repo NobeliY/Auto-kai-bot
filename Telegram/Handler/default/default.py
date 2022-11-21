@@ -22,7 +22,7 @@ async def get_default_commands(dp: Dispatcher):
         [
             types.BotCommand("start", "Начало Работы / Обновить бота."),
             types.BotCommand("application", "Заявление."),
-            types.BotCommand("help", "Инструкция по эксплуатации.")
+            types.BotCommand("help", "Инструкция по эксплуатации. 🧐")
         ]
     )
     # from Handler import register_handlers
