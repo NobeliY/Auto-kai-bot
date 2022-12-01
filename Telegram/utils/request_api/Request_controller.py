@@ -1,8 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 from Data.config import TIME_RANGE
-from utils.database_api.quick_commands import get_user, get_date_quality_from_user, set_date_quality_from_user, \
-    update_date_quality, rebase_date_quality_from_user
+from utils.database_api.quick_commands import (
+    get_user,
+    get_date_quality_from_user,
+    set_date_quality_from_user,
+    update_date_quality,
+    rebase_date_quality_from_user
+)
 from utils.request_api.SMTP_controller import SMTPController
 
 

@@ -4,7 +4,7 @@ from aiogram.types import Message, ParseMode
 from app import dp
 
 
-@dp.message_handler(Command('help'))
+@dp.message_handler(Command('help'), state='*')
 async def send_help_fork(message: Message):
     await message.answer("👋 Вас приветствует бот для <b>АФ \"КНИТУ-КАИ\"</b>,"
                          "предназначенный для автоматизации въезда и выезда с автомобильной парковки.\n"

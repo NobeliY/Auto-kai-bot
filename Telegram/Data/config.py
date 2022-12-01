@@ -1,5 +1,6 @@
 import os
 from datetime import time
+from pathlib import Path
 
 admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID').split(' ')]
 
@@ -22,3 +23,5 @@ SMTP_PORT = os.getenv("EMAIL_PORT")
 SMTP_FROM_LOGIN = os.getenv("EMAIL_LOGIN")
 SMTP_FROM_PASSWORD = os.getenv("EMAIL_PASSWORD")
 SMTP_TO = os.getenv("EMAIL_TO")
+
+USER_CSV_PATH = Path('Data/users.csv')
