@@ -2,7 +2,7 @@ from datetime import timezone, timedelta, datetime
 import re
 from typing import List
 
-from asyncpg import UniqueViolationError
+from asyncpg import UniqueViolationError, ForeignKeyViolationError
 
 from utils.database_api.database_gino import database
 from utils.database_api.schemas.application import Application
@@ -94,8 +94,12 @@ async def get_users_by_group(group: str) -> List[User] | None:
 
 
 async def delete_users_by_group(users: List[User]):
-    print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
-    [await user.delete() for user in users]
+
+    for user in users:
+        try:
+            await user.delete()
+        except ForeignKeyViolationError as foreignKeyViolationEr:
+            await user.foreigns.delete()
 
 
 async def add_user(user_id: int, initials: str, email: str,

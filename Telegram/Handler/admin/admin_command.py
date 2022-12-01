@@ -5,10 +5,12 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import CallbackQuery, Message, ParseMode, InputFile
 
+from app import dp
+from Data.config import USER_CSV_PATH
 from Handler.default import get_admin_level, get_access_level
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
 from Keyboard.Inline.InlineKeyboard import delete_menu, show_db_menu
-from app import dp
+
 from states import UserState, Admin
 from utils.database_api.quick_commands import get_user, get_users_shortly_info, get_users_info
 from utils.database_api.schemas.application import Application
@@ -88,11 +90,11 @@ async def show_fully_information(query: CallbackQuery, state: FSMContext):
                 get_access_level(user.access)
             ])
 
-    with open('Data/users.csv', 'w', encoding='utf-8', newline='') as file:
+    with open(USER_CSV_PATH, 'w', encoding='utf-8', newline='') as file:
         csv_file = csv.writer(file)
         csv_file.writerows(fully_info_csv)
     await query.message.delete()
-    await query.message.answer_document(InputFile('Data/users.csv'),
+    await query.message.answer_document(InputFile(USER_CSV_PATH),
                                         reply_markup=back_inline_menu)
 
 
