@@ -2,6 +2,8 @@ import os
 from datetime import time
 from pathlib import Path
 
+from states import UserState, Admins
+
 admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID').split(' ')]
 
 PG_HOST = os.getenv('PG_HOST')
@@ -25,3 +27,5 @@ SMTP_FROM_PASSWORD = os.getenv("EMAIL_PASSWORD")
 SMTP_TO = os.getenv("EMAIL_TO")
 
 USER_CSV_PATH = Path('Data/users.csv')
+
+__all_states__ = UserState.all_states + Admins.all_states

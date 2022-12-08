@@ -28,12 +28,12 @@ async def send_request_from_esp(post_json_data: dict) -> dict:
             async with session.post(url=request_uri, data=post_json_data) as response:
                 return await response.json()
     except ClientConnectionError as client_connection_error:
-        print(client_connection_error)
+        print(f"User: {post_json_data['user_id']} | {client_connection_error}")
         return {
             'value': 0,
         }
     except ServerTimeoutError as server_error:
-        print(server_error)
+        print(f"User: {post_json_data['user_id']} | {server_error}")
         return {
             'value': 0,
         }

@@ -17,10 +17,10 @@ from Keyboard.Inline import (
     manual_add_menu,
     cancel_manual_add_menu
 )
-from Keyboard.Inline.InlineKeyboard import manual_approve_menu
+from Keyboard.Inline import manual_approve_menu
 from app import dp, bot
-from states import Admin
-from states.admin import ManualAdd
+from states import Admins
+from states.admins import ManualAdd
 from utils.database_api.quick_commands import (
     get_count_of_applications,
     get_all_applications,
@@ -44,9 +44,9 @@ _manual_user_access_level_dict = {
 
 
 @dp.callback_query_handler(Text(equals="auto_add_by_application"),
-                           state=Admin.add_menu_state)
+                           state=Admins.add_menu_state)
 async def auto_add_by_application(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.auto_add_state)
+    await state.set_state(Admins.auto_add_state)
     count = await get_count_of_applications(query.message.chat.id)
     if not count:
         await query.message.edit_text("Нет заявок!",
@@ -59,7 +59,7 @@ async def auto_add_by_application(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="start_from_begin"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def get_application_from_begin(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
     global _application_list_
     if not _application_list_:
@@ -76,7 +76,7 @@ async def get_application_from_begin(query: CallbackQuery, state: FSMContext, ed
 
 
 @dp.callback_query_handler(Text(equals="next_application"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def next_application(query: CallbackQuery, state: FSMContext):
     application_obj = await state.get_data()
     if application_obj['reversed']:
@@ -88,13 +88,13 @@ async def next_application(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="approve_application"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_application(query: CallbackQuery):
     await query.message.edit_reply_markup(application_or_manual_submit_menu)
 
 
 @dp.callback_query_handler(Text(equals="submit_reject_application"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def submit_reject_application(query: CallbackQuery, state: FSMContext):
     application_response_dict = await state.get_data()
     await query.message.edit_text(f"Вы уверены, что хотите отклонить заявку:\n"
@@ -104,7 +104,7 @@ async def submit_reject_application(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="reject_application"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def reject_application(query: CallbackQuery, state: FSMContext):
     application_response_dict = await state.get_data()
     if await drop_application(application_response_dict['data']):
@@ -127,7 +127,7 @@ async def reject_application(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="start_from_end"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
     global _reversed_application_list_
     if not _reversed_application_list_:
@@ -170,7 +170,7 @@ async def insert_elem_from_application_list_(elem: Application):
 
 
 @dp.callback_query_handler(Text(equals="student"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state, level='S'),
                                   parse_mode=ParseMode.HTML,
@@ -178,7 +178,7 @@ async def approve_student_level_from_application(query: CallbackQuery, state: FS
 
 
 @dp.callback_query_handler(Text(equals="student_plus"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state, level='I'),
                                   parse_mode=ParseMode.HTML,
@@ -186,7 +186,7 @@ async def approve_student_level_from_application(query: CallbackQuery, state: FS
 
 
 @dp.callback_query_handler(Text(equals="teacher"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state, level='T'),
                                   parse_mode=ParseMode.HTML,
@@ -194,7 +194,7 @@ async def approve_student_level_from_application(query: CallbackQuery, state: FS
 
 
 @dp.callback_query_handler(Text(equals="employee"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state, level='P'),
                                   parse_mode=ParseMode.HTML,
@@ -202,7 +202,7 @@ async def approve_student_level_from_application(query: CallbackQuery, state: FS
 
 
 @dp.callback_query_handler(Text(equals="administrator"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state, level='A'),
                                   parse_mode=ParseMode.HTML,
@@ -210,7 +210,7 @@ async def approve_student_level_from_application(query: CallbackQuery, state: FS
 
 
 @dp.callback_query_handler(Text(equals="approve_level_application"),
-                           state=Admin.auto_add_state)
+                           state=Admins.auto_add_state)
 async def approve_application(query: CallbackQuery, state: FSMContext):
     application_object: dict = await state.get_data()
     application: Application = application_object['data']
@@ -252,9 +252,9 @@ async def build_application_info(application: Application):
 
 
 @dp.callback_query_handler(Text(equals="manual_add"),
-                           state=Admin.add_menu_state)
+                           state=Admins.add_menu_state)
 async def manual_add_user(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.manual_add_state)
+    await state.set_state(Admins.manual_add_state)
     await query.message.edit_text("Вы выбрали ручное добавление пользователя!\n"
                                   "Для того, чтобы начать, нажмите <b>Добавить</b>!\n"
                                   "Для того, чтобы отменить добавление, нажмите <b>Отмена</b>!",
@@ -263,7 +263,7 @@ async def manual_add_user(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="start_manual_add"),
-                           state=Admin.manual_add_state)
+                           state=Admins.manual_add_state)
 async def start_manual_add(query: CallbackQuery):
     await ManualAdd.id.set()
     global _linked_query_dict
@@ -400,27 +400,23 @@ async def get_user_state_number_from_manual_add(message: Message, state: FSMCont
     await message.delete()
 
 
-@dp.callback_query_handler(Text(equals="student"),
-                           state=ManualAdd.state_number)
-@dp.callback_query_handler(Text(equals="student_plus"),
-                           state=ManualAdd.state_number)
-@dp.callback_query_handler(Text(equals="teacher"),
-                           state=ManualAdd.state_number)
-@dp.callback_query_handler(Text(equals="employee"),
-                           state=ManualAdd.state_number)
-@dp.callback_query_handler(Text(equals="administrator"),
+@dp.callback_query_handler(lambda text: True if text in ["student", "student_plus",
+                                                         "teacher", "employee",
+                                                         "administrator"] else False,
                            state=ManualAdd.state_number)
 async def get_user_access_from_manual_add(query: CallbackQuery, state: FSMContext):
-    if query.data == 'student':
-        await state.update_data(level='S')
-    elif query.data == 'student_plus':
-        await state.update_data(level='I')
-    elif query.data == 'teacher':
-        await state.update_data(level='T')
-    elif query.data == 'employee':
-        await state.update_data(level='E')
-    elif query.data == 'administrator':
-        await state.update_data(level='A')
+    match query.data:
+        case 'student':
+            await state.update_data(level='S')
+        case 'student_plus':
+            await state.update_data(level='I')
+        case 'teacher':
+            await state.update_data(level='T')
+        case 'employee':
+            await state.update_data(level='E')
+        case 'administrator':
+            await state.update_data(level='A')
+
     user = await state.get_data()
 
     await query.message.edit_text(f"Вы уверены, что хотите добавить:\n"
@@ -456,14 +452,14 @@ async def approve_manual_add_user(query: CallbackQuery, state: FSMContext):
                                       reply_markup=back_inline_menu)
 
     await state.reset_data()
-    await Admin.manual_add_state.set()
+    await Admins.manual_add_state.set()
 
 
 @dp.callback_query_handler(Text(equals="cancel_manual_add"),
                            state=ManualAdd.all_states)
 async def cancel_manual_add(query: CallbackQuery, state: FSMContext):
     await state.reset_data()
-    await Admin.manual_add_state.set()
+    await Admins.manual_add_state.set()
     await preview_step(query, state)
     global _linked_query_dict
     del _linked_query_dict[query.message.chat.id]

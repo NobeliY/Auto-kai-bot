@@ -6,12 +6,12 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import CallbackQuery, Message, ParseMode, InputFile
 
 from app import dp
-from Data.config import USER_CSV_PATH
+from Data import USER_CSV_PATH, __all_states__
 from Handler.default import get_admin_level, get_access_level
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
-from Keyboard.Inline.InlineKeyboard import delete_menu, show_db_menu
+from Keyboard.Inline import delete_menu, show_db_menu
 
-from states import UserState, Admin
+from states import Admins
 from utils.database_api.quick_commands import get_user, get_users_shortly_info, get_users_info
 from utils.database_api.schemas.application import Application
 from utils.database_api.schemas.user import User
@@ -19,9 +19,7 @@ from utils.request_api.Request_controller import RequestController
 
 
 @dp.message_handler(Text(equals="панель для администратора", ignore_case=True),
-                    state=UserState.all_states)
-@dp.message_handler(Text(equals="панель для администратора", ignore_case=True),
-                    state=Admin.all_states)
+                    state=__all_states__)
 async def call_admin_panel(message: Message):
     if not await get_admin_level(RequestController(message.from_id)):
         return
@@ -29,44 +27,44 @@ async def call_admin_panel(message: Message):
     user = await get_user(message.from_id)
     await message.answer(f"Добро пожаловать, <b>{user.initials}</b>!",
                          parse_mode=ParseMode.HTML, reply_markup=main_admin_menu)
-    await Admin.main_state.set()
+    await Admins.main_state.set()
     await message.delete()
 
 
 @dp.callback_query_handler(Text(equals="users_info"),
-                           state=Admin.main_state)
+                           state=Admins.main_state)
 async def users_info(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.show_db_state)
+    await state.set_state(Admins.show_db_state)
     await query.message.edit_text(f"{await get_users_shortly_info(query.message.chat.id)}",
                                   reply_markup=show_db_menu, parse_mode=ParseMode.HTML)
 
 
 @dp.callback_query_handler(Text(equals="user_add_menu"),
-                           state=Admin.main_state)
+                           state=Admins.main_state)
 async def set_add_menu(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.add_menu_state)
+    await state.set_state(Admins.add_menu_state)
     await query.message.edit_text(F"Выберите режим", reply_markup=add_menu)
 
 
 @dp.callback_query_handler(Text(equals="user_remove_menu"),
-                           state=Admin.main_state)
+                           state=Admins.main_state)
 async def set_remove_menu(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.delete_menu_state)
+    await state.set_state(Admins.delete_menu_state)
     await query.message.edit_text(F"Выберите режим", reply_markup=delete_menu)
 
 
 @dp.callback_query_handler(Text(equals="show_applications"),
-                           state=Admin.main_state)
+                           state=Admins.main_state)
 async def show_applications(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.show_applications_state)
+    await state.set_state(Admins.show_applications_state)
     await query.message.edit_text("Происходит доработка",
                                   reply_markup=back_inline_menu)
 
 
 @dp.callback_query_handler(Text(equals="show_fully_information_from_db"),
-                           state=Admin.show_db_state)
+                           state=Admins.show_db_state)
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.show_fully_state)
+    await state.set_state(Admins.show_fully_state)
     users: List[User] = await get_users_info(query.message.chat.id)
     fully_info_csv: List[List[str]] = [
         [
@@ -99,7 +97,7 @@ async def show_fully_information(query: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(Text(equals="preview_step"),
-                           state=Admin.all_states)
+                           state=Admins.all_states)
 async def preview_step(query: CallbackQuery, state: FSMContext):
     state_level = await state.get_state()
     _state_list = {
@@ -133,13 +131,13 @@ async def preview_step(query: CallbackQuery, state: FSMContext):
 
 async def return_call_admin_panel(query: CallbackQuery, state: FSMContext):
     user = await get_user(query.message.chat.id)
-    await state.set_state(Admin.main_state)
+    await state.set_state(Admins.main_state)
     await query.message.edit_text(f"Добро пожаловать, <b>{user.initials}</b>!",
                                   parse_mode=ParseMode.HTML, reply_markup=main_admin_menu)
 
 
 async def reset_admin_panel(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Admin.main_state)
+    await state.set_state(Admins.main_state)
     user = await get_user(query.message.chat.id)
     await query.message.delete()
     await query.message.answer(f"Добро пожаловать, <b>{user.initials}</b>!",

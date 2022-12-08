@@ -1,7 +1,7 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class Admin(StatesGroup):
+class Admins(StatesGroup):
     """
         Ветка пользователя
     """

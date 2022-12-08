@@ -1,11 +1,9 @@
 import re
 
 import Handler
-# TODO: Import a Custom Modules
 from app import dp
 from states import ApplicationSubmission
 
-# TODO: Import Aiogram
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
