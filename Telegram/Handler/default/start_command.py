@@ -1,13 +1,11 @@
 from threading import Thread
 from time import sleep
 
-# TODO: Import Aiogram
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 
 from Handler.default import return_user_checked, get_access_level, get_reply_keyboard
-# TODO: Import a Custom Modules
 from app import dp
 from states import UserState
 from utils.database_api.quick_commands import get_user
@@ -37,7 +35,6 @@ async def start(message: types.Message, state: FSMContext):
                              parse_mode=types.ParseMode.HTML, reply_markup=get_reply_keyboard(user.access))
         await UserState.in_active.set()
     await message.delete()
-    # await state.finish()
 
 
 async def get_admin_level(request_controller: RequestController):

@@ -7,4 +7,3 @@ from .default import soon_info
 
 from .start_command import start
 from .start_command import get_admin_level
-# from .start_command import keyboard_on_registered_users

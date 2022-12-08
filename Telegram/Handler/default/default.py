@@ -4,8 +4,7 @@ from colorama import Fore
 
 from Data import admins
 from Keyboard.Reply import student_menu, teacher_menu, employee_menu, admin_menu
-from app import bot
-from app import dp
+from app import bot, dp
 from aiogram import types, Dispatcher
 import aiogram.utils.exceptions as exceptions
 
@@ -25,8 +24,6 @@ async def get_default_commands(dp: Dispatcher):
             types.BotCommand("help", "Инструкция по эксплуатации. 🧐")
         ]
     )
-    # from Handler import register_handlers
-    # register_handlers(dp)
     print(Fore.GREEN + f"{datetime.now()}: Бот запущен" + Fore.RESET)
 
     for admin_id in admins:

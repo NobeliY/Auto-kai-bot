@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor
 from states.loader import storage
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
 load_dotenv()
 
 bot_token = os.getenv("BOT_TOKEN")
 bot = Bot(bot_token)  # type: ignore
 
 dp = Dispatcher(bot=bot, storage=storage)
+dp.setup_middleware(LoggingMiddleware())
 
 # TODO: Main
 if __name__ == "__main__":

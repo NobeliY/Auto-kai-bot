@@ -6,7 +6,8 @@ from aiogram.types import Message, ParseMode, ReplyKeyboardRemove
 
 from Handler.default import return_user_checked, soon_info
 from app import dp
-from states import UserState, Admin
+from Data import __all_states__
+from states import UserState, Admins
 from utils.request_api.Request_controller import RequestController
 from utils.request_api.request_to_ESP import send_first_level
 
@@ -51,9 +52,7 @@ async def open_from_all_registered_users(message: Message):
 
 
 @dp.message_handler(Text(equals="Открыть 1 уровень", ignore_case=True),
-                    state=UserState.all_states)
-@dp.message_handler(Text(equals="Открыть 1 уровень", ignore_case=True),
-                    state=Admin.all_states)
+                    state=__all_states__)
 async def open_first_level_from_employee(message: Message):
     request_controller = RequestController(message.from_id)
     access = await request_controller.check_user_on_database()
@@ -74,7 +73,7 @@ async def open_first_level_from_employee(message: Message):
 @dp.message_handler(Text(equals="Открыть 2 уровень", ignore_case=True),
                     state=UserState.all_states)
 @dp.message_handler(Text(equals="Открыть 2 уровень", ignore_case=True),
-                    state=Admin.all_states)
+                    state=Admins.all_states)
 async def open_second_level_from_employee(message: Message):
     request_controller = RequestController(message.from_id)
     access = await request_controller.check_user_on_database()
