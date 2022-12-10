@@ -1,13 +1,9 @@
 from threading import Thread
 from time import sleep
 
-from aiogram.dispatcher.filters import Text
 from aiogram.types import Message, ParseMode, ReplyKeyboardRemove
 
-from Handler.default import return_user_checked, soon_info
-from app import dp
-from Data import __all_states__
-from states import UserState, Admins
+from utils.shared_methods.default import soon_info, return_user_checked
 from utils.request_api.Request_controller import RequestController
 from utils.request_api.request_to_ESP import send_first_level
 
@@ -21,8 +17,6 @@ def user_opened_task():
 opened_loop = Thread(target=user_opened_task)
 
 
-@dp.message_handler(Text(equals="открыть", ignore_case=True),
-                    state=UserState.all_states)
 async def open_from_all_registered_users(message: Message):
     global opened_loop
     if opened_loop.is_alive():
@@ -51,8 +45,6 @@ async def open_from_all_registered_users(message: Message):
     await message.delete()
 
 
-@dp.message_handler(Text(equals="Открыть 1 уровень", ignore_case=True),
-                    state=__all_states__)
 async def open_first_level_from_employee(message: Message):
     request_controller = RequestController(message.from_id)
     access = await request_controller.check_user_on_database()
@@ -70,10 +62,6 @@ async def open_first_level_from_employee(message: Message):
     await message.delete()
 
 
-@dp.message_handler(Text(equals="Открыть 2 уровень", ignore_case=True),
-                    state=UserState.all_states)
-@dp.message_handler(Text(equals="Открыть 2 уровень", ignore_case=True),
-                    state=Admins.all_states)
 async def open_second_level_from_employee(message: Message):
     request_controller = RequestController(message.from_id)
     access = await request_controller.check_user_on_database()
