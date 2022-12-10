@@ -1,30 +1,24 @@
 from typing import List
 
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-from aiogram.types import CallbackQuery, Message, ParseMode, ContentTypes
+from aiogram.types import CallbackQuery, Message, ParseMode
 
-from Handler.default import get_access_level
+from utils.shared_methods.default import get_access_level
 from Keyboard.Inline import back_inline_menu
 from Keyboard.Inline import delete_accept_menu, delete_fully_show_searched_menu,\
     delete_searched_user_button
-from app import dp, bot
 from states import Admins
 from utils.database_api.quick_commands import delete_users_by_group, get_users_by_group, get_users_by_initials,\
     delete_user_by_initials_command
 from utils.database_api.schemas.user import User
 
 
-@dp.callback_query_handler(Text(equals="delete_by_initials"),
-                           state=Admins.delete_menu_state)
 async def delete_user_by_initials(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.searched_user_delete_state)
     await query.message.answer("Введите ФИО (Можно Фамилию имя). \n"
                                "Рекомендуется вводить ФИО полностью")
 
 
-@dp.message_handler(content_types=ContentTypes.TEXT,
-                    state=Admins.searched_user_delete_state)
 async def delete_user_by_initials_searched(message: Message, state: FSMContext):
     users = await get_users_by_initials(initials=message.text)
     if not users:
@@ -47,8 +41,6 @@ async def delete_user_by_initials_searched(message: Message, state: FSMContext):
     })
 
 
-@dp.callback_query_handler(Text(equals="show_fully_searched_users"),
-                           state=Admins.searched_user_delete_state)
 async def send_all_searched_users_for_delete(query: CallbackQuery, state: FSMContext):
     users = await state.get_data()
     [
@@ -65,8 +57,6 @@ async def send_all_searched_users_for_delete(query: CallbackQuery, state: FSMCon
     ]
 
 
-@dp.callback_query_handler(Text(equals="selected_user_for_delete"),
-                           state=Admins.searched_user_delete_state)
 async def delete_user_question(query: CallbackQuery, state: FSMContext):
     initials = query.message.text.split("`")[1]
     try:
@@ -82,8 +72,6 @@ async def delete_user_question(query: CallbackQuery, state: FSMContext):
     })
 
 
-@dp.callback_query_handler(Text(equals="accept_delete"),
-                           state=Admins.searched_user_delete_state)
 async def delete_user(query: CallbackQuery, state: FSMContext):
     users = await state.get_data()
     user = users['data']
@@ -99,21 +87,15 @@ async def delete_user(query: CallbackQuery, state: FSMContext):
                                   reply_markup=back_inline_menu)
 
 
-@dp.callback_query_handler(Text(equals="decline_delete"),
-                           state=Admins.searched_user_delete_state)
 async def decline_delete_user(query: CallbackQuery):
     await decline_delete(query)
 
 
-@dp.callback_query_handler(Text(equals="delete_all_group"),
-                           state=Admins.delete_menu_state)
 async def delete_all_from_group(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.delete_all_group_state)
     await query.message.answer("Введите группу для удаления!")
 
 
-@dp.message_handler(content_types=ContentTypes.TEXT,
-                    state=Admins.delete_all_group_state)
 async def get_group_for_delete(message: Message, state: FSMContext):
     users: List[User] | None = await get_users_by_group(group=message.text)
     if not users:
@@ -128,8 +110,6 @@ async def get_group_for_delete(message: Message, state: FSMContext):
     })
 
 
-@dp.callback_query_handler(Text(equals="accept_delete"),
-                           state=Admins.delete_all_group_state)
 async def accept_delete_group(query: CallbackQuery, state: FSMContext):
     users = await state.get_data()
     await delete_users_by_group(users=users['data'])
@@ -137,8 +117,6 @@ async def accept_delete_group(query: CallbackQuery, state: FSMContext):
                                   reply_markup=back_inline_menu)
 
 
-@dp.callback_query_handler(Text(equals="decline_delete"),
-                           state=Admins.delete_all_group_state)
 async def decline_delete_group(query: CallbackQuery):
     await decline_delete(query)
 

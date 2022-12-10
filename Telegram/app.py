@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor
+
 from states.loader import storage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 load_dotenv()
@@ -13,7 +14,5 @@ dp.setup_middleware(LoggingMiddleware())
 
 # TODO: Main
 if __name__ == "__main__":
-    from Handler import dp
-    from Handler.default import get_default_commands
-
+    from Handler.default.default import get_default_commands
     executor.start_polling(dp, skip_updates=True, on_startup=get_default_commands)
