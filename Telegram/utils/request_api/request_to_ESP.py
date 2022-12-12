@@ -1,6 +1,7 @@
-
+import logging as logger
 from os import getenv
 from aiohttp import ClientSession, ClientConnectionError, ServerTimeoutError
+from colorama import Fore
 
 from utils.database_api.schemas.user import User
 
@@ -28,12 +29,12 @@ async def send_request_from_esp(post_json_data: dict) -> dict:
             async with session.post(url=request_uri, data=post_json_data) as response:
                 return await response.json()
     except ClientConnectionError as client_connection_error:
-        print(f"User: {post_json_data['user_id']} | {client_connection_error}")
+        logger.error(f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {client_connection_error}{Fore.RESET}")
         return {
             'value': 0,
         }
     except ServerTimeoutError as server_error:
-        print(f"User: {post_json_data['user_id']} | {server_error}")
+        logger.error(f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}")
         return {
             'value': 0,
         }

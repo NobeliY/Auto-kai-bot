@@ -1,6 +1,8 @@
 from email.mime.text import MIMEText
+import logging as logger
 from smtplib import SMTP
 
+from colorama import Fore
 from Data import SMTP_SERVER, SMTP_PORT, SMTP_FROM_LOGIN, SMTP_FROM_PASSWORD, SMTP_TO
 
 
@@ -36,8 +38,7 @@ class SMTPController:
         message['Subject'] = "Parking Abuse"
         message['From'] = SMTP_FROM_LOGIN
         message['Reply-To'] = self.email
-        # message['To'] = SMTP_TO
-        message['To'] = SMTP_FROM_LOGIN
+        message['To'] = SMTP_TO
         self.message = message
 
     def send_message(self):
@@ -47,4 +48,5 @@ class SMTPController:
                 server.login(SMTP_FROM_LOGIN, SMTP_FROM_PASSWORD)
                 server.send_message(self.message)
             except Exception as _ex:
-                print(F"{_ex} | ERROR with sendMail fun")
+                logger.error(f"{Fore.LIGHTRED_EX}Error with send message func {Fore.LIGHTYELLOW_EX}{_ex}{Fore.RESET}")
+

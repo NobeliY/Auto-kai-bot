@@ -1,21 +1,12 @@
 #! /bin/bash
-echo "Bot running..."
 set -a
 . ./.env
 set +a
-
-echo "$BOT_TOKEN and ${ADMIN_ID[*]}"
 source venv/bin/activate
-
 # shellcheck disable=SC2120
 function pause(){
     # shellcheck disable=SC2162
     read -p "$*"
 }
-
-
 python app.py
-
-#python test.py
-
 pause
