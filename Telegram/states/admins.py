@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 class Admins(StatesGroup):
     """
-        Ветка пользователя
+        Admin fork
     """
     main_state = State()
     show_db_state = State()
@@ -22,6 +22,9 @@ class Admins(StatesGroup):
 
 
 class ManualAdd(StatesGroup):
+    """
+        Admin manual add user fork
+    """
     id = State()
     initials = State()
     email = State()

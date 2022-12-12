@@ -1,7 +1,9 @@
+import logging as logger
 from threading import Thread
 from time import sleep
 
 from aiogram.types import Message, ParseMode, ReplyKeyboardRemove
+from colorama import Fore
 
 from utils.shared_methods.default import soon_info, return_user_checked
 from utils.request_api.Request_controller import RequestController
@@ -23,7 +25,6 @@ async def open_from_all_registered_users(message: Message):
         await message.answer(f"Уже открыт")
         return
     request_controller = RequestController(message.from_id)
-    print(request_controller)
     access = await request_controller.check_user_on_database()
     if access is not None:
         if await request_controller.check_time(access):
@@ -33,7 +34,8 @@ async def open_from_all_registered_users(message: Message):
                 if request_data['value']:
                     await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
             except KeyError:
-                print("KeyError with request 1 level. (S|I|T)")
+                logger.error(f"{Fore.LIGHTRED_EX}KeyError with request :"
+                             f"{Fore.LIGHTWHITE_EX}1{Fore.LIGHTRED_EX} level. (S|I|T){Fore.RESET}")
 
             opened_loop = Thread(target=user_opened_task)
             opened_loop.start()
@@ -57,7 +59,8 @@ async def open_first_level_from_employee(message: Message):
         if request_data['value']:
             await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
     except KeyError:
-        print("KeyError with request 1 level. (E|A)")
+        logger.error(f"{Fore.LIGHTRED_EX}KeyError with request :"
+                     f"{Fore.LIGHTWHITE_EX}1{Fore.LIGHTRED_EX} level. (E|A){Fore.RESET}")
 
     await message.delete()
 

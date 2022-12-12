@@ -1,19 +1,10 @@
 
-from threading import Thread
-from time import sleep
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import utils.shared_methods.default
 from states import UserState
 from utils.database_api.quick_commands import get_user
-
-
-def user_opened_task():
-    sleep(20)
-
-
-opened_loop = Thread(target=user_opened_task)
 
 
 async def start(message: types.Message, state: FSMContext):
@@ -28,6 +19,7 @@ async def start(message: types.Message, state: FSMContext):
         await message.answer(f"Добро пожаловать! \n"
                              f"|{utils.shared_methods.default.get_access_level(user.access)}| {user.initials}!\n"
                              f"Вызвана клавиатура с командами снизу!",
-                             parse_mode=types.ParseMode.HTML, reply_markup=utils.shared_methods.default.get_reply_keyboard(user.access))
+                             parse_mode=types.ParseMode.HTML,
+                             reply_markup=utils.shared_methods.default.get_reply_keyboard(user.access))
         await UserState.in_active.set()
     await message.delete()

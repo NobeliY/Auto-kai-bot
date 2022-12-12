@@ -30,7 +30,7 @@ from Handler.application.application_command import (
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
 from Handler.user.info import (
-    change_user_info, get_free_positions, get_user_info
+    change_user_info, get_free_positions, get_user_info, close_user_info
 )
 from Handler.user.open_command import (
     open_from_all_registered_users, open_first_level_from_employee,
@@ -63,6 +63,8 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(get_free_positions, Text(equals="свободные места", ignore_case=True),
                                 state=__all_states__)
     dp.register_callback_query_handler(change_user_info, Text(equals="change_info_menu"),
+                                       state=__all_states__)
+    dp.register_callback_query_handler(close_user_info, Text(equals="close_info"),
                                        state=__all_states__)
 
     """

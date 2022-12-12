@@ -6,5 +6,8 @@ change_info_menu = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="Изменить данные", callback_data="change_info_menu"),
         ],
+        [
+            InlineKeyboardButton(text="Закрыть", callback_data="close_info"),
+        ],
     ],
 )

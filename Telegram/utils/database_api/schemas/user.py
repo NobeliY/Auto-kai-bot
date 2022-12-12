@@ -1,6 +1,5 @@
 from sqlalchemy import BigInteger, Column, String, sql
 from sqlalchemy.orm import relationship
-
 from utils.database_api.database_gino import TimeDatabaseModel
 
 

@@ -1,7 +1,9 @@
+import logging as logger
 from typing import List
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message, ParseMode
+from colorama import Fore
 
 from utils.shared_methods.default import get_access_level
 from Keyboard.Inline import back_inline_menu
@@ -62,7 +64,7 @@ async def delete_user_question(query: CallbackQuery, state: FSMContext):
     try:
         await query.message.delete()
     except Exception as ex_:
-        print(f"Error: {ex_}")
+        logger.error(f"{Fore.LIGHTRED_EX}{ex_}{Fore.RESET}")
         await query.message.edit_text("Ничего нет!")
     await query.message.answer(f"Вы точно хотите удалить {initials}",
                                reply_markup=delete_accept_menu)
