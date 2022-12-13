@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 class ApplicationSubmission(StatesGroup):
     """
-        Ветка заявки
+        Application fork
     """
     user_id = State()
     user_initials = State()

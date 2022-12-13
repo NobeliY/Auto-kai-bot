@@ -1,5 +1,4 @@
 from sqlalchemy import Column, BigInteger, ForeignKey, Integer, sql, String
-
 from utils.database_api.database_gino import BaseModel
 
 

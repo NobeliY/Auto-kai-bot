@@ -1,9 +1,1 @@
-# from .admin_command import call_admin_panel
-# from .admin_command import users_info
-# from .admin_command import set_add_menu
-# from .admin_command import set_remove_menu
-# from .admin_command import show_applications
-# from .application_section import auto_add_by_application
-# from .application_section import manual_add_user
-# from .user_section import delete_user_by_initials
-# from .user_section import delete_all_from_group
+

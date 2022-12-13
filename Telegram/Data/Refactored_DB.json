@@ -17,14 +17,6 @@
             "SQLuser_id": "79"
         },
         {
-            "user_id": "753366106",
-            "initials": "Ахметзянов Айнур Фагилевич",
-            "phone_number": "9872767372",
-            "group": "20-07",
-            "state_number": "Х395НР|116",
-            "SQLuser_id": "81"
-        },
-        {
             "user_id": "2074708631",
             "initials": "Пискунов Дмитрий Андреевич",
             "phone_number": "9196498411",
@@ -135,14 +127,6 @@
             "group": "20-00",
             "state_number": "А281АМ|716",
             "SQLuser_id": "98"
-        },
-        {
-            "user_id": "476571353",
-            "initials": "Садыков Тимур Русланович",
-            "phone_number": "9172447740",
-            "group": "20-07",
-            "state_number": "Р818ТК|16",
-            "SQLuser_id": "99"
         },
         {
             "user_id": "408524889",
@@ -375,6 +359,30 @@
             "group": "22-76",
             "state_number": "Р700ВУ|16",
             "SQLuser_id": "154"
+        },
+        {
+            "user_id": "1898052631",
+            "initials": "Сайфутдинов Рустам Рамилевич",
+            "phone_number": "9393841462",
+            "group": "19-02",
+            "state_number": "О309ОР|116",
+            "SQLuser_id": "156"
+        },
+        {
+            "user_id": "753366106",
+            "initials": "Ахметзянов Айнур Фагилевич",
+            "phone_number": "9872767372",
+            "group": "20-07",
+            "state_number": "О933МР|716",
+            "SQLuser_id": "157"
+        },
+        {
+            "user_id": "476571353",
+            "initials": "Садыков Тимур Русланович",
+            "phone_number": "9172447740",
+            "group": "20-07",
+            "state_number": "М412МО|716",
+            "SQLuser_id": "159"
         }
     ],
     "Преподаватель": [
@@ -501,6 +509,14 @@
             "SQLuser_id": "58"
         },
         {
+            "user_id": "665722525",
+            "initials": "Астафьев Олег Валерьевич",
+            "phone_number": "79172993502",
+            "group": "ивц",
+            "state_number": "А123АА|116",
+            "SQLuser_id": "59"
+        },
+        {
             "user_id": "1688833286",
             "initials": "Шамсутдинов Рустам Салатович",
             "phone_number": "79872984639",
@@ -571,6 +587,14 @@
             "group": "Сотрудник",
             "state_number": "Е835УО|116",
             "SQLuser_id": "155"
+        },
+        {
+            "user_id": "5151839157",
+            "initials": "Шамаев Сергей Николаевич",
+            "phone_number": "9172627869",
+            "group": "Водитель",
+            "state_number": "О360МС|716",
+            "SQLuser_id": "158"
         }
     ]
 }
