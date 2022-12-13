@@ -1,16 +1,12 @@
 import logging
-import os
 
 from colorama import Fore
-from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, executor
-
+from Data import BOT_TOKEN
 from states.loader import storage
 
-load_dotenv()
 
-bot_token = os.getenv("BOT_TOKEN")
-bot = Bot(bot_token)
+bot = Bot(BOT_TOKEN)
 dp = Dispatcher(bot=bot, storage=storage)
 
 logging.basicConfig(level=logging.WARNING, format=f"{Fore.YELLOW}%(asctime)s {Fore.RESET}| [{Fore.CYAN}%(levelname)s"

@@ -1,11 +1,14 @@
 import os
 from datetime import time
 from pathlib import Path
+from dotenv import load_dotenv
 
 from states import UserState, Admins
+load_dotenv()
 
 # Basic Configuration
-admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID').split(' ')]
+admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID_LIST').split(' ')]
+BOT_TOKEN = os.getenv('BOT_TOKEN_AUTO')
 TIME_RANGE = [time(6, 0), time(23, 0)]
 USER_CSV_PATH = Path('Data/users.csv')
 __all_states__ = UserState.all_states + Admins.all_states
@@ -29,4 +32,4 @@ SMTP_SERVER = os.getenv("EMAIL_SERVER")
 SMTP_PORT = os.getenv("EMAIL_PORT")
 SMTP_FROM_LOGIN = os.getenv("EMAIL_LOGIN")
 SMTP_FROM_PASSWORD = os.getenv("EMAIL_PASSWORD")
-SMTP_TO = os.getenv("EMAIL_TO")
+SMTP_TO = os.getenv("SMTP_TO")

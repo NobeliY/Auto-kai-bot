@@ -1,4 +1,7 @@
 /venv/
 /Data/users.csv
+/Data/parking_employee.json
+/Data/refactor.py
+/Data/Refactored_DB.json
 /test.py
 /.env

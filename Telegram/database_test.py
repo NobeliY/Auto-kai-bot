@@ -1,12 +1,9 @@
 import asyncio
 import json
-import re
-from typing import List
 
 from Data import POSTGRES_URL
 from utils.database_api import quick_commands as commands
 from utils.database_api.database_gino import database
-from utils.database_api.schemas.user import User
 
 
 async def database_test():
@@ -33,23 +30,14 @@ async def database_test():
         access='A'
     )
 
-    await commands.add_application(user_id=2, initials='hi de', email='hi_de@er.er',
-                                   group='232-22', phone_number="8989898989", state_number='a123aa|123')
-    await commands.add_application(user_id=3, initials='shi de', email='hi_de@easdr.er',
-                                   group='23-222', phone_number="8989898989", state_number='a123ta|123')
-    await commands.add_application(user_id=4, initials='haas de', email='hiasd_de@er.er',
-                                   group='2-3222', phone_number="8989898989", state_number='a123sa|123')
-    await commands.add_application(user_id=5, initials='hi dade', email='hadi_de@er.er',
-                                   group='2322-2', phone_number="8989898989", state_number='a123wa|123')
-
-    users: List[User] = await commands.get_users_info(834865678)
-    print([user.group for user in users])
-
-    print(sum([1 if re.findall(r"\d-\d", user.group) else 0 for user in users]))
-
-    print("Applications test")
-    applications = await commands.get_count_of_applications(834865678)
-    print(applications)
+    # await commands.add_application(user_id=2, initials='hi de', email='hi_de@er.er',
+    #                                group='232-22', phone_number="8989898989", state_number='a123aa|123')
+    # await commands.add_application(user_id=3, initials='shi de', email='hi_de@easdr.er',
+    #                                group='23-222', phone_number="8989898989", state_number='a123ta|123')
+    # await commands.add_application(user_id=4, initials='haas de', email='hiasd_de@er.er',
+    #                                group='2-3222', phone_number="8989898989", state_number='a123sa|123')
+    # await commands.add_application(user_id=5, initials='hi dade', email='hadi_de@er.er',
+    #                                group='2322-2', phone_number="8989898989", state_number='a123wa|123')
 
     with open("Data/Refactored_DB.json", "r") as file:
         json_dict = json.load(file)
