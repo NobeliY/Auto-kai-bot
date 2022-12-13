@@ -7,4 +7,4 @@ from .config import (
     SMTP_FROM_LOGIN, SMTP_FROM_PASSWORD,
     SMTP_TO
 )
-from .config import __all_states__, USER_CSV_PATH
+from .config import __all_states__, USER_CSV_PATH, BOT_TOKEN
