@@ -1,8 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 from Data.config import TIME_RANGE
-from utils.database_api.quick_commands import get_user, get_date_quality_from_user, set_date_quality_from_user, \
-    update_date_quality, rebase_date_quality_from_user
+from utils.database_api.quick_commands import (
+    get_user,
+    get_date_quality_from_user,
+    set_date_quality_from_user,
+    update_date_quality,
+    rebase_date_quality_from_user
+)
 from utils.request_api.SMTP_controller import SMTPController
 
 
@@ -17,7 +22,7 @@ class Singleton(object):
 
 class RequestController(Singleton):
     activate_on_level: list[str] = ['S', 'I']
-    offset = timezone(timedelta(hours=3))
+    _offset = timezone(timedelta(hours=3))
 
     def __init__(self, user_id: int, attempts: int = 0):
         self.attempts = attempts
@@ -30,7 +35,7 @@ class RequestController(Singleton):
     async def check_time(self, access_level: str) -> bool:
         if access_level not in self.activate_on_level:
             return True
-        time_now = datetime.now(tz=self.offset).time()
+        time_now = datetime.now(tz=self._offset).time()
         if TIME_RANGE[0] > time_now or time_now > TIME_RANGE[1]:
             return False
         return True
@@ -43,7 +48,7 @@ class RequestController(Singleton):
             else:
                 return self.return_status_message("500-C")
 
-        time_now = datetime.now(tz=self.offset).strftime("%d %m %Y %H %M")
+        time_now = datetime.now(tz=self._offset).strftime("%d %m %Y %H %M")
         time_now_split = self.rebase_time_list([
             int(datetime_item)
             for datetime_item in time_now.split(" ")
@@ -62,7 +67,7 @@ class RequestController(Singleton):
                 return self.return_status_message("200-U")
             if not await update_date_quality(user_id=self.user_id):
                 """
-                Место под отправку письма на почту по причине Abuse.
+                    Use SMTP to send e-mail.
                 """
                 user = await get_user(self.user_id)
                 smtp = SMTPController(

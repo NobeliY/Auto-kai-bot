@@ -1,13 +1,10 @@
 import datetime
+import logging as logger
 from typing import List
 from colorama import Fore
-
 import sqlalchemy as sa
-from aiogram import Dispatcher
 from gino import Gino
-
 from Data import POSTGRES_URL
-
 
 database = Gino()
 
@@ -39,10 +36,10 @@ class TimeDatabaseModel(BaseModel):
     )
 
 
-async def on_startup(dp: Dispatcher):
-    print(Fore.BLUE + "Подключение к БД PostgreSQL Server" + Fore.RESET)
+async def on_startup():
+    logger.info(f"{Fore.GREEN}Подключение к БД PostgreSQL Server{Fore.RESET}")
     await database.set_bind(POSTGRES_URL)
 
 
-async def on_close(dp: Dispatcher):
-    await database.pop_bind()
+def on_close():
+    database.pop_bind()

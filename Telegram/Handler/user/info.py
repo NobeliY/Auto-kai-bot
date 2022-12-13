@@ -1,17 +1,15 @@
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import Text
-from aiogram.types import Message, ParseMode
+import logging as logger
 
-from Handler.default import get_access_level, soon_info
-from app import dp
-from states import UserState
+from aiogram.types import Message, ParseMode, CallbackQuery
+from aiogram.utils.exceptions import MessageToDeleteNotFound
+from colorama import Fore
+
+from Keyboard.Inline import change_info_menu
 from utils.database_api.quick_commands import get_user
+from utils.shared_methods.default import soon_info, get_access_level
 
 
-@dp.message_handler(Text(equals="информация о себе", ignore_case=True),
-                    state=UserState.all_states)
-async def get_user_info(message: Message, state: FSMContext):
-    print("touched user info")
+async def get_user_info(message: Message):
     user = await get_user(message.from_id)
     await message.answer(
         f"Информация о Вас! \n"
@@ -21,11 +19,27 @@ async def get_user_info(message: Message, state: FSMContext):
         f"Номер телефона: <b>{user.phoneNumber}</b>\n"
         f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
         f"Уровень: <b>{get_access_level(user.access)}</b>\n",
-        parse_mode=ParseMode.HTML
+        parse_mode=ParseMode.HTML,
+        reply_markup=change_info_menu
     )
+    await message.delete()
 
 
-@dp.message_handler(Text(equals="свободные места", ignore_case=True),
-                    state=UserState.all_states)
-async def get_free_positions(message: Message, state: FSMContext):
+async def close_user_info(query: CallbackQuery):
+    try:
+        await query.message.delete()
+    except MessageToDeleteNotFound:
+        logger.error(f"{Fore.LIGHTRED_EX}{query.message.from_id} | Try delete message with close info.")
+
+
+async def change_user_info(query: CallbackQuery):
+    try:
+        await query.message.delete()
+        await query.message.answer(await soon_info())
+    except MessageToDeleteNotFound:
+        pass
+
+
+async def get_free_positions(message: Message):
     await message.answer(await soon_info())
+    await message.delete()

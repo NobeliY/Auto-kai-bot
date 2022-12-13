@@ -1,5 +1,4 @@
 from sqlalchemy import BigInteger, Column, ForeignKey, TIMESTAMP, String, sql
-
 from utils.database_api.database_gino import TimeDatabaseModel
 
 

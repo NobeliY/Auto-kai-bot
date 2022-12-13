@@ -1,17 +1,19 @@
 from datetime import timezone, timedelta, datetime
+import logging as logger
 import re
 from typing import List
 
-from asyncpg import UniqueViolationError
-from overrides import override
+from asyncpg import UniqueViolationError, ForeignKeyViolationError
+from colorama import Fore
 
 from utils.database_api.database_gino import database
 from utils.database_api.schemas.application import Application
 from utils.database_api.schemas.date_quality import DateQuality
 from utils.database_api.schemas.user import User
 
+_offset = timezone(timedelta(hours=3))
 
-# TODO -------------- Application
+
 async def add_application(user_id: int, initials: str, email: str,
                           phone_number: str, group: str, state_number: str):
     try:
@@ -19,14 +21,14 @@ async def add_application(user_id: int, initials: str, email: str,
                                   phoneNumber=phone_number, group=group, stateNumber=state_number)
         await application.create()
     except UniqueViolationError:
-        print("Application not created!")
+        logger.warning(f"{Fore.LIGHTGREEN_EX} Application not created{Fore.RESET}!")
 
 
 async def add_ready_application(application: Application):
     try:
         await application.create()
     except UniqueViolationError:
-        print("Application not created!")
+        logger.warning(f"{Fore.LIGHTGREEN_EX} Application not created{Fore.RESET}!")
 
 
 async def get_count_of_applications(admin_id: int) -> int | None:
@@ -48,7 +50,6 @@ async def drop_application(application: Application) -> bool:
     return await application.delete()
 
 
-# TODO -------------- User
 async def get_users_info(admin_id: int) -> User | None:
     if await check_admin(admin_id=admin_id):
         return await User.query.gino.all()
@@ -95,8 +96,14 @@ async def get_users_by_group(group: str) -> List[User] | None:
 
 
 async def delete_users_by_group(users: List[User]):
-    print([f"Id: {user.id} | INIT: {user.initials} | group: {user.group}" for user in users])
-    [await user.delete() for user in users]
+
+    for user in users:
+        try:
+            await user.delete()
+        except ForeignKeyViolationError as foreignKeyViolationEr:
+            logger.warning(f"{Fore.LIGHTYELLOW_EX}{user.initials} {Fore.LIGHTGREEN_EX} :"
+                           f"try to delete: {Fore.YELLOW}{foreignKeyViolationEr}")
+            await user.foreigns.delete()
 
 
 async def add_user(user_id: int, initials: str, email: str,
@@ -106,16 +113,12 @@ async def add_user(user_id: int, initials: str, email: str,
                     stateNumber=state_number, access=access)
         await user.create()
     except UniqueViolationError:
-        print("User not created! ")
+        logger.warning(f"{Fore.LIGHTGREEN_EX} User not created{Fore.RESET}!")
 
 
 async def get_user(user_id: int) -> User | None:
     user = await User.query.where(User.id == user_id).gino.first()
     return user if user is not None else None
-
-
-# TODO -------------- Date Quality
-offset = timezone(timedelta(hours=3))
 
 
 async def get_date_quality_from_user(user_id: int):
@@ -130,7 +133,7 @@ async def rebase_date_quality_from_user(user_id: int):
 
 async def set_date_quality_from_user(user_id: int, count: int = 1) -> bool:
     try:
-        time_now = datetime.now(tz=offset).strftime("%d %m %Y %H %M")
+        time_now = datetime.now(tz=_offset).strftime("%d %m %Y %H %M")
         date_quality = DateQuality(id=user_id, times=time_now, count=count)
         await date_quality.create()
         return True

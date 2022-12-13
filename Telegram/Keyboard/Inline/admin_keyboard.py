@@ -39,6 +39,23 @@ add_by_applications_menu = InlineKeyboardMarkup(
     ]
 )
 
+manual_add_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Добавить", callback_data="start_manual_add"),
+            InlineKeyboardButton("Отмена", callback_data="preview_step"),
+        ]
+    ]
+)
+
+cancel_manual_add_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Отменить добавление", callback_data="cancel_manual_add"),
+        ]
+    ]
+)
+
 delete_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -111,7 +128,6 @@ application_change_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton("Следующая", callback_data="next_application"),
-            # InlineKeyboardButton("Предыдущая", callback_data="preview_application"),
         ],
         [
           InlineKeyboardButton("Принять", callback_data="approve_application"),
@@ -123,7 +139,7 @@ application_change_menu = InlineKeyboardMarkup(
     ]
 )
 
-application_submit_menu = InlineKeyboardMarkup(
+application_or_manual_submit_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton("Студент", callback_data="student"),
@@ -138,6 +154,15 @@ application_submit_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton("Отмена", callback_data="preview_step")
+        ],
+    ]
+)
+
+manual_approve_menu = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Да", callback_data="approve_manual"),
+            InlineKeyboardButton("Нет", callback_data="cancel_manual_add")
         ],
     ]
 )
@@ -159,5 +184,3 @@ application_reject_menu = InlineKeyboardMarkup(
         ],
     ]
 )
-
-
