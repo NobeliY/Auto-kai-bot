@@ -31,42 +31,35 @@ async def add_ready_application(application: Application):
         logger.warning(f"{Fore.LIGHTGREEN_EX} Application not created{Fore.RESET}!")
 
 
-async def get_count_of_applications(admin_id: int) -> int | None:
-    if await check_admin(admin_id=admin_id):
-        applications_count = await database.func.count(Application.id).gino.scalar()
-        return applications_count
-    return None
+async def get_count_of_applications() -> int | None:
+    applications_count = await database.func.count(Application.id).gino.scalar()
+    return applications_count
 
 
-async def get_application(admin_id: int) -> Application | None:
-    return await Application.query.gino.first() if await check_admin(admin_id) else None
+async def get_application() -> Application | None:
+    return await Application.query.gino.first()
 
 
-async def get_all_applications(admin_id: int) -> List[Application] | None:
-    return await Application.query.gino.all() if await check_admin(admin_id) else None
+async def get_all_applications() -> List[Application] | None:
+    return await Application.query.gino.all()
 
 
 async def drop_application(application: Application) -> bool:
     return await application.delete()
 
 
-async def get_users_info(admin_id: int) -> User | None:
-    if await check_admin(admin_id=admin_id):
-        return await User.query.gino.all()
-    return None
+async def get_users_info() -> List[User] | None:
+    return await User.query.gino.all()
 
 
-async def get_users_shortly_info(admin_id: int) -> str | None:
-    access = await check_admin(admin_id)
-    if access:
-        users = await get_users_info(admin_id)
-        filtered_users = await filter_users_shortly_info(users)
-        return f"Всего в БД: <b>{await database.func.count(User.id).gino.scalar()}</b>\n" \
-               f"Из них: \n" \
-               f"Студенты: <b>{filtered_users['Студенты']}</b>\n" \
-               f"Преподаватели: <b>{filtered_users['Преподаватели']}</>\n" \
-               f"Сотрудники: <b>{filtered_users['Сотрудники']}</b>"
-    return None
+async def get_users_shortly_info() -> str | None:
+    filtered_users = await filter_users_shortly_info(await get_users_info())
+    return f"Всего в БД: <b>{await database.func.count(User.id).gino.scalar()}</b>\n" \
+            f"Из них: \n" \
+            f"Студенты: <b>{filtered_users['Студенты']}</b>\n" \
+            f"Преподаватели: <b>{filtered_users['Преподаватели']}</>\n" \
+            f"Сотрудники: <b>{filtered_users['Сотрудники']}</b>"
+
 
 
 async def filter_users_shortly_info(users: List[User]) -> dict:
