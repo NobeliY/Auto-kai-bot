@@ -31,4 +31,6 @@ class ManualAdd(StatesGroup):
     phone_number = State()
     academy_group = State()
     state_number = State()
+    level = State()
+    approve = State()
 

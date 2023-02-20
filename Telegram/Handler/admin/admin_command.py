@@ -29,7 +29,7 @@ async def call_admin_panel(message: Message):
 
 async def users_info(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.show_db_state)
-    await query.message.edit_text(f"{await get_users_shortly_info(query.message.chat.id)}",
+    await query.message.edit_text(f"{await get_users_shortly_info()}",
                                   reply_markup=show_db_menu, parse_mode=ParseMode.HTML)
 
 
@@ -51,7 +51,7 @@ async def show_applications(query: CallbackQuery, state: FSMContext):
 
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.show_fully_state)
-    users: List[User] = await get_users_info(query.message.chat.id)
+    users: List[User] = await get_users_info()
     fully_info_csv: List[List[str]] = [
         [
             "Telegram ID",
@@ -84,23 +84,24 @@ async def show_fully_information(query: CallbackQuery, state: FSMContext):
 
 async def preview_step(query: CallbackQuery, state: FSMContext):
     state_level = await state.get_state()
+    print(state_level)
     _state_list = {
         'main': [
-            "Admin:show_db_state",
-            "Admin:add_menu_state",
-            "Admin:delete_menu_state",
-            "Admin:show_applications_state"
+            "Admins:show_db_state",
+            "Admins:add_menu_state",
+            "Admins:delete_menu_state",
+            "Admins:show_applications_state"
         ],
         'add_menu': [
-            "Admin:auto_add_state",
-            "Admin:manual_add_state"
+            "Admins:auto_add_state",
+            "Admins:manual_add_state"
         ],
         'delete_menu': [
-            "Admin:searched_user_delete_state",
-            "Admin:delete_all_group_state"
+            "Admins:searched_user_delete_state",
+            "Admins:delete_all_group_state"
         ],
         'show_db_menu': [
-            "Admin:show_fully_state"
+            "Admins:show_fully_state"
         ]
     }
     if state_level in _state_list['main']:

@@ -9,7 +9,7 @@ from states.loader import storage
 bot = Bot(BOT_TOKEN)
 dp = Dispatcher(bot=bot, storage=storage)
 
-logging.basicConfig(level=logging.WARNING, format=f"{Fore.YELLOW}%(asctime)s {Fore.RESET}| [{Fore.CYAN}%(levelname)s"
+logging.basicConfig(level=logging.INFO, format=f"{Fore.YELLOW}%(asctime)s {Fore.RESET}| [{Fore.CYAN}%(levelname)s"
                                                   f"{Fore.RESET}] %(message)s")
 
 # TODO: Main
