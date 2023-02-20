@@ -1,17 +1,27 @@
-from sqlalchemy import BigInteger, Column, String, sql
-from sqlalchemy.orm import relationship
-from utils.database_api.database_gino import TimeDatabaseModel
+from typing import Optional
+
+from sqlalchemy import BigInteger, select
+from sqlalchemy.orm import relationship, Mapped, mapped_column, Relationship
+
+from utils.database_api.schemas.database_sqlalchemy import TimeDatabaseModel
 
 
 class User(TimeDatabaseModel):
-    __tablename__ = 'users'
-    id = Column(BigInteger, primary_key=True, unique=True)
-    initials = Column(String, primary_key=True)
-    email = Column(String)
-    phoneNumber = Column(String)
-    group = Column(String)
-    stateNumber = Column(String)
-    access = Column(String, primary_key=True)
+    __tablename__ = "users"
+    id: Mapped[BigInteger] = mapped_column(primary_key=True)
+    initials: Mapped[Optional[str]]
+    email: Mapped[str]
+    phoneNumber: Mapped[str]
+    group: Mapped[str]
+    stateNumber: Mapped[str]
+    access: Mapped[str]
+    # = mapped_column(primary_key=True)
 
-    query: sql.select
-    foreigns = relationship("users", cascade="all, delete")
+    query: select
+    foreigns: Relationship = relationship("users", cascade="all, delete")
+
+    def __repr_(self) -> str:
+        return f"id={self.id}, initials={self.initials}, email={self.email}," \
+               f"phoneNumber={self.phoneNumber}, group={self.group}," \
+               f"stateNumber={self.stateNumber}, access={self.access}."
+

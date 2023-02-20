@@ -1,12 +1,20 @@
-from sqlalchemy import BigInteger, Column, ForeignKey, TIMESTAMP, String, sql
-from utils.database_api.database_gino import TimeDatabaseModel
+from sqlalchemy import BigInteger, ForeignKey, TIMESTAMP
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import Mapped, mapped_column
+
+from utils.database_api.schemas.database_sqlalchemy import TimeDatabaseModel
 
 
 class ParkingLog(TimeDatabaseModel):
-    __tablename__ = 'parking_logs'
-    id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey('users.id'))
-    time_from_user = Column(TIMESTAMP)
-    initials = Column(String, ForeignKey('users.initials'))
+    __tablename__ = "parking_logs"
+    id: Mapped[BigInteger] = mapped_column(primary_key=True)
+    user_id: Mapped[BigInteger] = mapped_column(ForeignKey("users.id"))
+    time_from_user: Mapped[TIMESTAMP]
+    initials: Mapped[str] = mapped_column(ForeignKey("users.initials"))
 
-    query: sql.insert
+    query: insert
+
+    def __repr__(self) -> str:
+        return f"id={self.id}, user_id={self.user_id}," \
+               f"time_from_user={self.time_from_user}," \
+               f"initials={self.initials}."
