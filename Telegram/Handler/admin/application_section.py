@@ -14,8 +14,7 @@ from Keyboard.Inline import (
     application_or_manual_submit_menu,
     application_reject_menu,
     application_approve_level_menu,
-    manual_add_menu,
-    cancel_manual_add_menu
+    manual_add_menu
 )
 from Keyboard.Inline import manual_approve_menu
 from states import Admins
@@ -44,7 +43,7 @@ _manual_user_access_level_dict = {
 
 async def auto_add_by_application(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.auto_add_state)
-    count = await get_count_of_applications(query.message.chat.id)
+    count = await get_count_of_applications()
     if not count:
         await query.message.edit_text("Нет заявок!",
                                       reply_markup=back_inline_menu)
@@ -58,7 +57,7 @@ async def auto_add_by_application(query: CallbackQuery, state: FSMContext):
 async def get_application_from_begin(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
     global _application_list_
     if not _application_list_:
-        _application_list_ = await get_all_applications(query.message.chat.id)
+        _application_list_ = await get_all_applications()
     application = await get_elem_from_application_list_()
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
@@ -116,7 +115,7 @@ async def reject_application(query: CallbackQuery, state: FSMContext):
 async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
     global _reversed_application_list_
     if not _reversed_application_list_:
-        _reversed_application_list_ = list(reversed(await get_all_applications(query.message.chat.id)))
+        _reversed_application_list_ = list(reversed(await get_all_applications()))
     application = await get_elem_from_reversed_application_list_()
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
@@ -210,31 +209,30 @@ async def manual_add_user(query: CallbackQuery, state: FSMContext):
                                   reply_markup=manual_add_menu)
 
 
-async def start_manual_add(query: CallbackQuery):
+async def start_manual_add(query: CallbackQuery, state: FSMContext):
+    print(await state.get_state())
     await ManualAdd.id.set()
+    print(await state.get_state())
     global _linked_query_dict
     _linked_query_dict[query.message.chat.id] = query
     await query.message.edit_text("Введите <b>Telegram ID</b>:",
-                                  parse_mode=ParseMode.HTML,
-                                  reply_markup=cancel_manual_add_menu)
+                                  parse_mode=ParseMode.HTML)
 
 
 async def get_user_id_from_manual_add(message: Message, state: FSMContext):
     global _linked_query_dict
-    query = _linked_query_dict[message.from_id]
-
+    query = _linked_query_dict[message.chat.id]
+    print(message.chat.id)
     if not message.text.isdigit():
         try:
-            await query.message.edit_text("Telegram ID должен содержать только целые числа!",
-                                          reply_markup=cancel_manual_add_menu)
+            await query.message.edit_text("Telegram ID должен содержать только целые числа!")
         except MessageNotModified:
             pass
         await message.delete()
         return
     await state.update_data(id=int(message.text))
     await query.message.edit_text("Введите <b>ФИО</b>:",
-                                  parse_mode=ParseMode.HTML,
-                                  reply_markup=cancel_manual_add_menu)
+                                  parse_mode=ParseMode.HTML)
     await ManualAdd.initials.set()
     await message.delete()
 
@@ -244,8 +242,7 @@ async def get_user_initials_from_manual_add(message: Message, state: FSMContext)
     query = _linked_query_dict[message.from_id]
     if not re.fullmatch(r"^[A-Za-z ]+", message.text):
         try:
-            await query.message.edit_text("ФИО должно содержать только Буквы.",
-                                          reply_markup=cancel_manual_add_menu)
+            await query.message.edit_text("ФИО должно содержать только Буквы.")
         except MessageNotModified:
             pass
         _linked_query_dict[message.from_id] = query
@@ -253,8 +250,7 @@ async def get_user_initials_from_manual_add(message: Message, state: FSMContext)
         return
     await state.update_data(initials=message.text)
     await query.message.edit_text("Введите <b>E-mail</b>:",
-                                  parse_mode=ParseMode.HTML,
-                                  reply_markup=cancel_manual_add_menu)
+                                  parse_mode=ParseMode.HTML)
     await ManualAdd.email.set()
     await message.delete()
 
@@ -265,8 +261,7 @@ async def get_user_email_from_manual_add(message: Message, state: FSMContext):
     if re.search(r"[^@]+@[^@]+\.[^@]+", message.text):
         await state.update_data(email=message.text)
         await query.message.edit_text("Введите <b>номер телефона: </b>",
-                                      parse_mode=ParseMode.HTML,
-                                      reply_markup=cancel_manual_add_menu)
+                                      parse_mode=ParseMode.HTML)
         _linked_query_dict[message.from_id] = query
         await ManualAdd.phone_number.set()
         await message.delete()
@@ -274,8 +269,7 @@ async def get_user_email_from_manual_add(message: Message, state: FSMContext):
         try:
             await query.message.edit_text("<b>Неправильно введён E-mail.</b> \n"
                                           "Например: <b>prime@example.com</b>",
-                                          parse_mode=ParseMode.HTML,
-                                          reply_markup=cancel_manual_add_menu)
+                                          parse_mode=ParseMode.HTML)
         except MessageNotModified:
             pass
         await message.delete()
@@ -288,8 +282,7 @@ async def get_user_phone_number_from_manual_add(message: Message, state: FSMCont
     if re.fullmatch(r"\d{11}", message.text):
         await state.update_data(phone_number=message.text)
         await query.message.edit_text("Введите <b>Академическую группу</b>:",
-                                      parse_mode=ParseMode.HTML,
-                                      reply_markup=cancel_manual_add_menu)
+                                      parse_mode=ParseMode.HTML)
         _linked_query_dict[message.from_id] = query
         await message.delete()
         await ManualAdd.academy_group.set()
@@ -297,8 +290,7 @@ async def get_user_phone_number_from_manual_add(message: Message, state: FSMCont
         try:
             await query.message.edit_text("<b>Неправильно введён номер телефона.</b> \n"
                                           "Например: <b>89999999999</b>",
-                                          parse_mode=ParseMode.HTML,
-                                          reply_markup=cancel_manual_add_menu)
+                                          parse_mode=ParseMode.HTML)
         except MessageNotModified:
             pass
         await message.delete()
@@ -311,8 +303,7 @@ async def get_academy_group_from_manual_add(message: Message, state: FSMContext)
     await state.update_data(group=message.text)
     try:
         await query.message.edit_text("Введите <b>Гос. номер ТС</b>:",
-                                      parse_mode=ParseMode.HTML,
-                                      reply_markup=cancel_manual_add_menu)
+                                      parse_mode=ParseMode.HTML)
     except MessageNotModified:
         pass
     _linked_query_dict[message.from_id] = query
@@ -326,8 +317,7 @@ async def get_user_state_number_from_manual_add(message: Message, state: FSMCont
         try:
             await query.message.edit_text("<b>Неправильно введён государственный номер.</b> \n"
                                           "Например: <b>А000АА|(регион)</b>",
-                                          parse_mode=ParseMode.HTML,
-                                          reply_markup=cancel_manual_add_menu)
+                                          parse_mode=ParseMode.HTML)
         except MessageNotModified:
             pass
         await message.delete()
@@ -337,6 +327,7 @@ async def get_user_state_number_from_manual_add(message: Message, state: FSMCont
     await query.message.edit_text("Выберите <b>уровень доступа:</b>",
                                   parse_mode=ParseMode.HTML,
                                   reply_markup=application_or_manual_submit_menu)
+    await ManualAdd.level.set()
     await message.delete()
 
 
@@ -364,6 +355,7 @@ async def get_user_access_from_manual_add(query: CallbackQuery, state: FSMContex
                                   f"Уровень: <b>{_manual_user_access_level_dict[query.data]}</b>\n",
                                   parse_mode=ParseMode.HTML,
                                   reply_markup=manual_approve_menu)
+    await ManualAdd.approve.set()
 
 
 async def approve_manual_add_user(query: CallbackQuery, state: FSMContext):
@@ -389,9 +381,10 @@ async def approve_manual_add_user(query: CallbackQuery, state: FSMContext):
     await Admins.manual_add_state.set()
 
 
-async def cancel_manual_add(query: CallbackQuery, state: FSMContext):
-    await state.reset_data()
-    await Admins.manual_add_state.set()
-    await preview_step(query, state)
-    global _linked_query_dict
-    del _linked_query_dict[query.message.chat.id]
+async def cancel_manual_add(query, state: FSMContext):
+    if query is CallbackQuery:
+    # await state.reset_data()
+        await Admins.manual_add_state.set()
+        await preview_step(query, state)
+        global _linked_query_dict
+        del _linked_query_dict[query.message.chat.id]

@@ -19,7 +19,7 @@ const char* password = STAPSK;
 
 const String security_key = "tsVPw1T7PoQSP%2B9gbgrhT4RFchMzK8EQfa9cwuINuDEArAzX6YTbk7LijfeFnzwbDh%2FQtMxKXmnoknwz6RF%2BTw";
 
-ESP8266WebServer server(3944);
+ESP8266WebServer server(80);
 
 const int led = LED_BUILTIN;
 

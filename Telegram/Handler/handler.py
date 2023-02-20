@@ -123,21 +123,21 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.add_menu_state)
     dp.register_callback_query_handler(start_manual_add, Text(equals="start_manual_add"),
                                        state=Admins.manual_add_state)
-    dp.register_callback_query_handler(get_user_id_from_manual_add, state=ManualAdd.id)
-    dp.register_callback_query_handler(get_user_initials_from_manual_add, state=ManualAdd.initials)
-    dp.register_callback_query_handler(get_user_email_from_manual_add, state=ManualAdd.email)
-    dp.register_callback_query_handler(get_user_phone_number_from_manual_add, state=ManualAdd.phone_number)
-    dp.register_callback_query_handler(get_academy_group_from_manual_add, state=ManualAdd.academy_group)
-    dp.register_callback_query_handler(get_user_state_number_from_manual_add, state=ManualAdd.state_number)
+    dp.register_message_handler(get_user_id_from_manual_add, state=ManualAdd.id)
+    dp.register_message_handler(get_user_initials_from_manual_add, state=ManualAdd.initials)
+    dp.register_message_handler(get_user_email_from_manual_add, state=ManualAdd.email)
+    dp.register_message_handler(get_user_phone_number_from_manual_add, state=ManualAdd.phone_number)
+    dp.register_message_handler(get_academy_group_from_manual_add, state=ManualAdd.academy_group)
+    dp.register_message_handler(get_user_state_number_from_manual_add, state=ManualAdd.state_number)
     dp.register_callback_query_handler(get_user_access_from_manual_add,
-                                       lambda text: True if text in ["student", "student_plus",
+                                       Text(equals=["student", "student_plus",
                                                                      "teacher", "employee",
-                                                                     "administrator"] else False,
-                                       state=ManualAdd.state_number)
+                                                                     "administrator"]),
+                                       state=ManualAdd.level)
     dp.register_callback_query_handler(approve_manual_add_user, Text(equals="approve_manual"),
-                                       state=ManualAdd.state_number)
-    dp.register_callback_query_handler(cancel_manual_add, Text(equals="cancel_manual_add"),
-                                       state=ManualAdd.all_states)
+                                       state=ManualAdd.approve)
+    # dp.register_callback_query_handler(cancel_manual_add, Text(equals="cancel_manual_add"),
+    #                                    state=ManualAdd.all_states)
 
     """
         Admin User Section
