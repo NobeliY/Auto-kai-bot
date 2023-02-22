@@ -20,7 +20,7 @@ PG_USER = os.getenv('PG_USER')
 PG_PASSWORD = os.getenv('PG_PASSWORD')
 PG_DATABASE = os.getenv('PG_DATABASE')
 
-POSTGRES_URL = f'postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}'
+POSTGRES_URL = f'postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DATABASE}'
 
 
 def get_postgres_uri():

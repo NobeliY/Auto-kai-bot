@@ -1,11 +1,14 @@
-from sqlalchemy import Column, BigInteger, ForeignKey, Integer, sql, String
-from utils.database_api.database_gino import BaseModel
+from sqlalchemy import BigInteger, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
+
+from utils.database_api.database_sqlalchemy import Base
 
 
-class DateQuality(BaseModel):
-    __tablename__ = 'date_quality'
-    id = Column(BigInteger, ForeignKey('users.id'), primary_key=True)
-    times = Column(String, primary_key=True)
-    count = Column(Integer, primary_key=True)
+class DateQuality(Base):
+    __tablename__ = "date_quality"
+    id: Mapped[BigInteger] = mapped_column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    times: Mapped[str]
+    count: Mapped[int]
+    def __repr_(self) -> str:
+        return f"id={self.id}, times={self.times}, count={self.count}."
 
-    query: sql.select
