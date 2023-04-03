@@ -11,6 +11,8 @@ admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID_LIST').split(' ')]
 BOT_TOKEN = os.getenv('BOT_TOKEN_AUTO')
 TIME_RANGE = [time(6, 0), time(23, 0)]
 USER_CSV_PATH = Path('Data/users.csv')
+LOGGING_LEVEL = os.getenv("LEVEL")
+WEB_APP_URL = os.getenv("WEB_APP_URL")
 __all_states__ = UserState.all_states + Admins.all_states
 
 

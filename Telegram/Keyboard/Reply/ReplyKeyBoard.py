@@ -1,4 +1,6 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
+
+from Data.config import WEB_APP_URL
 
 student_menu = ReplyKeyboardMarkup(
     [
@@ -68,4 +70,6 @@ admin_menu = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+
 
