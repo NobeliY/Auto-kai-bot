@@ -1,4 +1,4 @@
-from aiogram.types import Message, ParseMode
+from aiogram.types import Message
 
 
 async def send_help_fork(message: Message):
@@ -8,6 +8,5 @@ async def send_help_fork(message: Message):
                          "<b>/start</b> - Запуск или перезапуск меня.\n"
                          "<b>/application</b> - Отправки заявку на получение доступа на парковку.\n"
                          "<b>/help</b> - Вызов помощи по боту.\n"
-                         "Спасибо за использование данного бота 😃",
-                         parse_mode=ParseMode.HTML)
+                         "Спасибо за использование данного бота 😃")
     await message.delete()

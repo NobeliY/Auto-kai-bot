@@ -5,6 +5,7 @@ class ApplicationSubmission(StatesGroup):
     """
         Application fork
     """
+    select_mode = State()
     user_id = State()
     user_initials = State()
     user_email = State()

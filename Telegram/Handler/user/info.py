@@ -1,10 +1,11 @@
 import logging as logger
 
-from aiogram.types import Message, ParseMode, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 from aiogram.utils.exceptions import MessageToDeleteNotFound
 from colorama import Fore
 
 from Keyboard.Inline import change_info_menu
+
 from utils.database_api.quick_commands import get_user
 from utils.shared_methods.default import soon_info, get_access_level
 
@@ -19,7 +20,6 @@ async def get_user_info(message: Message):
         f"Номер телефона: <b>{user.phoneNumber}</b>\n"
         f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
         f"Уровень: <b>{get_access_level(user.access)}</b>\n",
-        parse_mode=ParseMode.HTML,
         reply_markup=change_info_menu
     )
     await message.delete()

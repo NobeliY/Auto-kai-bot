@@ -2,15 +2,15 @@ import logging as logger
 from typing import List
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message, ParseMode
+from aiogram.types import CallbackQuery, Message
 from colorama import Fore
 
 from utils.shared_methods.default import get_access_level
 from Keyboard.Inline import back_inline_menu
-from Keyboard.Inline import delete_accept_menu, delete_fully_show_searched_menu,\
+from Keyboard.Inline import delete_accept_menu, delete_fully_show_searched_menu, \
     delete_searched_user_button
 from states import Admins
-from utils.database_api.quick_commands import delete_users_by_group, get_users_by_group, get_users_by_initials,\
+from utils.database_api.quick_commands import delete_users_by_group, get_users_by_group, get_users_by_initials, \
     delete_user_by_initials_command
 from utils.database_api.schemas.user import User
 
@@ -36,7 +36,6 @@ async def delete_user_by_initials_searched(message: Message, state: FSMContext):
         return
     await message.answer(f"По вашему запросу найдено: <b>{len(users)}</b>\n"
                          f"Нажмите на `Подробнее` и выберите из сообщений необходимый!",
-                         parse_mode=ParseMode.HTML,
                          reply_markup=delete_fully_show_searched_menu)
     await state.update_data(data={
         "data": users
@@ -53,7 +52,6 @@ async def send_all_searched_users_for_delete(query: CallbackQuery, state: FSMCon
                                    f"Номер телефона: <b>{user.phoneNumber}</b>\n"
                                    f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
                                    f"Уровень: <b>{get_access_level(user.access)}</b>\n",
-                                   parse_mode=ParseMode.HTML,
                                    reply_markup=delete_searched_user_button)
         for user in users['data']
     ]
@@ -85,7 +83,6 @@ async def delete_user(query: CallbackQuery, state: FSMContext):
                                   f"Группа: <b>{user.group}</b>\n"
                                   f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
                                   f"Уровень: <b>{get_access_level(user.access)}</b>\n",
-                                  parse_mode=ParseMode.HTML,
                                   reply_markup=back_inline_menu)
 
 
@@ -105,8 +102,7 @@ async def get_group_for_delete(message: Message, state: FSMContext):
         return
     await message.answer(f"Найдено: <b>{len(users)}</b>\n"
                          f"Вы точно хотите удалить эту группу?",
-                         reply_markup=delete_accept_menu,
-                         parse_mode=ParseMode.HTML)
+                         reply_markup=delete_accept_menu)
     await state.update_data(data={
         "data": users
     })
@@ -125,5 +121,4 @@ async def decline_delete_group(query: CallbackQuery):
 
 async def decline_delete(query: CallbackQuery):
     await query.message.edit_text("<b>Операция отменена!</b>",
-                                  parse_mode=ParseMode.HTML,
                                   reply_markup=back_inline_menu)
