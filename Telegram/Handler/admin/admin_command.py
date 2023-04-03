@@ -2,9 +2,10 @@ import csv
 from typing import List
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message, ParseMode, InputFile
+from aiogram.types import CallbackQuery, Message, InputFile
 
 from Data import USER_CSV_PATH
+
 from utils.shared_methods.default import get_access_level, get_admin_level
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
 from Keyboard.Inline import delete_menu, show_db_menu
@@ -22,7 +23,7 @@ async def call_admin_panel(message: Message):
 
     user = await get_user(message.from_id)
     await message.answer(f"Добро пожаловать, <b>{user.initials}</b>!",
-                         parse_mode=ParseMode.HTML, reply_markup=main_admin_menu)
+                         reply_markup=main_admin_menu)
     await Admins.main_state.set()
     await message.delete()
 
@@ -30,7 +31,7 @@ async def call_admin_panel(message: Message):
 async def users_info(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.show_db_state)
     await query.message.edit_text(f"{await get_users_shortly_info()}",
-                                  reply_markup=show_db_menu, parse_mode=ParseMode.HTML)
+                                  reply_markup=show_db_menu)
 
 
 async def set_add_menu(query: CallbackQuery, state: FSMContext):
@@ -118,7 +119,7 @@ async def return_call_admin_panel(query: CallbackQuery, state: FSMContext):
     user = await get_user(query.message.chat.id)
     await state.set_state(Admins.main_state)
     await query.message.edit_text(f"Добро пожаловать, <b>{user.initials}</b>!",
-                                  parse_mode=ParseMode.HTML, reply_markup=main_admin_menu)
+                                  reply_markup=main_admin_menu)
 
 
 async def reset_admin_panel(query: CallbackQuery, state: FSMContext):
@@ -126,7 +127,7 @@ async def reset_admin_panel(query: CallbackQuery, state: FSMContext):
     user = await get_user(query.message.chat.id)
     await query.message.delete()
     await query.message.answer(f"Добро пожаловать, <b>{user.initials}</b>!",
-                               parse_mode=ParseMode.HTML, reply_markup=main_admin_menu)
+                               reply_markup=main_admin_menu)
 
 
 async def build_application_info(application: Application) -> str:

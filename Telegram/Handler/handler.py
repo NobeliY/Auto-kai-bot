@@ -1,6 +1,7 @@
+
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text, Command
-from aiogram.types import ContentTypes
+from aiogram.types import ContentType
 
 from Data import __all_states__
 
@@ -25,7 +26,8 @@ from Handler.admin.user_section import (
 )
 from Handler.application.application_command import (
     set_application, application_submission_initials, application_submission_email,
-    application_submission_phone, application_submission_academy_group, application_submission_state_number
+    application_submission_phone, application_submission_academy_group, application_submission_state_number,
+    select_application_mode, application_from_web_app
 )
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
@@ -53,7 +55,11 @@ def register_handlers(dp: Dispatcher):
     """
         Application
     """
-    dp.register_message_handler(set_application, Command("application"), state="*")
+    dp.register_message_handler(select_application_mode, Command("application"), state="*")
+    dp.register_message_handler(set_application, Text(equals="Старый вариант подачи.", ignore_case=True),
+                                state=ApplicationSubmission.select_mode)
+    # dp.register_message_handler(application_from_web_app, content_types='web_app_data')
+    # dp.register_message_handler(application_from_web_app, content_types=ContentType.WEB_APP_DATA)
 
     """
         INFO
@@ -131,20 +137,18 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(get_user_state_number_from_manual_add, state=ManualAdd.state_number)
     dp.register_callback_query_handler(get_user_access_from_manual_add,
                                        Text(equals=["student", "student_plus",
-                                                                     "teacher", "employee",
-                                                                     "administrator"]),
+                                                    "teacher", "employee",
+                                                    "administrator"]),
                                        state=ManualAdd.level)
     dp.register_callback_query_handler(approve_manual_add_user, Text(equals="approve_manual"),
                                        state=ManualAdd.approve)
-    # dp.register_callback_query_handler(cancel_manual_add, Text(equals="cancel_manual_add"),
-    #                                    state=ManualAdd.all_states)
 
     """
         Admin User Section
     """
     dp.register_callback_query_handler(delete_user_by_initials, Text(equals="delete_by_initials"),
                                        state=Admins.delete_menu_state)
-    dp.register_message_handler(delete_user_by_initials_searched, content_types=ContentTypes.TEXT,
+    dp.register_message_handler(delete_user_by_initials_searched, content_types=ContentType.TEXT,
                                 state=Admins.searched_user_delete_state)
     dp.register_callback_query_handler(send_all_searched_users_for_delete, Text(equals="show_fully_searched_users"),
                                        state=Admins.searched_user_delete_state)
@@ -156,7 +160,7 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.searched_user_delete_state)
     dp.register_callback_query_handler(delete_all_from_group, Text(equals="delete_all_group"),
                                        state=Admins.delete_menu_state)
-    dp.register_message_handler(get_group_for_delete, content_types=ContentTypes.TEXT,
+    dp.register_message_handler(get_group_for_delete, content_types=ContentType.TEXT,
                                 state=Admins.delete_all_group_state)
     dp.register_callback_query_handler(accept_delete_group, Text(equals="accept_delete"),
                                        state=Admins.delete_all_group_state)

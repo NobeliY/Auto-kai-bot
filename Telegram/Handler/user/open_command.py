@@ -2,7 +2,7 @@ import logging as logger
 from threading import Thread
 from time import sleep
 
-from aiogram.types import Message, ParseMode, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove
 from colorama import Fore
 
 from utils.shared_methods.default import soon_info, return_user_checked
@@ -43,7 +43,7 @@ async def open_from_all_registered_users(message: Message):
             await message.answer(f" Диапазон от 6 до 23")
     else:
         await message.answer(return_user_checked(False),
-                             parse_mode=ParseMode.HTML, reply_markup=ReplyKeyboardRemove())
+                             reply_markup=ReplyKeyboardRemove())
     await message.delete()
 
 
