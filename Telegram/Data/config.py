@@ -3,7 +3,8 @@ from datetime import time
 from pathlib import Path
 from dotenv import load_dotenv
 
-from states import UserState, Admins
+from states import UserState, Admins, UserChanges
+
 load_dotenv()
 
 # Basic Configuration

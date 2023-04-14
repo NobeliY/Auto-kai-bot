@@ -2,6 +2,7 @@ import logging
 import re
 
 from aiogram import Bot
+from aiogram.utils.exceptions import MessageNotModified
 from aiogram.utils.web_app import safe_parse_webapp_init_data
 from aiohttp.web_request import Request
 from aiohttp.web_response import json_response
@@ -17,13 +18,19 @@ from aiogram.types import Message, ReplyKeyboardRemove, ParseMode
 from aiogram.dispatcher import FSMContext
 
 from utils.database_api.quick_commands import add_application
+from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials
 
 
-async def select_application_mode(message: Message, state: FSMContext):
+async def select_application_mode(message: Message, state: FSMContext) -> None:
+    if message.from_id in on_startup_users():
+        await message.answer(f"Вы зарегистрированы в боте!\n"
+                             f"Используйте команду: <b>/start</b>")
+        return
     await state.reset_state()
     await message.answer(f"<b>Выберите способ отправки заявления</b>",
-                         reply_markup=select_application_mode_kb, parse_mode=ParseMode.HTML)
+                         reply_markup=select_application_mode_kb)
     await ApplicationSubmission.select_mode.set()
+    return
 
 
 async def set_application(message: Message, state: FSMContext):
@@ -36,37 +43,42 @@ async def set_application(message: Message, state: FSMContext):
 
 async def application_submission_initials(message: Message, state: FSMContext):
     if await check_message_text(message, state):
-        await state.update_data(user_initials=message.text)
-        await message.answer("<b>Введите E-mail: </b>")
-        await ApplicationSubmission.user_email.set()
+        if check_initials(message.text):
+            await state.update_data(user_initials=message.text)
+            await message.answer("<b>Введите E-mail: </b>")
+            await ApplicationSubmission.user_email.set()
+            return
+        try:
+            await message.edit_text("ФИО должно содержать только Буквы.")
+        except MessageNotModified:
+            pass
 
 
 async def application_submission_email(message: Message, state: FSMContext):
     if await check_message_text(message, state):
-        email_address_re_compile = re.compile(r"[^@]+@[^@]+\.[^@]+")
-        if re.search(email_address_re_compile, message.text):
+        if check_email(message.text):
             await state.update_data(user_email=message.text)
             await message.answer("<b>Введите номер телефона: </b>",
                                  )
             await ApplicationSubmission.user_phone_number.set()
-        else:
-            await message.answer("<b>Неправильно введён E-mail.</b> \n"
-                                 "Например: <b>prime@example.com</b>")
             return
+        await message.answer("<b>Неправильно введён E-mail.</b> \n"
+                             "Например: <b>prime@example.com</b>")
+        return
 
 
 async def application_submission_phone(message: Message, state: FSMContext):
     if await check_message_text(message, state):
-        phone_number_re_compile = re.compile(r"\d{11}")
-        if re.fullmatch(phone_number_re_compile, message.text):
+
+        if check_phone(message.text):
             await state.update_data(user_phone_number=message.text)
             await message.answer("<b>Введите Академическую группу: </b>",
                                  )
             await ApplicationSubmission.user_academy_group.set()
-        else:
-            await message.answer("<b>Неправильно введён номер телефона.</b> \n"
-                                 "Например: <b>89999999999</b>")
             return
+        await message.answer("<b>Неправильно введён номер телефона.</b> \n"
+                             "Например: <b>89999999999</b>")
+        return
 
 
 async def application_submission_academy_group(message: Message, state: FSMContext):

@@ -1,17 +1,18 @@
 import logging as logger
 
+from app import bot
+from aiogram import types, Dispatcher
+import aiogram.utils.exceptions as exceptions
 from colorama import Fore
 
 from Data import admins
 from Handler.handler import register_handlers
-from app import bot
-from aiogram import types, Dispatcher
-import aiogram.utils.exceptions as exceptions
-
 from utils.database_api.database_gino import on_startup, on_close
+from utils.database_api.quick_commands import get_users_info
+from utils.shared_methods.default import set_on_startup_users
 
 
-async def get_default_commands(dp: Dispatcher):
+async def get_default_commands(dp: Dispatcher) -> None:
     try:
         on_close()
     except Exception as _ex:
@@ -24,6 +25,9 @@ async def get_default_commands(dp: Dispatcher):
             types.BotCommand("help", "Инструкция по эксплуатации. 🧐")
         ]
     )
+    set_on_startup_users([
+        user.id for user in await get_users_info()
+    ])
     logger.info(f"{Fore.GREEN}Бот запущен{Fore.RESET}!")
 
     for admin_id in admins:
@@ -33,4 +37,3 @@ async def get_default_commands(dp: Dispatcher):
             logger.error(f"{Fore.RED}Нет чата с {admin_id}{Fore.RESET}!")
     register_handlers(dp=dp)
     logger.info(f"{Fore.LIGHTGREEN_EX}Register handlers job done{Fore.RESET}!")
-

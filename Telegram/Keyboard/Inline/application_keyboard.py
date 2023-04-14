@@ -7,7 +7,7 @@ select_application_mode_kb = InlineKeyboardMarkup(
         [
             # InlineKeyboardButton(text="Новый вариант подачи.",
             #                web_app=WebAppInfo(url=WEB_APP_URL)),
-            InlineKeyboardButton(text="Старый вариант подачи."),
+            InlineKeyboardButton(text="Старый вариант подачи.", callback_data="old_type"),
 
         ],
     ],
