@@ -1,4 +1,3 @@
-
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text, Command
 from aiogram.types import ContentType
@@ -8,7 +7,7 @@ from Data import __all_states__
 from Handler.admin.admin_command import (
     call_admin_panel, users_info, set_add_menu,
     set_remove_menu, show_fully_information, preview_step,
-    show_applications
+    # show_applications
 )
 from Handler.admin.application_section import (
     auto_add_by_application, manual_add_user,
@@ -18,6 +17,10 @@ from Handler.admin.application_section import (
     get_user_email_from_manual_add, get_user_phone_number_from_manual_add, get_academy_group_from_manual_add,
     get_user_state_number_from_manual_add, get_user_access_from_manual_add, approve_manual_add_user, cancel_manual_add
 )
+from Handler.admin.change_ap_command import get_change_application, get_change_application_from_begin, \
+    get_change_application_from_end, next_change_application, approve_change_application, \
+    reject_change_application, confirm_reject, confirm_approve_change_application, close_change_application, \
+    cancel_approve_change_application
 from Handler.admin.user_section import (
     delete_user_by_initials, delete_all_from_group,
     delete_user_by_initials_searched, send_all_searched_users_for_delete,
@@ -32,13 +35,16 @@ from Handler.application.application_command import (
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
 from Handler.user.info import (
-    change_user_info, get_free_positions, get_user_info, close_user_info
+    change_user_info, get_free_positions, get_user_info, close_user_info, change_initials, change_email,
+    change_phone_number, change_group, change_state_number, accept_changes, cancel_changes, agree_changes,
+    get_change_initials, get_change_email, get_change_group, get_change_phone, get_change_state_number, close_info,
+    preview_step_info
 )
 from Handler.user.open_command import (
     open_from_all_registered_users, open_first_level_from_employee,
     open_second_level_from_employee
 )
-from states import UserState, ApplicationSubmission, Admins, ManualAdd
+from states import UserState, ApplicationSubmission, Admins, ManualAdd, UserChanges
 
 
 def register_handlers(dp: Dispatcher):
@@ -56,22 +62,55 @@ def register_handlers(dp: Dispatcher):
         Application
     """
     dp.register_message_handler(select_application_mode, Command("application"), state="*")
-    dp.register_message_handler(set_application, Text(equals="Старый вариант подачи.", ignore_case=True),
-                                state=ApplicationSubmission.select_mode)
+    dp.register_callback_query_handler(set_application, Text(equals="old_type"),
+                                       state=ApplicationSubmission.select_mode)
     # dp.register_message_handler(application_from_web_app, content_types='web_app_data')
     # dp.register_message_handler(application_from_web_app, content_types=ContentType.WEB_APP_DATA)
 
     """
         INFO
     """
-    dp.register_message_handler(get_user_info, Text(equals="информация о себе", ignore_case=True),
-                                state=__all_states__)
     dp.register_message_handler(get_free_positions, Text(equals="свободные места", ignore_case=True),
                                 state=__all_states__)
     dp.register_callback_query_handler(change_user_info, Text(equals="change_info_menu"),
                                        state=__all_states__)
+
+    """
+    INFO -> Sector change application
+    """
+    dp.register_message_handler(get_user_info, Text(equals="информация о себе", ignore_case=True),
+                                state=__all_states__)
     dp.register_callback_query_handler(close_user_info, Text(equals="close_info"),
                                        state=__all_states__)
+    dp.register_callback_query_handler(change_user_info, Text(equals="change_info_menu"),
+                                       state=__all_states__)
+    dp.register_callback_query_handler(change_initials, Text(equals="change_initials"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(change_email, Text(equals="change_email"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(change_phone_number, Text(equals="change_phone"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(change_group, Text(equals="change_group"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(change_state_number, Text(equals="change_state_number"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(accept_changes, Text(equals="finish_changes"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(cancel_changes, Text(equals="cancel_changes"),
+                                       state=UserChanges.change_menu)
+
+    dp.register_callback_query_handler(agree_changes, Text(equals="agree_changes"),
+                                       state=UserChanges.change_menu)
+
+    dp.register_message_handler(get_change_initials, state=UserChanges.change_initials)
+    dp.register_message_handler(get_change_email, state=UserChanges.change_email)
+    dp.register_message_handler(get_change_phone, state=UserChanges.change_phone)
+    dp.register_message_handler(get_change_group, state=UserChanges.change_group)
+    dp.register_message_handler(get_change_state_number, state=UserChanges.change_state_number)
+    dp.register_callback_query_handler(close_info, Text(equals="close_info"),
+                                       state=UserChanges.change_menu)
+    dp.register_callback_query_handler(preview_step_info, Text(equals="preview_step"),
+                                       state=UserChanges.all_states)
 
     """
         Open Command
@@ -94,12 +133,37 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.main_state)
     dp.register_callback_query_handler(set_remove_menu, Text(equals="user_remove_menu"),
                                        state=Admins.main_state)
-    dp.register_callback_query_handler(show_applications, Text(equals="show_applications"),
-                                       state=Admins.main_state)
+    # dp.register_callback_query_handler(show_applications, Text(equals="show_applications"),
+    #                                    state=Admins.main_state)
     dp.register_callback_query_handler(show_fully_information, Text(equals="show_fully_information_from_db"),
                                        state=Admins.show_db_state)
     dp.register_callback_query_handler(preview_step, Text(equals="preview_step"),
                                        state=Admins.all_states)
+
+    """
+        Admin -> Change Application Section
+    """
+    dp.register_callback_query_handler(get_change_application, Text(equals="show_applications"),
+                                       state=Admins.all_states)
+    dp.register_callback_query_handler(get_change_application_from_begin, Text(equals="start_from_begin"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(get_change_application_from_end, Text(equals="start_from_end"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(next_change_application, Text(equals="next_application"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(approve_change_application, Text(equals="approve_application"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(confirm_approve_change_application, Text(equals="approve_manual"),
+                                       state=Admins.show_selected_change_application)
+    dp.register_callback_query_handler(cancel_approve_change_application, Text(equals="cancel_manual_add"),
+                                       state=Admins.show_selected_change_application)
+    dp.register_callback_query_handler(reject_change_application, Text(equals="submit_reject_application"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(confirm_reject, Text(equals="reject_application"),
+                                       state=Admins.show_change_application)
+    dp.register_callback_query_handler(close_change_application, Text(equals="preview_step"),
+                                       state=Admins.show_change_application)
+
 
     """
         Admin Application Section
@@ -119,9 +183,9 @@ def register_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(get_application_from_end, Text(equals="start_from_end"),
                                        state=Admins.auto_add_state)
     dp.register_callback_query_handler(approve_student_level_from_application,
-                                       lambda equals: True if equals in ['student', 'student_plus',
-                                                                         'teacher', 'employee',
-                                                                         'administrator'] else False,
+                                       Text(equals=['student', 'student_plus',
+                                                    'teacher', 'employee',
+                                                    'administrator']),
                                        state=Admins.auto_add_state)
     dp.register_callback_query_handler(approve_application, Text(equals="approve_level_application"),
                                        state=Admins.auto_add_state)

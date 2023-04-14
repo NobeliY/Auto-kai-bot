@@ -184,3 +184,9 @@ application_reject_menu = InlineKeyboardMarkup(
         ],
     ]
 )
+
+application_close_menu: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        InlineKeyboardButton("Закрыть", callback_data="close_application")
+    ]
+)

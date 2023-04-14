@@ -1,12 +1,10 @@
-import re
-
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import MessageNotModified
 from asyncpg import UniqueViolationError
 
 from Handler.admin.admin_command import preview_step
-from utils.shared_methods.default import Level
+from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
 from Keyboard.Inline import (
     back_inline_menu,
     add_by_applications_menu,
@@ -41,12 +39,13 @@ _manual_user_access_level_dict = {
 }
 
 
-async def auto_add_by_application(query: CallbackQuery, state: FSMContext):
+async def auto_add_by_application(query: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(Admins.auto_add_state)
     count = await get_count_of_applications()
     if not count:
         await query.message.edit_text("Нет заявок!",
                                       reply_markup=back_inline_menu)
+        return
     await query.message.edit_text(f"Найдено: <b>{count}</b>\n"
                                   f"Выберите один из вариантов обработки.",
                                   reply_markup=add_by_applications_menu)
@@ -225,59 +224,58 @@ async def get_user_id_from_manual_add(message: Message, state: FSMContext):
     await message.delete()
 
 
-async def get_user_initials_from_manual_add(message: Message, state: FSMContext):
+async def get_user_initials_from_manual_add(message: Message, state: FSMContext) -> None:
     global _linked_query_dict
     query = _linked_query_dict[message.from_id]
-    if not re.fullmatch(r"^[А-Яа-я ]+", message.text):
-        try:
-            await query.message.edit_text("ФИО должно содержать только Буквы.")
-        except MessageNotModified:
-            pass
-        _linked_query_dict[message.from_id] = query
+    if check_initials(message.text):
+        await state.update_data(initials=message.text)
+        await query.message.edit_text("Введите <b>E-mail</b>:")
+        await ManualAdd.email.set()
         await message.delete()
         return
-    await state.update_data(initials=message.text)
-    await query.message.edit_text("Введите <b>E-mail</b>:")
-    await ManualAdd.email.set()
+    try:
+        await query.message.edit_text("ФИО должно содержать только Буквы.")
+    except MessageNotModified:
+        pass
+    _linked_query_dict[message.from_id] = query
     await message.delete()
 
 
 async def get_user_email_from_manual_add(message: Message, state: FSMContext):
     global _linked_query_dict
     query = _linked_query_dict[message.from_id]
-    if re.search(r"[^@]+@[^@]+\.[^@]+", message.text):
+    if check_email(message.text):
         await state.update_data(email=message.text)
         await query.message.edit_text("Введите <b>номер телефона: </b>")
         _linked_query_dict[message.from_id] = query
         await ManualAdd.phone_number.set()
         await message.delete()
-    else:
-        try:
-            await query.message.edit_text("<b>Неправильно введён E-mail.</b> \n"
-                                          "Например: <b>prime@example.com</b>")
-        except MessageNotModified:
-            pass
-        await message.delete()
         return
+    try:
+        await query.message.edit_text("<b>Неправильно введён E-mail.</b> \n"
+                                      "Например: <b>prime@example.com</b>")
+    except MessageNotModified:
+        pass
+    await message.delete()
 
 
 async def get_user_phone_number_from_manual_add(message: Message, state: FSMContext):
     global _linked_query_dict
     query = _linked_query_dict[message.from_id]
-    if re.fullmatch(r"\d{11}", message.text):
+    if check_phone(message.text):
         await state.update_data(phone_number=message.text)
         await query.message.edit_text("Введите <b>Академическую группу</b>:")
         _linked_query_dict[message.from_id] = query
         await message.delete()
         await ManualAdd.academy_group.set()
-    else:
-        try:
-            await query.message.edit_text("<b>Неправильно введён номер телефона.</b> \n"
-                                          "Например: <b>89999999999</b>")
-        except MessageNotModified:
-            pass
-        await message.delete()
         return
+    try:
+        await query.message.edit_text("<b>Неправильно введён номер телефона.</b> \n"
+                                      "Например: <b>89999999999</b>")
+    except MessageNotModified:
+        pass
+    await message.delete()
+    return
 
 
 async def get_academy_group_from_manual_add(message: Message, state: FSMContext):
@@ -295,20 +293,21 @@ async def get_academy_group_from_manual_add(message: Message, state: FSMContext)
 
 async def get_user_state_number_from_manual_add(message: Message, state: FSMContext):
     query = _linked_query_dict[message.from_id]
-    if not re.search(r"\w\d{3}\w{2}\|\d", message.text):
-        try:
-            await query.message.edit_text("<b>Неправильно введён государственный номер.</b> \n"
-                                          "Например: <b>А000АА|(регион)</b>")
-        except MessageNotModified:
-            pass
+    if check_state_number(message.text):
+        await state.update_data(state_number=message.text)
+        await query.message.edit_text("Выберите <b>уровень доступа:</b>",
+                                      reply_markup=application_or_manual_submit_menu)
+        await ManualAdd.level.set()
         await message.delete()
-        _linked_query_dict[message.from_id] = query
         return
-    await state.update_data(state_number=message.text)
-    await query.message.edit_text("Выберите <b>уровень доступа:</b>",
-                                  reply_markup=application_or_manual_submit_menu)
-    await ManualAdd.level.set()
+    try:
+        await query.message.edit_text("<b>Неправильно введён государственный номер.</b> \n"
+                                      "Например: <b>А000АА|(регион)</b>")
+    except MessageNotModified:
+        pass
     await message.delete()
+    _linked_query_dict[message.from_id] = query
+    return
 
 
 async def get_user_access_from_manual_add(query: CallbackQuery, state: FSMContext):

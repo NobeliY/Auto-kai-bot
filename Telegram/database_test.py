@@ -39,7 +39,7 @@ async def database_test():
     # await commands.add_application(user_id=5, initials='hi dade', email='hadi_de@er.er',
     #                                group='2322-2', phone_number="8989898989", state_number='a123wa|123')
 
-    with open("Data/Refactored_DB.json", "r") as file:
+    with open("Data/Refactored_DB.json", "r", encoding="utf-8") as file:
         json_dict = json.load(file)
         for access_level, user_list in json_dict.items():
             for user in user_list:

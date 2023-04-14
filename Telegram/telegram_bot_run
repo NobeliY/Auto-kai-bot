@@ -14,7 +14,7 @@ function pause(){
 }
 
 
-#python database_test.py
+python database_test.py
 python app.py
 
 #python test.py

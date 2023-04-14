@@ -9,4 +9,4 @@ from .admin_keyboard import (
     delete_menu, delete_accept_menu,
     delete_fully_show_searched_menu, delete_searched_user_button
 )
-from .user_keyboard import change_info_menu
+from .user_keyboard import change_info_menu, change_info_list_menu

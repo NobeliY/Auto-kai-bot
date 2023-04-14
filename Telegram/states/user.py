@@ -7,3 +7,14 @@ class UserState(StatesGroup):
     """
     in_active = State()
     is_admin = State()
+
+
+class UserChanges(StatesGroup):
+    change_menu = State()
+    user_id = State()
+    change_initials = State()
+    change_email = State()
+    change_phone = State()
+    change_group = State()
+    change_state_number = State()
+    accept = State()
