@@ -11,7 +11,7 @@ from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyb
 from app import bot
 from states import UserChanges, UserState
 
-from utils.database_api.quick_commands import get_user, add_change_application
+from utils.database_api.quick_commands import get_user, add_application
 from utils.shared_methods.default import soon_info, get_access_level, check_initials, check_email, check_phone, \
     check_state_number
 
@@ -20,10 +20,10 @@ async def preview_step(query: CallbackQuery, state: FSMContext) -> None:
     state_level = await state.get_state()
     if state_level in ["UserChanges:change_menu"]:
         await UserState.in_active.set()
-        await get_user_info(message=query.message, state=state, sec=query.from_user.id)
+        await get_user_info(message=query.message, sec=query.from_user.id)
 
 
-async def get_user_info(message: Message, state: FSMContext, sec: int = -1) -> None:
+async def get_user_info(message: Message, sec: int = -1) -> None:
     if sec < 0:
         user = await get_user(message.from_id)
     else:
@@ -226,13 +226,14 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
     for key in states_list:
         if _application[key] == 'без изменений':
             _application[key] = ''
-    await add_change_application(
+    await add_application(
         user_id=_application['user_id'],
         initials=_application['change_initials'],
         email=_application['change_email'],
         phone_number=_application['change_phone'],
         group=_application['change_group'],
-        state_number=_application['change_state_number']
+        state_number=_application['change_state_number'],
+        change_ap=True
     )
     try:
         await query.message.edit_text(f"Данные отправлены. Ожидайте изменения информации!",
@@ -259,7 +260,7 @@ async def get_free_positions(message: Message) -> None:
     await message.delete()
 
 
-async def close_info(query: CallbackQuery, state: FSMContext) -> None:
+async def close_info(query: CallbackQuery) -> None:
     await UserState.in_active.set()
     try:
         await query.message.delete()

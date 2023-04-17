@@ -1,22 +1,14 @@
 import logging
 import re
 
-from aiogram import Bot
+from aiogram.dispatcher import FSMContext
+from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.exceptions import MessageNotModified
-from aiogram.utils.web_app import safe_parse_webapp_init_data
-from aiohttp.web_request import Request
-from aiohttp.web_response import json_response
 
-from Data import BOT_TOKEN
-from app import bot
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
 from Keyboard.Inline.application_keyboard import select_application_mode_kb
 from states import ApplicationSubmission
-
-from aiogram.types import Message, ReplyKeyboardRemove, ParseMode
-from aiogram.dispatcher import FSMContext
-
 from utils.database_api.quick_commands import add_application
 from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials
 

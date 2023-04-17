@@ -3,7 +3,6 @@ from aiogram.dispatcher.filters import Text, Command
 from aiogram.types import ContentType
 
 from Data import __all_states__
-
 from Handler.admin.admin_command import (
     call_admin_panel, users_info, set_add_menu,
     set_remove_menu, show_fully_information, preview_step,
@@ -15,7 +14,7 @@ from Handler.admin.application_section import (
     submit_reject_application, reject_application, get_application_from_end, approve_student_level_from_application,
     approve_application_from_list, start_manual_add, get_user_id_from_manual_add, get_user_initials_from_manual_add,
     get_user_email_from_manual_add, get_user_phone_number_from_manual_add, get_academy_group_from_manual_add,
-    get_user_state_number_from_manual_add, get_user_access_from_manual_add, approve_manual_add_user, cancel_manual_add
+    get_user_state_number_from_manual_add, get_user_access_from_manual_add, approve_manual_add_user
 )
 from Handler.admin.change_ap_command import get_change_application, get_change_application_from_begin, \
     get_change_application_from_end, next_change_application, approve_change_application, \
@@ -30,7 +29,7 @@ from Handler.admin.user_section import (
 from Handler.application.application_command import (
     set_application, application_submission_initials, application_submission_email,
     application_submission_phone, application_submission_academy_group, application_submission_state_number,
-    select_application_mode, application_from_web_app
+    select_application_mode
 )
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
@@ -151,11 +150,11 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.show_change_application)
     dp.register_callback_query_handler(next_change_application, Text(equals="next_application"),
                                        state=Admins.show_change_application)
-    dp.register_callback_query_handler(approve_change_application, Text(equals="approve_application"),
+    dp.register_callback_query_handler(approve_change_application, Text(equals="approve_level_application"),
                                        state=Admins.show_change_application)
-    dp.register_callback_query_handler(confirm_approve_change_application, Text(equals="approve_manual"),
+    dp.register_callback_query_handler(confirm_approve_change_application, Text(equals="approve_level_application"),
                                        state=Admins.show_selected_change_application)
-    dp.register_callback_query_handler(cancel_approve_change_application, Text(equals="cancel_manual_add"),
+    dp.register_callback_query_handler(cancel_approve_change_application, Text(equals="preview_step"),
                                        state=Admins.show_selected_change_application)
     dp.register_callback_query_handler(reject_change_application, Text(equals="submit_reject_application"),
                                        state=Admins.show_change_application)
@@ -163,7 +162,6 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.show_change_application)
     dp.register_callback_query_handler(close_change_application, Text(equals="preview_step"),
                                        state=Admins.show_change_application)
-
 
     """
         Admin Application Section
@@ -204,7 +202,7 @@ def register_handlers(dp: Dispatcher):
                                                     "teacher", "employee",
                                                     "administrator"]),
                                        state=ManualAdd.level)
-    dp.register_callback_query_handler(approve_manual_add_user, Text(equals="approve_manual"),
+    dp.register_callback_query_handler(approve_manual_add_user, Text(equals="approve_level_application"),
                                        state=ManualAdd.approve)
 
     """

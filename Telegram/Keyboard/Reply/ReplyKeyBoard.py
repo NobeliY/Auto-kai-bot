@@ -1,9 +1,10 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
-
-from Data.config import WEB_APP_URL
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 student_menu = ReplyKeyboardMarkup(
     [
+        [
+            KeyboardButton("/start"),
+        ],
         [
             KeyboardButton(text="Информация о себе"),
         ],
@@ -18,6 +19,9 @@ student_menu = ReplyKeyboardMarkup(
 
 teacher_menu = ReplyKeyboardMarkup(
     [
+        [
+            KeyboardButton("/start"),
+        ],
         [
             KeyboardButton(text="Информация о себе")
         ],
@@ -34,17 +38,19 @@ teacher_menu = ReplyKeyboardMarkup(
 employee_menu = ReplyKeyboardMarkup(
     [
         [
+            KeyboardButton("/start"),
+        ],
+        [
             KeyboardButton(text="Свободные места"),
         ],
         [
             KeyboardButton(text="Информация о себе"),
         ],
         [
-            KeyboardButton(text="Открыть 2 уровень"),
+            KeyboardButton(text="Открыть железные ворота"),
         ],
         [
-            KeyboardButton(text="Открыть 1 уровень"),
-
+            KeyboardButton(text="Открыть шлагбаум"),
         ]
     ],
     resize_keyboard=True
@@ -52,6 +58,9 @@ employee_menu = ReplyKeyboardMarkup(
 
 admin_menu = ReplyKeyboardMarkup(
     [
+        [
+            KeyboardButton("/start"),
+        ],
         [
             KeyboardButton(text="Свободные места"),
         ],
@@ -62,14 +71,11 @@ admin_menu = ReplyKeyboardMarkup(
             KeyboardButton(text="Панель для администратора")
         ],
         [
-            KeyboardButton(text="Открыть 2 уровень"),
+            KeyboardButton(text="Открыть железные ворота"),
         ],
         [
-            KeyboardButton(text="Открыть 1 уровень"),
+            KeyboardButton(text="Открыть шлагбаум"),
         ]
     ],
     resize_keyboard=True
 )
-
-
-

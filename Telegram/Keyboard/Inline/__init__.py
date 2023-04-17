@@ -1,8 +1,8 @@
 from .admin_keyboard import (
-    add_menu, add_by_applications_menu, application_approve_level_menu,
+    add_menu, add_by_applications_menu, application_approve_menu,
     application_change_menu, application_or_manual_submit_menu,
     application_reject_menu, back_inline_menu, cancel_manual_add_menu,
-    main_admin_menu, manual_add_menu, manual_approve_menu,
+    main_admin_menu, manual_add_menu,
     show_applications_menu, show_db_menu
 )
 from .admin_keyboard import (
