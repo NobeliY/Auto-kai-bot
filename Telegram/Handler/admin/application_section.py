@@ -4,17 +4,15 @@ from aiogram.utils.exceptions import MessageNotModified
 from asyncpg import UniqueViolationError
 
 from Handler.admin.admin_command import preview_step
-from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
 from Keyboard.Inline import (
     back_inline_menu,
     add_by_applications_menu,
     application_change_menu,
     application_or_manual_submit_menu,
     application_reject_menu,
-    application_approve_level_menu,
+    application_approve_menu,
     manual_add_menu
 )
-from Keyboard.Inline import manual_approve_menu
 from states import Admins
 from states.admins import ManualAdd
 from utils.database_api.quick_commands import (
@@ -25,6 +23,7 @@ from utils.database_api.quick_commands import (
     add_user
 )
 from utils.database_api.schemas.application import Application
+from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
 
 _application_list_ = []
 _reversed_application_list_ = []
@@ -148,7 +147,7 @@ async def insert_elem_from_application_list_(elem: Application):
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state,
                                                                                      level=Level.value(query.data)),
-                                  reply_markup=application_approve_level_menu)
+                                  reply_markup=application_approve_menu)
 
 
 async def approve_application(query: CallbackQuery, state: FSMContext):
@@ -332,7 +331,7 @@ async def get_user_access_from_manual_add(query: CallbackQuery, state: FSMContex
                                   f"Группа: <b>{user['group']}</b>\n"
                                   f"Гос. номер используемого транспорта: <b>{user['state_number']}</b>\n"
                                   f"Уровень: <b>{_manual_user_access_level_dict[query.data]}</b>\n",
-                                  reply_markup=manual_approve_menu)
+                                  reply_markup=application_approve_menu)
     await ManualAdd.approve.set()
 
 

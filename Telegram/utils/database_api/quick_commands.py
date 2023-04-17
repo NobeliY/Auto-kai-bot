@@ -16,57 +16,50 @@ _offset = timezone(timedelta(hours=3))
 
 
 async def add_application(user_id: int, initials: str, email: str,
-                          phone_number: str, group: str, state_number: str) -> None:
+                          phone_number: str, group: str, state_number: str, change_ap: bool = False) -> None:
+    application: Union[Application, ApplicationChange, None] = None
     try:
-        application = Application(id=user_id, initials=initials, email=email,
-                                  phoneNumber=phone_number, group=group, stateNumber=state_number)
-        await application.create()
-    except UniqueViolationError:
-        logger.warning(f"{Fore.LIGHTGREEN_EX} Application not created{Fore.RESET}!")
-
-
-async def add_change_application(user_id: int, initials: str, email: str,
-                                 phone_number: str, group: str, state_number: str) -> None:
-    try:
-        change_application: ApplicationChange = ApplicationChange(
+        application = Application(
             id=user_id,
             initials=initials,
             email=email,
             phoneNumber=phone_number,
             group=group,
             stateNumber=state_number
-        )
-        await change_application.create()
+        ) if not change_ap else \
+            ApplicationChange(
+                id=user_id,
+                initials=initials,
+                email=email,
+                phoneNumber=phone_number,
+                group=group,
+                stateNumber=state_number
+            )
+        await application.create()
     except UniqueViolationError:
-        logger.warning(f"[{user_id}] -> {Fore.LIGHTGREEN_EX} Change Application not created{Fore.RESET}!")
+        logger.warning(f"{Fore.LIGHTGREEN_EX} {type(application)} not created{Fore.RESET}!")
 
 
-async def add_ready_application(application: Application | ApplicationChange) -> None:
+async def add_ready_application(application: Union[Application, ApplicationChange]) -> None:
     try:
         await application.create()
     except UniqueViolationError:
         logger.warning(f"{Fore.LIGHTGREEN_EX} {type(application)} not created{Fore.RESET}!")
 
 
-async def get_count_of_applications() -> int | None:
-    applications_count = await database.func.count(Application.id).gino.scalar()
-    return applications_count
+async def get_count_of_applications(change_ap: bool = False) -> int | None:
+    return await database.func.count(Application.id).gino.scalar() if not change_ap else \
+        await database.func.count(ApplicationChange.id).gino.scalar()
 
 
-async def get_count_of_change_application() -> int | None:
-    return await database.func.count(ApplicationChange.id).gino.scalar()
+async def get_application(change_ap: bool = False) -> Union[Application, ApplicationChange, None]:
+    return await Application.query.gino.first() if not change_ap else \
+        await ApplicationChange.query.gino.first()
 
 
-async def get_application() -> Application | None:
-    return await Application.query.gino.first()
-
-
-async def get_all_applications() -> List[Application] | None:
-    return await Application.query.gino.all()
-
-
-async def get_all_change_applications() -> List[ApplicationChange] | None:
-    return await ApplicationChange.query.gino.all()
+async def get_all_applications(change_ap: bool = False) -> Union[List[Application], List[ApplicationChange], None]:
+    return await Application.query.gino.all() if not change_ap else \
+        await ApplicationChange.query.gino.all()
 
 
 async def get_required_application(tg_id: int, change_app: bool = False) -> Union[Application, ApplicationChange, None]:
@@ -74,7 +67,7 @@ async def get_required_application(tg_id: int, change_app: bool = False) -> Unio
         Application.query.where(ApplicationChange.id == tg_id).gino.first()
 
 
-async def drop_application(application: Application | ApplicationChange) -> bool:
+async def drop_application(application: Union[Application, ApplicationChange]) -> bool:
     return await application.delete()
 
 

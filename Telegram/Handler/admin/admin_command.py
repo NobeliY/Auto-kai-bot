@@ -6,16 +6,14 @@ from aiogram.types import CallbackQuery, Message, InputFile
 
 from Data import USER_CSV_PATH
 from Handler.admin.change_ap_command import get_change_application
-
-from utils.shared_methods.default import get_access_level, get_admin_level
-from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
 from Keyboard.Inline import delete_menu, show_db_menu
-
-from states import Admins, UserState
+from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
+from states import Admins
 from utils.database_api.quick_commands import get_user, get_users_shortly_info, get_users_info
 from utils.database_api.schemas.application import Application
 from utils.database_api.schemas.user import User
 from utils.request_api.Request_controller import RequestController
+from utils.shared_methods.default import get_access_level, get_admin_level
 
 
 async def call_admin_panel(message: Message):
@@ -43,12 +41,6 @@ async def set_add_menu(query: CallbackQuery, state: FSMContext):
 async def set_remove_menu(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.delete_menu_state)
     await query.message.edit_text(F"Выберите режим", reply_markup=delete_menu)
-
-
-# async def show_applications(query: CallbackQuery, state: FSMContext):
-#     await state.set_state(Admins.show_applications_state)
-#     await query.message.edit_text("Происходит доработка",
-#                                   reply_markup=back_inline_menu)
 
 
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
@@ -117,7 +109,7 @@ async def preview_step(query: CallbackQuery, state: FSMContext):
     elif state_level in _state_list['show_db_menu']:
         await reset_admin_panel(query=query, state=state)
     elif state_level in _state_list['show_change_application']:
-        await get_change_application(query=query, state=state)
+        await get_change_application(query=query)
 
 
 async def return_call_admin_panel(query: CallbackQuery, state: FSMContext):

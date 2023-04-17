@@ -1,6 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-
-from Data.config import WEB_APP_URL
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 select_application_mode_kb = InlineKeyboardMarkup(
     inline_keyboard=[
