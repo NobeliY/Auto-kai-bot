@@ -116,9 +116,10 @@ def register_handlers(dp: Dispatcher):
     """
     dp.register_message_handler(open_from_all_registered_users, Text(equals="открыть", ignore_case=True),
                                 state=UserState.all_states)
-    dp.register_message_handler(open_first_level_from_employee, Text(equals="открыть 1 уровень", ignore_case=True),
+    dp.register_message_handler(open_first_level_from_employee, Text(equals="открыть шлагбаум", ignore_case=True),
                                 state=__all_states__)
-    dp.register_message_handler(open_second_level_from_employee, Text(equals="открыть 2 уровень", ignore_case=True),
+    dp.register_message_handler(open_second_level_from_employee, Text(equals="открыть железные ворота",
+                                                                      ignore_case=True),
                                 state=__all_states__)
 
     """

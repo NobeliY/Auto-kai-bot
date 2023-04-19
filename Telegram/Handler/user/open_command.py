@@ -5,6 +5,7 @@ from time import sleep
 from aiogram.types import Message, ReplyKeyboardRemove
 from colorama import Fore
 
+from utils.database_api.quick_commands import add_parking_log, get_user
 from utils.shared_methods.default import soon_info, return_user_checked
 from utils.request_api.Request_controller import RequestController
 from utils.request_api.request_to_ESP import send_first_level
@@ -25,7 +26,8 @@ async def open_from_all_registered_users(message: Message):
         await message.answer(f"Уже открыт")
         return
     request_controller = RequestController(message.from_id)
-    access = await request_controller.check_user_on_database()
+    user_ = await get_user(user_id=message.from_id)
+    access: str | None = await request_controller.check_user_on_database()
     if access is not None:
         if await request_controller.check_time(access):
             await request_controller.check_date_quality()
@@ -33,12 +35,13 @@ async def open_from_all_registered_users(message: Message):
             try:
                 if request_data['value']:
                     await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
+                    opened_loop = Thread(target=user_opened_task)
+                    opened_loop.start()
+                    await add_parking_log(user_id=user_.id, initials=user_.initials)
             except KeyError:
                 logger.error(f"{Fore.LIGHTRED_EX}KeyError with request :"
                              f"{Fore.LIGHTWHITE_EX}1{Fore.LIGHTRED_EX} level. (S|I|T){Fore.RESET}")
 
-            opened_loop = Thread(target=user_opened_task)
-            opened_loop.start()
         else:
             await message.answer(f" Диапазон от 6 до 23")
     else:

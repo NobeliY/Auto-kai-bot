@@ -10,8 +10,7 @@ from Keyboard.Inline import delete_menu, show_db_menu
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
 from states import Admins
 from utils.database_api.quick_commands import get_user, get_users_shortly_info, get_users_info
-from utils.database_api.schemas.application import Application
-from utils.database_api.schemas.user import User
+from utils.database_api.schemas import User, Application
 from utils.request_api.Request_controller import RequestController
 from utils.shared_methods.default import get_access_level, get_admin_level
 

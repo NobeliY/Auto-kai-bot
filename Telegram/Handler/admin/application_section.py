@@ -22,7 +22,7 @@ from utils.database_api.quick_commands import (
     add_ready_application,
     add_user
 )
-from utils.database_api.schemas.application import Application
+from utils.database_api.schemas import Application
 from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
 
 _application_list_ = []
