@@ -5,12 +5,10 @@ from typing import List, Union
 
 from asyncpg import UniqueViolationError, ForeignKeyViolationError
 from colorama import Fore
+from sqlalchemy import TIMESTAMP
 
 from utils.database_api.database_gino import database
-from utils.database_api.schemas import ApplicationChange
-from utils.database_api.schemas.application import Application
-from utils.database_api.schemas.date_quality import DateQuality
-from utils.database_api.schemas.user import User
+from utils.database_api.schemas import ApplicationChange, Application, DateQuality, User, ParkingLog
 
 _offset = timezone(timedelta(hours=3))
 
@@ -68,6 +66,8 @@ async def get_required_application(tg_id: int, change_app: bool = False) -> Unio
 
 
 async def drop_application(application: Union[Application, ApplicationChange]) -> bool:
+    if application is None:
+        return False
     return await application.delete()
 
 
@@ -110,11 +110,25 @@ async def get_users_by_initials(initials) -> List[User] | None:
 
 
 async def delete_user_by_initials_command(user: User) -> None:
-    await user.delete()
+    try:
+        await user.delete()
+    except ForeignKeyViolationError as foreignKeyViolationEr:
+        logger.warning(f"{Fore.LIGHTYELLOW_EX}{user.initials} {Fore.LIGHTGREEN_EX}: "
+                       f"try to delete: {Fore.YELLOW}{foreignKeyViolationEr}")
+        await delete_user(user=user)
 
 
 async def get_users_by_group(group: str) -> List[User] | None:
     return await User.query.where(User.group == group).gino.all()
+
+
+async def delete_user(user: User) -> None:
+    if user is None:
+        return
+    await drop_application(await get_required_application(user.id, change_app=True))
+    await rebase_date_quality_from_user(user.id)
+    await delete_parking_log(user_id=user.id)
+    await user.delete()
 
 
 async def delete_users_by_group(users: List[User]) -> None:
@@ -124,7 +138,7 @@ async def delete_users_by_group(users: List[User]) -> None:
         except ForeignKeyViolationError as foreignKeyViolationEr:
             logger.warning(f"{Fore.LIGHTYELLOW_EX}{user.initials} {Fore.LIGHTGREEN_EX} :"
                            f"try to delete: {Fore.YELLOW}{foreignKeyViolationEr}")
-            await user.foreigns.delete()
+            await delete_user(user=user)
 
 
 async def add_user(user_id: int, initials: str, email: str,
@@ -148,6 +162,8 @@ async def get_date_quality_from_user(user_id: int) -> DateQuality | None:
 
 async def rebase_date_quality_from_user(user_id: int) -> bool:
     date_quality = await get_date_quality_from_user(user_id=user_id)
+    if date_quality is None:
+        return False
     await date_quality.delete()
     return True
 
@@ -171,6 +187,31 @@ async def update_date_quality(user_id: int, reset: bool = False) -> bool:
         return True
     await preview_date_quality.update(count=preview_date_quality.count + 1).apply()
     return True
+
+
+async def add_parking_log(user_id: int, initials: str) -> None:
+    try:
+        time_now = datetime.now(tz=_offset).strftime("%d %m %Y %H %M")
+        parking_log = ParkingLog(
+            user_id=user_id,
+            initials=initials,
+            time_from_user=time_now
+        )
+        await parking_log.create()
+    except UniqueViolationError:
+        pass
+
+
+async def get_parking_log(user_id: int) -> List[ParkingLog] | None:
+    return await ParkingLog.query.where(ParkingLog.id == user_id).gino.all()
+
+
+async def delete_parking_log(user_id: int) -> None:
+    parking_logs = await get_parking_log(user_id=user_id)
+    if parking_logs is None:
+        return
+    for parking_log in parking_logs:
+        await parking_log.delete()
 
 
 async def check_admin(admin_id: int) -> bool:

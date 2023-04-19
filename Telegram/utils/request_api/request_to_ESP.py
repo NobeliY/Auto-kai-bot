@@ -4,7 +4,7 @@ from os import getenv
 from requests import Session, ConnectionError, Timeout
 from colorama import Fore
 
-from utils.database_api.schemas.user import User
+from utils.database_api.schemas import User
 
 request_uri, first_secret_key, second_secret_key = getenv("REQUEST_ESP").split()
 

@@ -2,7 +2,7 @@ import logging
 import re
 
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from aiogram.utils.exceptions import MessageNotModified
 
 from Handler.default.start_command import start
@@ -25,11 +25,11 @@ async def select_application_mode(message: Message, state: FSMContext) -> None:
     return
 
 
-async def set_application(message: Message, state: FSMContext):
-    await state.update_data(user_id=message.from_id)
-    await message.answer(f"<b>Вы начали подачу заявления</b> \n"
-                         f"<b>Введите ФИО: </b>",
-                         reply_markup=ReplyKeyboardRemove())
+async def set_application(query: CallbackQuery, state: FSMContext):
+    await state.update_data(user_id=query.message.from_user.id)
+    await query.message.answer(f"<b>Вы начали подачу заявления</b> \n"
+                               f"<b>Введите ФИО: </b>",
+                               reply_markup=ReplyKeyboardRemove())
     await ApplicationSubmission.user_initials.set()
 
 
