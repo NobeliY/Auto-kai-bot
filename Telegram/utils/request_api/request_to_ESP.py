@@ -40,22 +40,12 @@ async def send_second_level(user_id: int) -> dict | str:
     return request_
 
 
-def send_request_from_esp(post_json_data: dict) -> dict:
+def send_request_from_esp(post_json_data: dict) -> dict | str:
     try:
         with Session() as session:
             with session.post(url=request_uri, data=post_json_data) as response:
                 return response.json()
     except ConnectionError as connection_error:
-        error_msg: str = f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error}{Fore.RESET}"
-        await bot.send_message(admins[0], error_msg)
-        logger.error(error_msg)
-        return {
-            'value': 0,
-        }
+        return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error}{Fore.RESET}"
     except Timeout as server_error:
-        error_msg: str = f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}"
-        await bot.send_message(admins[0], error_msg)
-        logger.error(error_msg)
-        return {
-            'value': 0,
-        }
+        return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}"
