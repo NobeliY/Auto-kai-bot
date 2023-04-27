@@ -146,7 +146,7 @@ async def insert_elem_from_application_list_(elem: Application):
 
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(await build_message_approve_level_from_application(state,
-                                                                                     level=Level.value(query.data)),
+                                                                                     level=Level(query.data).name),
                                   reply_markup=application_approve_menu)
 
 
