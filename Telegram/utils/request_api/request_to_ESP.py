@@ -18,12 +18,26 @@ def set_post_json_dict(user_id: User.id, level: str) -> dict:
     }
 
 
-async def send_first_level(user_id: int) -> dict:
-    return send_request_from_esp(set_post_json_dict(user_id=user_id, level=first_secret_key))
+async def send_first_level(user_id: int) -> dict | str:
+    request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=first_secret_key))
+    if request_ is str:
+        await bot.send_message(admins[0], request_)
+        logger.error(request_)
+        return {
+            'value': 0,
+        }
+    return request_
 
 
-async def send_second_level(user_id: int) -> dict:
-    return send_request_from_esp(set_post_json_dict(user_id=user_id, level=second_secret_key))
+async def send_second_level(user_id: int) -> dict | str:
+    request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=second_secret_key))
+    if request_ is str:
+        await bot.send_message(admins[0], request_)
+        logger.error(request_)
+        return {
+            'value': 0,
+        }
+    return request_
 
 
 def send_request_from_esp(post_json_data: dict) -> dict:
