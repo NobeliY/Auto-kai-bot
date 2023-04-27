@@ -20,7 +20,7 @@ def set_post_json_dict(user_id: User.id, level: str) -> dict:
 
 async def send_first_level(user_id: int) -> dict | str:
     request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=first_secret_key))
-    if request_ is str:
+    if isinstance(request_, str):
         await bot.send_message(admins[0], request_)
         logger.error(request_)
         return {
@@ -31,7 +31,7 @@ async def send_first_level(user_id: int) -> dict | str:
 
 async def send_second_level(user_id: int) -> dict | str:
     request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=second_secret_key))
-    if request_ is str:
+    if isinstance(request_, str):
         await bot.send_message(admins[0], request_)
         logger.error(request_)
         return {

@@ -60,6 +60,8 @@ async def open_first_level_from_employee(message: Message):
     request_data = await send_first_level(message.from_id)
     try:
         if request_data['value']:
+            user_ = await get_user(message.from_id)
+            await add_parking_log(user_id=user_.id, initials=user_.initials)
             await message.answer("Добро пожаловать! Шлагбаум автоматически закроется через 20 секунд.")
     except KeyError:
         logger.error(f"{Fore.LIGHTRED_EX}KeyError with request :"
@@ -73,5 +75,7 @@ async def open_second_level_from_employee(message: Message):
     access = await request_controller.check_user_on_database()
     if access is None or access not in activate_on_level:
         return
+    # user_ = await get_user(message.from_id)
+    # await add_parking_log(user_id=user_.id, initials=user_.initials)
     await message.answer(await soon_info())
     await message.delete()
