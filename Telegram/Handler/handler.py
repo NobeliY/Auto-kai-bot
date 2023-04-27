@@ -151,7 +151,7 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.show_change_application)
     dp.register_callback_query_handler(next_change_application, Text(equals="next_application"),
                                        state=Admins.show_change_application)
-    dp.register_callback_query_handler(approve_change_application, Text(equals="approve_level_application"),
+    dp.register_callback_query_handler(approve_change_application, Text(equals="approve_application"),
                                        state=Admins.show_change_application)
     dp.register_callback_query_handler(confirm_approve_change_application, Text(equals="approve_level_application"),
                                        state=Admins.show_selected_change_application)
