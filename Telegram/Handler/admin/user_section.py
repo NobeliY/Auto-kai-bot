@@ -12,7 +12,7 @@ from Keyboard.Inline import delete_accept_menu, delete_fully_show_searched_menu,
 from states import Admins
 from utils.database_api.quick_commands import delete_users_by_group, get_users_by_group, get_users_by_initials, \
     delete_user_by_initials_command
-from utils.database_api.schemas.user import User
+from utils.database_api.schemas import User
 
 
 async def delete_user_by_initials(query: CallbackQuery, state: FSMContext):

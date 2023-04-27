@@ -4,7 +4,9 @@ from os import getenv
 from requests import Session, ConnectionError, Timeout
 from colorama import Fore
 
-from utils.database_api.schemas.user import User
+from Data import admins
+from app import bot
+from utils.database_api.schemas import User
 
 request_uri, first_secret_key, second_secret_key = getenv("REQUEST_ESP").split()
 
@@ -30,12 +32,16 @@ def send_request_from_esp(post_json_data: dict) -> dict:
             with session.post(url=request_uri, data=post_json_data) as response:
                 return response.json()
     except ConnectionError as connection_error:
-        logger.error(f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error}{Fore.RESET}")
+        error_msg: str = f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error}{Fore.RESET}"
+        await bot.send_message(admins[0], error_msg)
+        logger.error(error_msg)
         return {
             'value': 0,
         }
     except Timeout as server_error:
-        logger.error(f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}")
+        error_msg: str = f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}"
+        await bot.send_message(admins[0], error_msg)
+        logger.error(error_msg)
         return {
             'value': 0,
         }
