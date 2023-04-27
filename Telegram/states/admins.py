@@ -17,8 +17,10 @@ class Admins(StatesGroup):
     searched_user_delete_state = State()
     delete_all_group_state = State()
 
-    show_applications_state = State()
     all_applications_state = State()
+
+    show_change_application = State()
+    show_selected_change_application = State()
 
 
 class ManualAdd(StatesGroup):

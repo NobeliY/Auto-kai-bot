@@ -158,16 +158,8 @@ application_or_manual_submit_menu = InlineKeyboardMarkup(
     ]
 )
 
-manual_approve_menu = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton("Да", callback_data="approve_manual"),
-            InlineKeyboardButton("Нет", callback_data="cancel_manual_add")
-        ],
-    ]
-)
 
-application_approve_level_menu = InlineKeyboardMarkup(
+application_approve_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton("Да", callback_data="approve_level_application"),
@@ -182,5 +174,11 @@ application_reject_menu = InlineKeyboardMarkup(
             InlineKeyboardButton("Да", callback_data="reject_application"),
             InlineKeyboardButton("Нет", callback_data="preview_step")
         ],
+    ]
+)
+
+application_close_menu: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        InlineKeyboardButton("Закрыть", callback_data="close_application")
     ]
 )

@@ -8,7 +8,7 @@ from states.loader import storage
 
 bot = Bot(BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher(bot=bot, storage=storage)
-logging_level = logging.INFO if LOGGING_LEVEL == "INFO" else logging.DEBUG
+logging_level = LOGGING_LEVEL
 logging.basicConfig(level=logging_level, format=f"{Fore.YELLOW}%(asctime)s {Fore.RESET}| [{Fore.CYAN}%(levelname)s"
                                                 f"{Fore.RESET}] %(message)s")
 
