@@ -18,22 +18,13 @@ def set_post_json_dict(user_id: User.id, level: str) -> dict:
     }
 
 
-async def send_first_level(user_id: int) -> dict | str:
-    request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=first_secret_key))
-    if isinstance(request_, str):
-        await bot.send_message(admins[0], request_)
-        logger.error(request_)
-        return {
-            'value': 0,
-        }
-    return request_
-
-
-async def send_second_level(user_id: int) -> dict | str:
-    request_ = send_request_from_esp(set_post_json_dict(user_id=user_id, level=second_secret_key))
-    if isinstance(request_, str):
-        await bot.send_message(admins[0], request_)
-        logger.error(request_)
+async def send_level(user_id: int, first_level: bool = True) -> dict | str:
+    request_ = send_request_from_esp(set_post_json_dict(user_id=user_id,
+                                                        level=first_secret_key if first_level else second_secret_key))
+    request_['error'] = request_['error'].replace('<', '{').replace('>', '}')
+    if 'error' in request_.keys():
+        await bot.send_message(admins[0], f"User: {user_id} | Error: {request_['error']}")
+        logger.error(f"{Fore.LIGHTRED_EX}User: {user_id} | {request_['error']}{Fore.RESET}")
         return {
             'value': 0,
         }
@@ -46,6 +37,13 @@ def send_request_from_esp(post_json_data: dict) -> dict | str:
             with session.post(url=request_uri, data=post_json_data) as response:
                 return response.json()
     except ConnectionError as connection_error:
-        return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error}{Fore.RESET}"
+        # logger.error(f"{type(connection_error)} \n {connection_error.__str__()}")
+        return {
+            'error': connection_error.__str__()
+        }
+        # return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error.strerror}{Fore.RESET}"
     except Timeout as server_error:
-        return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error}{Fore.RESET}"
+        return {
+            'error': server_error.__str__()
+        }
+        # return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error.strerror}{Fore.RESET}"
