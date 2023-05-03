@@ -97,6 +97,7 @@ async def application_submission_state_number(message: Message, state: FSMContex
                 state_number=user_application['user_state_number'],
 
             )
+            logging.info(f"Application: {','.join(user_application)}")
             await message.answer("<b>Данные были отправлены. Ожидайте письма с подтверждением на указанный вами "
                                  "почты.</b>",
                                  )
