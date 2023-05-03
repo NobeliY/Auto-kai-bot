@@ -1,3 +1,5 @@
+import logging
+
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import MessageNotModified
@@ -163,6 +165,7 @@ async def approve_application(query: CallbackQuery, state: FSMContext):
         state_number=application.stateNumber,
         access=level
     )
+    logging.info(F"Added Application: {str(application)}")
     await query.message.edit_text(f"Успешно добавлен\n"
                                   f"{await build_application_info(application)}",
                                   reply_markup=back_inline_menu)
