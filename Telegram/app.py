@@ -4,7 +4,7 @@ from logging import StreamHandler, FileHandler
 import sys
 from colorama import Fore
 from aiogram import Bot, Dispatcher, executor
-from Data import BOT_TOKEN, LOGGING_FILE, check_log_dir
+from Data import BOT_TOKEN, LOGGING_FILE, check_log_dir, LOGGING_PATH
 from Data.config import LOGGING_LEVEL
 from states.loader import storage
 
@@ -16,7 +16,7 @@ logging.basicConfig(level=logging_level,
                            f"{Fore.RESET}] %(message)s")
 check_log_dir()
 logging.getLogger().addHandler(StreamHandler(sys.stdout))
-logging.getLogger().addHandler(FileHandler(f"logs/{LOGGING_FILE}"))
+logging.getLogger().addHandler(FileHandler(f"{LOGGING_PATH}/{LOGGING_FILE}"))
 
 # TODO: Main
 if __name__ == "__main__":
