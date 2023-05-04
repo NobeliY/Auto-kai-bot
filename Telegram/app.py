@@ -16,7 +16,7 @@ logging.basicConfig(level=logging_level,
                            f"{Fore.RESET}] %(message)s")
 check_log_dir()
 logging.getLogger().addHandler(StreamHandler(sys.stdout))
-logging.getLogger().addHandler(FileHandler(f"{LOGGING_PATH}/{LOGGING_FILE}"))
+logging.getLogger().addHandler(FileHandler(filename=f"{LOGGING_PATH}/{LOGGING_FILE}", mode="a"))
 
 # TODO: Main
 if __name__ == "__main__":
