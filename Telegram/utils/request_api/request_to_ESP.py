@@ -21,8 +21,8 @@ def set_post_json_dict(user_id: User.id, level: str) -> dict:
 async def send_level(user_id: int, first_level: bool = True) -> dict | str:
     request_ = send_request_from_esp(set_post_json_dict(user_id=user_id,
                                                         level=first_secret_key if first_level else second_secret_key))
-    request_['error'] = request_['error'].replace('<', '{').replace('>', '}')
     if 'error' in request_.keys():
+        request_['error'] = request_['error'].replace('<', '{').replace('>', '}')
         await bot.send_message(admins[0], f"User: {user_id} | Error: {request_['error']}")
         logger.error(f"{Fore.LIGHTRED_EX}User: {user_id} | {request_['error']}{Fore.RESET}")
         return {
