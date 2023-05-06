@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters import Text, Command
 from aiogram.types import ContentType
@@ -47,6 +49,7 @@ from states import UserState, ApplicationSubmission, Admins, ManualAdd, UserChan
 
 
 def register_handlers(dp: Dispatcher):
+    logging.warning(f"Register handlers: {dp}")
     """
         Start Command
     """
