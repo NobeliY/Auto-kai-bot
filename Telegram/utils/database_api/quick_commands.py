@@ -5,10 +5,11 @@ from typing import List, Union
 
 from asyncpg import UniqueViolationError, ForeignKeyViolationError
 from colorama import Fore
-from sqlalchemy import TIMESTAMP
+from sqlalchemy import TIMESTAMP, and_
 
 from utils.database_api.database_gino import database
-from utils.database_api.schemas import ApplicationChange, Application, DateQuality, User, ParkingLog
+from utils.database_api.schemas import ApplicationChange, Application, DateQuality, User, ParkingLog, AiogramState, \
+    AiogramData, AiogramBucket
 
 _offset = timezone(timedelta(hours=3))
 
@@ -220,3 +221,107 @@ async def check_admin(admin_id: int) -> bool:
         return True if user.access == 'A' else False
     except AttributeError:
         return False
+
+
+""" Aiogram save FSM states """
+
+
+async def add_aiogram_state(user: int, chat: int, state: str) -> None:
+    aiogram_state = AiogramState(
+        user=user,
+        chat=chat,
+        state=state
+    )
+    await aiogram_state.create()
+
+
+async def get_aiogram_state(user: int, chat: int) -> Union[AiogramState, None]:
+    return await AiogramState.query.where(and_(AiogramState.user == user, AiogramState.chat == chat)).gino.first()
+
+
+async def delete_aiogram_state(user: int, chat: int) -> None:
+    aiogram_state = await get_aiogram_state(user=user, chat=chat)
+    if not aiogram_state:
+        return
+    await aiogram_state.delete()
+
+
+async def get_all_aiogram_states() -> List[AiogramState]:
+    return await AiogramState.query.gino.all()
+
+
+async def delete_all_aiogram_states() -> None:
+    aiogram_states: Union[List[AiogramState], None] = await get_all_aiogram_states()
+    if not aiogram_states:
+        return
+    for aiogram_state in aiogram_states:
+        await aiogram_state.delete()
+
+
+async def add_aiogram_data(user: int, chat: int, data: dict) -> None:
+    aiogram_data = AiogramData(
+        user=user,
+        chat=chat,
+        data=data
+    )
+    await aiogram_data.create()
+
+
+async def get_aiogram_data(user: int, chat: int) -> Union[AiogramData, None]:
+    return await AiogramData.query.where(and_(AiogramData.user == user, AiogramData.chat == chat)).gino.first()
+
+
+async def delete_aiogram_data(user: int, chat: int) -> None:
+    aiogram_data = await get_aiogram_data(user=user, chat=chat)
+    if not aiogram_data:
+        return
+    await aiogram_data.delete()
+
+
+async def get_all_aiogram_datas() -> List[AiogramData]:
+    return await AiogramData.query.gino.all()
+
+
+async def delete_all_aiogram_datas() -> None:
+    aiogram_datas: Union[List[AiogramData], None] = await get_all_aiogram_datas()
+    if not aiogram_datas:
+        return
+    for aiogram_data in aiogram_datas:
+        await aiogram_data.delete()
+
+
+async def add_aiogram_bucket(user: int, chat: int, bucket: dict) -> None:
+    aiogram_bucket = AiogramBucket(
+        user=user,
+        chat=chat,
+        bucket=bucket
+    )
+    await aiogram_bucket.create()
+
+
+async def get_aiogram_bucket(user: int, chat: int) -> Union[AiogramBucket, None]:
+    return await AiogramBucket.query.where(and_(AiogramBucket.user == user, AiogramBucket.chat == chat)).gino.first()
+
+
+async def delete_aiogram_bucket(user: int, chat: int) -> None:
+    aiogram_bucket = await get_aiogram_bucket(user=user, chat=chat)
+    await aiogram_bucket.delete()
+
+
+async def get_all_aiogram_buckets() -> List[AiogramBucket]:
+    return await AiogramBucket.query.gino.all()
+
+
+async def delete_all_aiogram_buckets() -> None:
+    aiogram_buckets: Union[List[AiogramBucket], None] = await get_all_aiogram_buckets()
+    if not aiogram_buckets:
+        return
+    for aiogram_bucket in aiogram_buckets:
+        await aiogram_bucket.delete()
+
+
+async def drop_aiogram_save_data_tables(full: bool) -> None:
+    await delete_all_aiogram_states()
+    if full:
+        await delete_all_aiogram_datas()
+        await delete_all_aiogram_buckets()

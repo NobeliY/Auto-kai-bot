@@ -13,6 +13,7 @@ from utils.shared_methods.default import set_on_startup_users
 
 
 async def get_default_commands(dp: Dispatcher) -> None:
+    logger.warning(f"Default commands: {dp}")
     try:
         on_close()
     except Exception as _ex:
