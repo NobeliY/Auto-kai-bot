@@ -1,12 +1,12 @@
 from sqlalchemy import select, delete, ForeignKey, Column, BigInteger, String, Integer, TIMESTAMP
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.postgresql import insert, JSON
 from sqlalchemy.orm import relationship
 
 from utils.database_api.database_gino import TimeDatabaseModel, database, BaseModel
 
 
 class User(TimeDatabaseModel):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = Column(BigInteger, primary_key=True, unique=True)
     initials = Column(String, primary_key=True, unique=True)
     email = Column(String)
@@ -24,7 +24,7 @@ class User(TimeDatabaseModel):
 
 
 class Application(TimeDatabaseModel):
-    __tablename__ = 'applications'
+    __tablename__ = "applications"
     id = Column(BigInteger, primary_key=True, unique=True)
     initials = Column(String, primary_key=True)
     email = Column(String, primary_key=True)
@@ -36,8 +36,8 @@ class Application(TimeDatabaseModel):
 
 
 class ApplicationChange(TimeDatabaseModel):
-    __tablename__ = 'application_changes'
-    id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE'),
+    __tablename__ = "application_changes"
+    id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"),
                 primary_key=True)
     initials = Column(String, primary_key=True)
     email = Column(String, primary_key=True)
@@ -49,8 +49,8 @@ class ApplicationChange(TimeDatabaseModel):
 
 
 class DateQuality(BaseModel):
-    __tablename__ = 'date_quality'
-    id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE'),
+    __tablename__ = "date_quality"
+    id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"),
                 primary_key=True)
     times = Column(String, primary_key=True)
     count = Column(Integer, primary_key=True)
@@ -59,11 +59,42 @@ class DateQuality(BaseModel):
 
 
 class ParkingLog(TimeDatabaseModel):
-    __tablename__ = 'parking_logs'
+    __tablename__ = "parking_logs"
     id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE'))
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"))
     time_from_user = Column(String)
-    initials = Column(String, ForeignKey('users.initials', ondelete='CASCADE'))
+    initials = Column(String, ForeignKey("users.initials", ondelete="CASCADE"))
+
+    query: select
+    add: insert
+
+
+class AiogramState(BaseModel):
+    __tablename__ = "aiogram_states"
+
+    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    chat = Column(BigInteger, nullable=False)
+    state = Column(String, nullable=False)
+
+    query: select
+    add: insert
+
+
+class AiogramData(BaseModel):
+    __tablename__ = "aiogram_datas"
+    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    chat = Column(BigInteger, nullable=False)
+    data = Column(JSON, nullable=True)
+
+    query: select
+    add: insert
+
+
+class AiogramBucket(BaseModel):
+    __tablename__ = "aiogram_buckets"
+    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    chat = Column(BigInteger, nullable=False)
+    bucket = Column(JSON, nullable=False)
 
     query: select
     add: insert

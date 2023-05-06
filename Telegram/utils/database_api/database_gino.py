@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from gino import Gino
 from Data import POSTGRES_URL
 
-database = Gino()
+database: Gino = Gino()
 
 
 class BaseModel(database.Model):
