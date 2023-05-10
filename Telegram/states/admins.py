@@ -8,6 +8,7 @@ class Admins(StatesGroup):
     main_state = State()
     show_db_state = State()
     show_fully_state = State()
+    send_message_state = State()
 
     add_menu_state = State()
     auto_add_state = State()
