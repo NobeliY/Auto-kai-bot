@@ -119,8 +119,16 @@ async def delete_user_by_initials_command(user: User) -> None:
         await delete_user(user=user)
 
 
-async def get_users_by_group(group: str) -> List[User] | None:
+async def get_users_by_group(group: str) -> Union[List[User], None]:
     return await User.query.where(User.group == group).gino.all()
+
+
+async def get_all_users() -> Union[List[User], None]:
+    return await User.query.gino.all()
+
+
+async def get_users_by_access(access: str) -> Union[List[User], None]:
+    return await User.query.where(User.access == access).gino.all()
 
 
 async def delete_user(user: User) -> None:

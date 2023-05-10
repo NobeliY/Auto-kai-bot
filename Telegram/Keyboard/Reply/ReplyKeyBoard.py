@@ -3,9 +3,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 student_menu = ReplyKeyboardMarkup(
     [
         [
-            KeyboardButton("/start"),
-        ],
-        [
             KeyboardButton(text="Информация о себе"),
         ],
         [
@@ -19,9 +16,6 @@ student_menu = ReplyKeyboardMarkup(
 
 teacher_menu = ReplyKeyboardMarkup(
     [
-        [
-            KeyboardButton("/start"),
-        ],
         [
             KeyboardButton(text="Информация о себе")
         ],
@@ -37,9 +31,6 @@ teacher_menu = ReplyKeyboardMarkup(
 
 employee_menu = ReplyKeyboardMarkup(
     [
-        [
-            KeyboardButton("/start"),
-        ],
         [
             KeyboardButton(text="Свободные места"),
         ],
@@ -59,7 +50,7 @@ employee_menu = ReplyKeyboardMarkup(
 admin_menu = ReplyKeyboardMarkup(
     [
         [
-            KeyboardButton("/start"),
+            KeyboardButton("Отправить сообщение"),
         ],
         [
             KeyboardButton(text="Свободные места"),
