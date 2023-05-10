@@ -130,8 +130,8 @@ application_change_menu = InlineKeyboardMarkup(
             InlineKeyboardButton("Следующая", callback_data="next_application"),
         ],
         [
-          InlineKeyboardButton("Принять", callback_data="approve_application"),
-          InlineKeyboardButton("Отклонить", callback_data="submit_reject_application"),
+            InlineKeyboardButton("Принять", callback_data="approve_application"),
+            InlineKeyboardButton("Отклонить", callback_data="submit_reject_application"),
         ],
         [
             InlineKeyboardButton("Назад", callback_data="preview_step"),
@@ -158,7 +158,6 @@ application_or_manual_submit_menu = InlineKeyboardMarkup(
     ]
 )
 
-
 application_approve_menu = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -180,5 +179,39 @@ application_reject_menu = InlineKeyboardMarkup(
 application_close_menu: InlineKeyboardMarkup = InlineKeyboardMarkup(
     inline_keyboard=[
         InlineKeyboardButton("Закрыть", callback_data="close_application")
+    ]
+)
+
+send_message_menu_kb: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Студентам", callback_data="send_students"),
+            InlineKeyboardButton("Сотрудникам", callback_data="send_employees")
+        ],
+        [
+            InlineKeyboardButton("Администраторам", callback_data="send_admins"),
+            InlineKeyboardButton("Всем", callback_data="send_all"),
+        ],
+        [
+            InlineKeyboardButton("Закрыть", callback_data="close_send")
+        ]
+    ]
+)
+
+reject_send_message_kb: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Закрыть", callback_data="close_send")
+        ]
+
+    ]
+)
+
+message_approve_menu_kb: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Да", callback_data="approve_send_message"),
+            InlineKeyboardButton("Нет", callback_data="close_send")
+        ],
     ]
 )

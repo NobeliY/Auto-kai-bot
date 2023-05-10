@@ -22,6 +22,8 @@ from Handler.admin.change_ap_command import get_change_application, get_change_a
     get_change_application_from_end, next_change_application, approve_change_application, \
     reject_change_application, confirm_reject, confirm_approve_change_application, close_change_application, \
     cancel_approve_change_application
+from Handler.admin.send_messages import get_send_message_menu, close_send_message_menu, get_group_set_to_send, \
+    send_message_choice, approve_send_message
 from Handler.admin.user_section import (
     delete_user_by_initials, delete_all_from_group,
     delete_user_by_initials_searched, send_all_searched_users_for_delete,
@@ -232,6 +234,22 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.delete_all_group_state)
     dp.register_callback_query_handler(decline_delete_group, Text(equals="decline_delete"),
                                        state=Admins.delete_all_group_state)
+
+    """
+    Admin -> Send Message from users group
+    """
+    dp.register_message_handler(get_send_message_menu, Text(equals="отправить сообщение", ignore_case=True),
+                                state="*")
+
+    dp.register_callback_query_handler(close_send_message_menu, Text(equals="close_send"),
+                                       state=Admins.send_message_state)
+    dp.register_callback_query_handler(get_group_set_to_send,
+                                       Text(equals=["send_students", "send_employees",
+                                                    "send_admins", "send_all"]),
+                                       state=Admins.send_message_state)
+    dp.register_message_handler(send_message_choice, state=Admins.send_message_state)
+    dp.register_callback_query_handler(approve_send_message, Text(equals="approve_send_message"),
+                                       state=Admins.send_message_state)
 
     """
         Help Fork
