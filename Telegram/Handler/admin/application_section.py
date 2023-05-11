@@ -30,6 +30,8 @@ from utils.shared_methods.default import Level, check_initials, check_email, che
 _application_list_ = []
 _reversed_application_list_ = []
 
+__selected_application__: dict = {}
+
 _linked_query_dict = {}
 _manual_user_access_level_dict = {
     'student': 'Студент',
@@ -53,21 +55,28 @@ async def auto_add_by_application(query: CallbackQuery, state: FSMContext) -> No
 
 
 async def get_application_from_begin(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
-    global _application_list_
+    global _application_list_, __selected_application__
     if not _application_list_:
         _application_list_ = await get_all_applications()
     application = await get_elem_from_application_list_()
+    if not application:
+        await auto_add_by_application(query, state)
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
-    await state.update_data({
+    __selected_application__[query.from_user.id] = {
+        "data": application,
+        "reversed": False,
+    }
+    await state.set_data({
         'data': application,
         'reversed': False,
     })
+    # logging.error(application.__values__)
 
 
 async def next_application(query: CallbackQuery, state: FSMContext):
-    application_obj = await state.get_data()
+    application_obj = __selected_application__[query.from_user.id]
     if application_obj['reversed']:
         await insert_elem_from_reversed_application_list_(application_obj['data'])
         await get_application_from_end(query=query, state=state)
@@ -81,14 +90,14 @@ async def approve_application_from_list(query: CallbackQuery):
 
 
 async def submit_reject_application(query: CallbackQuery, state: FSMContext):
-    application_response_dict = await state.get_data()
+    application_response_dict = __selected_application__[query.from_user.id]
     await query.message.edit_text(f"Вы уверены, что хотите отклонить заявку:\n"
                                   f"{await build_application_info(application_response_dict['data'])}",
                                   reply_markup=application_reject_menu)
 
 
 async def reject_application(query: CallbackQuery, state: FSMContext):
-    application_response_dict = await state.get_data()
+    application_response_dict = __selected_application__[query.from_user.id]
     if await drop_application(application_response_dict['data']):
         await query.message.edit_text(f"Успешно удален:\n"
                                       f"{await build_application_info(application_response_dict['data'])}",
@@ -107,14 +116,20 @@ async def reject_application(query: CallbackQuery, state: FSMContext):
 
 
 async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
-    global _reversed_application_list_
+    global _reversed_application_list_, __selected_application__
     if not _reversed_application_list_:
         _reversed_application_list_ = list(reversed(await get_all_applications()))
     application = await get_elem_from_reversed_application_list_()
+    if not application:
+        await auto_add_by_application(query, state)
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
-    await state.update_data({
+    __selected_application__[query.from_user.id] = {
+        "data": application,
+        "reversed": False,
+    }
+    await state.set_data({
         'data': application,
         'reversed': True,
     })
@@ -147,13 +162,13 @@ async def insert_elem_from_application_list_(elem: Application):
 
 
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text(await build_message_approve_level_from_application(state,
+    await query.message.edit_text(await build_message_approve_level_from_application(query=query,
                                                                                      level=Level(query.data).name),
                                   reply_markup=application_approve_menu)
 
 
 async def approve_application(query: CallbackQuery, state: FSMContext):
-    application_object: dict = await state.get_data()
+    application_object: dict = __selected_application__[query.from_user.id]
     application: Application = application_object['data']
     level: str = application_object['level']
     await add_user(
@@ -173,14 +188,12 @@ async def approve_application(query: CallbackQuery, state: FSMContext):
     await state.reset_data()
 
 
-async def build_message_approve_level_from_application(state: FSMContext, level: str):
-    application_obj = await state.get_data()
-    application = application_obj['data']
+async def build_message_approve_level_from_application(query: CallbackQuery, level: str):
+    application_obj = __selected_application__[query.from_user.id]
     application_obj['level'] = level
-    await state.update_data(application_obj)
     return f"Вы уверены, что хотите принять заявку:\n" \
            f"Информация о пользователе! \n" \
-           f"{await build_application_info(application)}"
+           f"{await build_application_info(application_obj['data'])}"
 
 
 async def build_application_info(application: Application):

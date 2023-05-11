@@ -31,7 +31,6 @@ async def get_send_message_menu(message: Message, state: FSMContext) -> None:
 
 
 async def get_group_set_to_send(query: CallbackQuery, state: FSMContext) -> None:
-
     await state.set_data(data={
         "group": query.data
     })
@@ -60,11 +59,11 @@ async def approve_send_message(query: CallbackQuery, state: FSMContext) -> None:
         case "send_employees":
             user_list: Union[List[User], None] = await get_users_by_access(access="T")
             user_list += await get_users_by_access(access="E")
-            await send_message_from_users(user_list, data["message"])
+            await send_message_from_users(user_list, data["message"], level="сотрудника")
             return
         case "send_admins":
             user_list: Union[List[User], None] = await get_users_by_access(access="A")
-            await send_message_from_users(user_list, data["message"])
+            await send_message_from_users(user_list, data["message"], level="администраторам")
             return
         case "send_all":
             user_list: Union[List[User], None] = await get_all_users()
@@ -72,13 +71,19 @@ async def approve_send_message(query: CallbackQuery, state: FSMContext) -> None:
             return
 
 
-async def send_message_from_users(user_list: Union[List[User], None], message: str) -> None:
+async def send_message_from_users(user_list: Union[List[User], None], message: str,
+                                  level: Union[str, None] = None) -> None:
+    level_sends: Union[str, None] = None
+    if level:
+        level_sends = f"Данное сообщение отправлено только <b>{level}</b>"
     if user_list:
         for user in user_list:
             try:
                 await bot.send_message(chat_id=user.id,
-                                       text=f"Здравствуйте{user.initials}! Для вас уведомление от администратора!\n"
-                                            f"{message}",
+                                       text=f"Здравствуйте, <b>{user.initials}</b>! \n"
+                                            f"Для вас уведомление от администратора!\n"
+                                            f"{message}\n"
+                                            f"{level_sends}",
                                        reply_markup=reject_send_message_kb)
             except ChatNotFound:
                 logging.error(f"Chat not found: {user.id}")
