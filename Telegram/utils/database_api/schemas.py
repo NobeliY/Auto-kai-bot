@@ -72,7 +72,7 @@ class ParkingLog(TimeDatabaseModel):
 class AiogramState(BaseModel):
     __tablename__ = "aiogram_states"
 
-    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    user = Column(BigInteger, nullable=False, primary_key=True)
     chat = Column(BigInteger, nullable=False)
     state = Column(String, nullable=False)
 
@@ -82,7 +82,7 @@ class AiogramState(BaseModel):
 
 class AiogramData(BaseModel):
     __tablename__ = "aiogram_datas"
-    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    user = Column(BigInteger, nullable=False, primary_key=True)
     chat = Column(BigInteger, nullable=False)
     data = Column(JSON, nullable=True)
 
@@ -92,7 +92,7 @@ class AiogramData(BaseModel):
 
 class AiogramBucket(BaseModel):
     __tablename__ = "aiogram_buckets"
-    user = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, primary_key=True)
+    user = Column(BigInteger, nullable=False, primary_key=True)
     chat = Column(BigInteger, nullable=False)
     bucket = Column(JSON, nullable=False)
 

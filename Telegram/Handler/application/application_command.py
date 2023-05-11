@@ -3,7 +3,7 @@ import re
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
-from aiogram.utils.exceptions import MessageNotModified
+from aiogram.utils.exceptions import MessageNotModified, MessageCantBeEdited
 
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
@@ -26,7 +26,9 @@ async def select_application_mode(message: Message, state: FSMContext) -> None:
 
 
 async def set_application(query: CallbackQuery, state: FSMContext):
-    await state.update_data(user_id=query.message.from_user.id)
+    await state.set_data({
+        "user_id": query.from_user.id
+    })
     await query.message.answer(f"<b>Вы начали подачу заявления</b> \n"
                                f"<b>Введите ФИО: </b>",
                                reply_markup=ReplyKeyboardRemove())
@@ -42,7 +44,7 @@ async def application_submission_initials(message: Message, state: FSMContext):
             return
         try:
             await message.edit_text("ФИО должно содержать только Буквы.")
-        except MessageNotModified:
+        except MessageCantBeEdited:
             pass
 
 

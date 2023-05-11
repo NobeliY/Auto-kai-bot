@@ -13,11 +13,10 @@ from utils.shared_methods.default import set_on_startup_users
 
 
 async def get_default_commands(dp: Dispatcher) -> None:
-    logger.warning(f"Default commands: {dp}")
     try:
         on_close()
     except Exception as _ex:
-        logger.info(f"{Fore.LIGHTRED_EX}{_ex} | On Close Exception {Fore.RESET}")
+        logger.error(f"{Fore.LIGHTRED_EX}{_ex} | On Close Exception {Fore.RESET}")
     await on_startup()
     await bot.set_my_commands(
         [
@@ -35,6 +34,6 @@ async def get_default_commands(dp: Dispatcher) -> None:
         try:
             await bot.send_message(chat_id=admin_id, text=" Бот возобновил работу.")
         except exceptions.ChatNotFound:
-            logger.error(f"{Fore.RED}Нет чата с {admin_id}{Fore.RESET}!")
+            logger.warning(f"{Fore.RED}Нет чата с {admin_id}{Fore.RESET}!")
     register_handlers(dp=dp)
     logger.info(f"{Fore.LIGHTGREEN_EX}Register handlers job done{Fore.RESET}!")
