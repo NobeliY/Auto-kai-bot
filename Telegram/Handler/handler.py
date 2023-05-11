@@ -7,8 +7,7 @@ from aiogram.types import ContentType
 from Data import __all_states__
 from Handler.admin.admin_command import (
     call_admin_panel, users_info, set_add_menu,
-    set_remove_menu, show_fully_information, preview_step,
-    # show_applications
+    set_remove_menu, show_fully_information, preview_step
 )
 from Handler.admin.application_section import (
     auto_add_by_application, manual_add_user,
@@ -51,7 +50,9 @@ from states import UserState, ApplicationSubmission, Admins, ManualAdd, UserChan
 
 
 def register_handlers(dp: Dispatcher):
-    logging.warning(f"Register handlers: {dp}")
+    """
+    Function register all required handlers from bot
+    """
     """
         Start Command
     """

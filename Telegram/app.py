@@ -25,5 +25,4 @@ logging.getLogger().addHandler(FileHandler(filename=f"{LOGGING_PATH}/{LOGGING_FI
 # TODO: Main
 if __name__ == "__main__":
     from Handler.default.default import get_default_commands
-    logging.warning(f"{dp}")
     executor.start_polling(dp, skip_updates=True, on_startup=get_default_commands)
