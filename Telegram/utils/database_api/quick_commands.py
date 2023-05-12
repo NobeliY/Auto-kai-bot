@@ -1,7 +1,8 @@
+import logging
 from datetime import timezone, timedelta, datetime
 import logging as logger
 import re
-from typing import List, Union
+from typing import List, Union, Dict
 
 from asyncpg import UniqueViolationError, ForeignKeyViolationError
 from colorama import Fore
@@ -39,6 +40,27 @@ async def add_application(user_id: int, initials: str, email: str,
         logger.warning(f"{Fore.LIGHTGREEN_EX} {type(application)} not created{Fore.RESET}!")
 
 
+async def get_serialized_application(application_dict: Dict, change_ap: bool = False) -> Union[
+    Application, ApplicationChange
+]:
+    return Application(
+        id=application_dict["id"],
+        initials=application_dict["initials"],
+        email=application_dict["email"],
+        phoneNumber=application_dict["phoneNumber"],
+        group=application_dict["group"],
+        stateNumber=application_dict["stateNumber"]
+    ) if not change_ap else \
+        ApplicationChange(
+            id=application_dict["id"],
+            initials=application_dict["initials"],
+            email=application_dict["email"],
+            phoneNumber=application_dict["phoneNumber"],
+            group=application_dict["group"],
+            stateNumber=application_dict["stateNumber"]
+        )
+
+
 async def add_ready_application(application: Union[Application, ApplicationChange]) -> None:
     try:
         await application.create()
@@ -61,7 +83,8 @@ async def get_all_applications(change_ap: bool = False) -> Union[List[Applicatio
         await ApplicationChange.query.gino.all()
 
 
-async def get_required_application(tg_id: int, change_app: bool = False) -> Union[Application, ApplicationChange, None]:
+async def get_required_application(tg_id: int, change_app: bool = False) -> Union[
+    Application, ApplicationChange, None]:
     return await ApplicationChange.query.where(ApplicationChange.id == tg_id).gino.first() if change_app else await \
         Application.query.where(ApplicationChange.id == tg_id).gino.first()
 
@@ -101,7 +124,8 @@ async def filter_users_shortly_info(users: List[User]) -> dict:
             [1 if re.findall(r"Преподаватель", user.group) else 0 for user in users]
         ),
         'Сотрудники': sum(
-            [0 if re.findall(r"\d-\d", user.group) or re.findall(r"Преподаватель", user.group) else 1 for user in users]
+            [0 if re.findall(r"\d-\d", user.group) or re.findall(r"Преподаватель", user.group) else 1 for user in
+             users]
         )
     }
 
@@ -110,7 +134,23 @@ async def get_users_by_initials(initials) -> List[User] | None:
     return await User.query.where(User.initials.like(f"%{initials}%")).gino.all()
 
 
-async def delete_user_by_initials_command(user: User) -> None:
+async def get_serialized_user(user_dict: Dict) -> User:
+    return User(id=user_dict["id"], initials=user_dict["initials"], email=user_dict["email"],
+                phoneNumber=user_dict["phoneNumber"], group=user_dict["group"],
+                stateNumber=user_dict["stateNumber"], access=user_dict["access"])
+
+
+async def delete_user_by_initials_command(user: Union[User, Dict]) -> None:
+    if user is dict:
+        user = User(
+            id=user["id"],
+            initials=user["initials"],
+            email=user["email"],
+            phoneNumber=user["phoneNumber"],
+            group=user["group"],
+            stateNumber=user["stateNumber"],
+            access=user["access"]
+        )
     try:
         await user.delete()
     except ForeignKeyViolationError as foreignKeyViolationEr:
@@ -308,7 +348,8 @@ async def add_aiogram_bucket(user: int, chat: int, bucket: dict) -> None:
 
 
 async def get_aiogram_bucket(user: int, chat: int) -> Union[AiogramBucket, None]:
-    return await AiogramBucket.query.where(and_(AiogramBucket.user == user, AiogramBucket.chat == chat)).gino.first()
+    return await AiogramBucket.query.where(
+        and_(AiogramBucket.user == user, AiogramBucket.chat == chat)).gino.first()
 
 
 async def delete_aiogram_bucket(user: int, chat: int) -> None:

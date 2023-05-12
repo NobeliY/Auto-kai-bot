@@ -22,15 +22,13 @@ from utils.database_api.quick_commands import (
     get_all_applications,
     drop_application,
     add_ready_application,
-    add_user
+    add_user, get_serialized_application
 )
 from utils.database_api.schemas import Application
 from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
 
 _application_list_ = []
 _reversed_application_list_ = []
-
-__selected_application__: dict = {}
 
 _linked_query_dict = {}
 _manual_user_access_level_dict = {
@@ -55,7 +53,7 @@ async def auto_add_by_application(query: CallbackQuery, state: FSMContext) -> No
 
 
 async def get_application_from_begin(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
-    global _application_list_, __selected_application__
+    global _application_list_
     if not _application_list_:
         _application_list_ = await get_all_applications()
     application = await get_elem_from_application_list_()
@@ -64,24 +62,23 @@ async def get_application_from_begin(query: CallbackQuery, state: FSMContext, ed
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
-    __selected_application__[query.from_user.id] = {
-        "data": application,
-        "reversed": False,
-    }
     await state.set_data({
-        'data': application,
+        'data': application.__dict__,
         'reversed': False,
     })
-    # logging.error(application.__values__)
 
 
 async def next_application(query: CallbackQuery, state: FSMContext):
-    application_obj = __selected_application__[query.from_user.id]
+    application_obj = await state.get_data()
     if application_obj['reversed']:
-        await insert_elem_from_reversed_application_list_(application_obj['data'])
+        await insert_elem_from_reversed_application_list_(
+            await get_serialized_application(application_obj['data']["__values__"])
+        )
         await get_application_from_end(query=query, state=state)
         return
-    await insert_elem_from_application_list_(application_obj['data'])
+    await insert_elem_from_application_list_(
+        await get_serialized_application(application_obj['data']["__values__"])
+    )
     await get_application_from_begin(query=query, state=state)
 
 
@@ -90,33 +87,35 @@ async def approve_application_from_list(query: CallbackQuery):
 
 
 async def submit_reject_application(query: CallbackQuery, state: FSMContext):
-    application_response_dict = __selected_application__[query.from_user.id]
+    application_response_dict = await state.get_data()
     await query.message.edit_text(f"Вы уверены, что хотите отклонить заявку:\n"
-                                  f"{await build_application_info(application_response_dict['data'])}",
+                                  f"{await build_application_info(await get_serialized_application(application_response_dict['data']['__values__']))}",
                                   reply_markup=application_reject_menu)
 
 
 async def reject_application(query: CallbackQuery, state: FSMContext):
-    application_response_dict = __selected_application__[query.from_user.id]
-    if await drop_application(application_response_dict['data']):
+    application_response_dict = await state.get_data()
+    application = await get_serialized_application(application_response_dict["data"]["__values__"])
+    if await drop_application(application):
         await query.message.edit_text(f"Успешно удален:\n"
-                                      f"{await build_application_info(application_response_dict['data'])}",
+                                      f"{await build_application_info(application)}",
                                       reply_markup=back_inline_menu)
         await state.reset_data()
-        await get_application_from_begin(query=query, state=state, edit_message=False) if not application_response_dict[
-            'reversed'] else await get_application_from_end(query=query, state=state, edit_message=False)
+        await get_application_from_begin(query=query, state=state, edit_message=False) if not \
+            application_response_dict[
+                'reversed'] else await get_application_from_end(query=query, state=state, edit_message=False)
 
         return
     await query.message.edit_text(f"Не удалось удалить:\n"
-                                  f"{await build_application_info(application_response_dict['data'])}",
+                                  f"{await build_application_info(application)}",
                                   reply_markup=back_inline_menu)
-    await add_ready_application(application=application_response_dict['data'])
-    await insert_elem_from_application_list_(application_response_dict['data']) if not application_response_dict[
-        'reversed'] else await insert_elem_from_reversed_application_list_(application_response_dict['data'])
+    await add_ready_application(application=application)
+    await insert_elem_from_application_list_(application) if not application_response_dict[
+        'reversed'] else await insert_elem_from_reversed_application_list_(application)
 
 
 async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit_message: bool = True):
-    global _reversed_application_list_, __selected_application__
+    global _reversed_application_list_
     if not _reversed_application_list_:
         _reversed_application_list_ = list(reversed(await get_all_applications()))
     application = await get_elem_from_reversed_application_list_()
@@ -125,12 +124,8 @@ async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
-    __selected_application__[query.from_user.id] = {
-        "data": application,
-        "reversed": False,
-    }
     await state.set_data({
-        'data': application,
+        'data': application.__dict__,
         'reversed': True,
     })
 
@@ -162,14 +157,14 @@ async def insert_elem_from_application_list_(elem: Application):
 
 
 async def approve_student_level_from_application(query: CallbackQuery, state: FSMContext):
-    await query.message.edit_text(await build_message_approve_level_from_application(query=query,
+    await query.message.edit_text(await build_message_approve_level_from_application(state=state,
                                                                                      level=Level(query.data).name),
                                   reply_markup=application_approve_menu)
 
 
 async def approve_application(query: CallbackQuery, state: FSMContext):
-    application_object: dict = __selected_application__[query.from_user.id]
-    application: Application = application_object['data']
+    application_object: dict = await state.get_data()
+    application: Application = await get_serialized_application(application_object["data"]["__values__"])
     level: str = application_object['level']
     await add_user(
         user_id=application.id,
@@ -188,12 +183,14 @@ async def approve_application(query: CallbackQuery, state: FSMContext):
     await state.reset_data()
 
 
-async def build_message_approve_level_from_application(query: CallbackQuery, level: str):
-    application_obj = __selected_application__[query.from_user.id]
+async def build_message_approve_level_from_application(state: FSMContext, level: str):
+    application_obj = await state.get_data()
     application_obj['level'] = level
+    application = await get_serialized_application(application_obj["data"]["__values__"])
+    await state.update_data(application_obj)
     return f"Вы уверены, что хотите принять заявку:\n" \
            f"Информация о пользователе! \n" \
-           f"{await build_application_info(application_obj['data'])}"
+           f"{await build_application_info(application)}"
 
 
 async def build_application_info(application: Application):
@@ -214,9 +211,7 @@ async def manual_add_user(query: CallbackQuery, state: FSMContext):
 
 
 async def start_manual_add(query: CallbackQuery, state: FSMContext):
-    print(await state.get_state())
     await ManualAdd.id.set()
-    print(await state.get_state())
     global _linked_query_dict
     _linked_query_dict[query.message.chat.id] = query
     await query.message.edit_text("Введите <b>Telegram ID</b>:")
