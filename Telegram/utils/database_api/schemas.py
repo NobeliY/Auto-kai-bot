@@ -84,7 +84,7 @@ class AiogramData(BaseModel):
     __tablename__ = "aiogram_datas"
     user = Column(BigInteger, nullable=False, primary_key=True)
     chat = Column(BigInteger, nullable=False)
-    data = Column(JSON, nullable=True)
+    data = Column(String, nullable=True)
 
     query: select
     add: insert
@@ -94,7 +94,7 @@ class AiogramBucket(BaseModel):
     __tablename__ = "aiogram_buckets"
     user = Column(BigInteger, nullable=False, primary_key=True)
     chat = Column(BigInteger, nullable=False)
-    bucket = Column(JSON, nullable=False)
+    bucket = Column(String, nullable=False)
 
     query: select
     add: insert

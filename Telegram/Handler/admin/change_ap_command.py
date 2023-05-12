@@ -8,7 +8,8 @@ from Keyboard.Inline import add_by_applications_menu, back_inline_menu, applicat
     application_reject_menu, application_approve_menu
 from states import Admins
 from utils.database_api.quick_commands import get_user, \
-    drop_application, add_ready_application, update_user, get_all_applications, get_count_of_applications
+    drop_application, add_ready_application, update_user, get_all_applications, get_count_of_applications, \
+    get_serialized_application
 from utils.database_api.schemas import ApplicationChange
 
 _change_application_list_: List[ApplicationChange] = []
@@ -36,7 +37,7 @@ async def get_change_application_from_begin(query: CallbackQuery, state: FSMCont
         await query.message.edit_text(await build_change_application_info(application=application),
                                       reply_markup=application_change_menu)
     await state.update_data({
-        'data': application,
+        'data': application.__dict__,
         'reversed': False,
     })
 
@@ -44,10 +45,14 @@ async def get_change_application_from_begin(query: CallbackQuery, state: FSMCont
 async def next_change_application(query: CallbackQuery, state: FSMContext) -> None:
     application_obj = await state.get_data()
     if application_obj['reversed']:
-        await insert_elem_from_reversed_change_application_list_(application_obj['data'])
+        await insert_elem_from_reversed_change_application_list_(
+            await get_serialized_application(application_obj["data"]["__values__"], True)
+        )
         await get_change_application_from_end(query)
         return
-    await insert_elem_from_change_application_list_(application_obj['data'])
+    await insert_elem_from_change_application_list_(
+        await get_serialized_application(application_obj["data"]["__values__"], True)
+    )
     await get_change_application_from_begin(query, state)
 
 
@@ -68,36 +73,40 @@ async def approve_change_application(query: CallbackQuery) -> None:
 
 async def cancel_approve_change_application(query: CallbackQuery, state: FSMContext) -> None:
     application_dict: dict = await state.get_data()
+    application = await get_serialized_application(application_dict["data"]["__values__"], True)
     await insert_elem_from_reversed_change_application_list_(
-        application_dict['data']) if application_dict['reversed'] else await insert_elem_from_change_application_list_(
-        application_dict['data']
+        application) if application_dict['reversed'] else await insert_elem_from_change_application_list_(
+        application
     )
     await get_change_application(query)
 
 
 async def confirm_approve_change_application(query: CallbackQuery, state: FSMContext) -> None:
     application_dict: dict = await state.get_data()
-    _successful: bool = await update_user(application_dict['data'])
+    application = await get_serialized_application(application_dict["data"]["__values__"], True)
+    _successful: bool = await update_user(application)
     if _successful:
         try:
             await query.message.edit_text("Успешно обновлены данные!", reply_markup=back_inline_menu)
-            await drop_application(application_dict['data'])
+            await drop_application(application)
         except MessageNotModified:
             pass
 
 
 async def reject_change_application(query: CallbackQuery, state: FSMContext) -> None:
     application_dict = await state.get_data()
+    application = await get_serialized_application(application_dict["data"]["__values__"], True)
     await query.message.edit_text(f"Вы уверены, что хотите отклонить заявку на изменение?\n"
-                                  f"{await build_change_application_info(application_dict['data'])}",
+                                  f"{await build_change_application_info(application)}",
                                   reply_markup=application_reject_menu)
 
 
 async def confirm_reject(query: CallbackQuery, state: FSMContext) -> None:
     application_dict = await state.get_data()
-    if await drop_application(application_dict['data']):
+    application = await get_serialized_application(application_dict["data"]["__values__"], True)
+    if await drop_application(application):
         await query.message.edit_text(f"Успешно удален:\n"
-                                      f"{await build_change_application_info(application_dict['data'])}",
+                                      f"{await build_change_application_info(application)}",
                                       reply_markup=back_inline_menu)
         await state.reset_data()
         await get_change_application_from_begin(query, state, False) if not application_dict[
@@ -105,11 +114,11 @@ async def confirm_reject(query: CallbackQuery, state: FSMContext) -> None:
         return
 
     await query.message.edit_text(f"Не удалось удалить:\n"
-                                  f"{await build_change_application_info(application_dict['data'])}",
+                                  f"{await build_change_application_info(application)}",
                                   reply_markup=back_inline_menu)
-    await add_ready_application(application_dict['data'])
-    await insert_elem_from_change_application_list_(application_dict['data']) if not application_dict[
-        'reversed'] else await insert_elem_from_reversed_change_application_list_(application_dict['data'])
+    await add_ready_application(application)
+    await insert_elem_from_change_application_list_(application) if not application_dict[
+        'reversed'] else await insert_elem_from_reversed_change_application_list_(application)
 
 
 async def insert_elem_from_reversed_change_application_list_(elem: ApplicationChange) -> None:

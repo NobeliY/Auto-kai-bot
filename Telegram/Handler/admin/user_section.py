@@ -11,7 +11,7 @@ from Keyboard.Inline import delete_accept_menu, delete_fully_show_searched_menu,
     delete_searched_user_button
 from states import Admins
 from utils.database_api.quick_commands import delete_users_by_group, get_users_by_group, get_users_by_initials, \
-    delete_user_by_initials_command
+    delete_user_by_initials_command, get_serialized_user
 from utils.database_api.schemas import User
 
 
@@ -31,20 +31,21 @@ async def delete_user_by_initials_searched(message: Message, state: FSMContext):
         await message.answer(f"Вы точно хотите удалить {user.initials}?",
                              reply_markup=delete_accept_menu)
         await state.update_data(data={
-            "data": user,
+            "data": user.__dict__,
         })
         return
     await message.answer(f"По вашему запросу найдено: <b>{len(users)}</b>\n"
                          f"Нажмите на `Подробнее` и выберите из сообщений необходимый!",
                          reply_markup=delete_fully_show_searched_menu)
     await state.update_data(data={
-        "data": users
+        "data": [user.__dict__ for user in users]
     })
 
 
 async def send_all_searched_users_for_delete(query: CallbackQuery, state: FSMContext):
     users = await state.get_data()
-    [
+    for _user in users["data"]:
+        user = await get_serialized_user(user_dict=_user["__values__"])
         await query.message.answer(f"Telegram ID: <b>{user.id}</b>\n"
                                    f"ФИО: <b>`{user.initials}`</b>\n"
                                    f"Почта: <b>{user.email}</b>\n"
@@ -53,8 +54,6 @@ async def send_all_searched_users_for_delete(query: CallbackQuery, state: FSMCon
                                    f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
                                    f"Уровень: <b>{get_access_level(user.access)}</b>\n",
                                    reply_markup=delete_searched_user_button)
-        for user in users['data']
-    ]
 
 
 async def delete_user_question(query: CallbackQuery, state: FSMContext):
@@ -67,14 +66,15 @@ async def delete_user_question(query: CallbackQuery, state: FSMContext):
     await query.message.answer(f"Вы точно хотите удалить {initials}",
                                reply_markup=delete_accept_menu)
     users = await get_users_by_initials(initials=initials)
+    required_user = users[0]
     await state.update_data(data={
-        "data": users[0]
+        "data": required_user.__dict__
     })
 
 
 async def delete_user(query: CallbackQuery, state: FSMContext):
-    users = await state.get_data()
-    user = users['data']
+    user_data = await state.get_data()
+    user = await get_serialized_user(user_dict=user_data["data"]["__values__"])
     await delete_user_by_initials_command(user=user)
     await query.message.edit_text(f"Успешно удален:\n"
                                   f"Telegram ID: <b>{user.id}</b>\n"
@@ -104,13 +104,14 @@ async def get_group_for_delete(message: Message, state: FSMContext):
                          f"Вы точно хотите удалить эту группу?",
                          reply_markup=delete_accept_menu)
     await state.update_data(data={
-        "data": users
+        "data": [user.__dict__ for user in users]
     })
 
 
 async def accept_delete_group(query: CallbackQuery, state: FSMContext):
     users = await state.get_data()
-    await delete_users_by_group(users=users['data'])
+    __users__: List[User] = [await get_serialized_user(user["__values__"]) for user in users["data"]]
+    await delete_users_by_group(users=__users__)
     await query.message.edit_text(f"Успешна удалена группа: {query.message.text}",
                                   reply_markup=back_inline_menu)
 
