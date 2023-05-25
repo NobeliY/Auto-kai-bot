@@ -13,6 +13,7 @@ admins = [int(admin_id) for admin_id in os.getenv('ADMIN_ID_LIST').split(' ')]
 BOT_TOKEN = os.getenv('BOT_TOKEN_AUTO')
 TIME_RANGE = [time(6, 0), time(23, 0)]
 USER_CSV_PATH = Path('Data/users.csv')
+USER_XLSX_PATH = Path('Data/users.xlsx')
 LOGGING_LEVEL = os.getenv("LEVEL")
 LOGGING_PATH = f"{os.getcwd()}/logs"
 print(LOGGING_PATH)
