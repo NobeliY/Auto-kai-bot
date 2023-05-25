@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message, InputFile
 
 from Data import USER_CSV_PATH
+from Data.config import USER_XLSX_PATH
 from Handler.admin.change_ap_command import get_change_application
 from Keyboard.Inline import delete_menu, show_db_menu
 from Keyboard.Inline import main_admin_menu, add_menu, back_inline_menu
@@ -12,7 +13,7 @@ from states import Admins
 from utils.database_api.quick_commands import get_user, get_users_shortly_info, get_users_info
 from utils.database_api.schemas import User, Application
 from utils.request_api.Request_controller import RequestController
-from utils.shared_methods.default import get_access_level, get_admin_level
+from utils.shared_methods.default import get_access_level, get_admin_level, get_fully_info
 
 
 async def call_admin_panel(message: Message):
@@ -44,34 +45,36 @@ async def set_remove_menu(query: CallbackQuery, state: FSMContext):
 
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.show_fully_state)
-    users: List[User] = await get_users_info()
-    fully_info_csv: List[List[str]] = [
-        [
-            "Telegram ID",
-            "ФИО",
-            "Почта",
-            "Группа",
-            "Номер телефона",
-            "Гос. номер используемого транспорта",
-            "Уровень"
-        ]
-    ]
-    for user in users:
-        fully_info_csv.append([
-            str(user.id),
-            user.initials,
-            user.email,
-            user.group,
-            user.phoneNumber,
-            user.stateNumber,
-            get_access_level(user.access)
-        ])
+    # users: List[User] = await get_users_info()
+    # fully_info_csv: List[List[str]] = [
+    #     [
+    #         "Telegram ID",
+    #         "ФИО",
+    #         "Почта",
+    #         "Группа",
+    #         "Номер телефона",
+    #         "Гос. номер используемого транспорта",
+    #         "Уровень"
+    #     ]
+    # ]
+    # for user in users:
+    #     fully_info_csv.append([
+    #         str(user.id),
+    #         user.initials,
+    #         user.email,
+    #         user.group,
+    #         user.phoneNumber,
+    #         user.stateNumber,
+    #         get_access_level(user.access)
+    #     ])
+    #
+    # with open(USER_CSV_PATH, 'w', encoding='utf-8', newline='') as file:
+    #     csv_file = csv.writer(file)
+    #     csv_file.writerows(fully_info_csv)
+    await get_fully_info()
 
-    with open(USER_CSV_PATH, 'w', encoding='utf-8', newline='') as file:
-        csv_file = csv.writer(file)
-        csv_file.writerows(fully_info_csv)
     await query.message.delete()
-    await query.message.answer_document(InputFile(USER_CSV_PATH),
+    await query.message.answer_document(InputFile(USER_XLSX_PATH),
                                         reply_markup=back_inline_menu)
 
 
