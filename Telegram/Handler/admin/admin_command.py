@@ -1,10 +1,6 @@
-import csv
-from typing import List
-
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message, InputFile
 
-from Data import USER_CSV_PATH
 from Data.config import USER_XLSX_PATH
 from Handler.admin.change_ap_command import get_change_application
 from Keyboard.Inline import delete_menu, show_db_menu
@@ -45,32 +41,6 @@ async def set_remove_menu(query: CallbackQuery, state: FSMContext):
 
 async def show_fully_information(query: CallbackQuery, state: FSMContext):
     await state.set_state(Admins.show_fully_state)
-    # users: List[User] = await get_users_info()
-    # fully_info_csv: List[List[str]] = [
-    #     [
-    #         "Telegram ID",
-    #         "ФИО",
-    #         "Почта",
-    #         "Группа",
-    #         "Номер телефона",
-    #         "Гос. номер используемого транспорта",
-    #         "Уровень"
-    #     ]
-    # ]
-    # for user in users:
-    #     fully_info_csv.append([
-    #         str(user.id),
-    #         user.initials,
-    #         user.email,
-    #         user.group,
-    #         user.phoneNumber,
-    #         user.stateNumber,
-    #         get_access_level(user.access)
-    #     ])
-    #
-    # with open(USER_CSV_PATH, 'w', encoding='utf-8', newline='') as file:
-    #     csv_file = csv.writer(file)
-    #     csv_file.writerows(fully_info_csv)
     await get_fully_info()
 
     await query.message.delete()

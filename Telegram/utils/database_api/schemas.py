@@ -1,3 +1,5 @@
+
+
 from sqlalchemy import select, delete, ForeignKey, Column, BigInteger, String, Integer, TIMESTAMP
 from sqlalchemy.dialects.postgresql import insert, JSON
 from sqlalchemy.orm import relationship
@@ -34,6 +36,9 @@ class Application(TimeDatabaseModel):
 
     query: select
 
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
+
 
 class ApplicationChange(TimeDatabaseModel):
     __tablename__ = "application_changes"
@@ -47,6 +52,9 @@ class ApplicationChange(TimeDatabaseModel):
 
     query: select
 
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
+
 
 class DateQuality(BaseModel):
     __tablename__ = "date_quality"
@@ -56,6 +64,9 @@ class DateQuality(BaseModel):
     count = Column(Integer, primary_key=True)
 
     query: select
+
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
 
 
 class ParkingLog(TimeDatabaseModel):
@@ -68,6 +79,9 @@ class ParkingLog(TimeDatabaseModel):
     query: select
     add: insert
 
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
+
 
 class AiogramState(BaseModel):
     __tablename__ = "aiogram_states"
@@ -79,6 +93,9 @@ class AiogramState(BaseModel):
     query: select
     add: insert
 
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
+
 
 class AiogramData(BaseModel):
     __tablename__ = "aiogram_datas"
@@ -89,6 +106,9 @@ class AiogramData(BaseModel):
     query: select
     add: insert
 
+    def to_list(self):
+        return [value for value in self.__dict__.values()]
+
 
 class AiogramBucket(BaseModel):
     __tablename__ = "aiogram_buckets"
@@ -98,3 +118,7 @@ class AiogramBucket(BaseModel):
 
     query: select
     add: insert
+
+    def to_list(self):
+        value_list = [value for value in self.__dict__.values()]
+        return value_list

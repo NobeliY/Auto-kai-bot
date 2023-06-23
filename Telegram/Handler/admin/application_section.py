@@ -25,7 +25,8 @@ from utils.database_api.quick_commands import (
     add_user, get_serialized_application
 )
 from utils.database_api.schemas import Application
-from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number
+from utils.shared_methods.default import Level, check_initials, check_email, check_phone, check_state_number, \
+    send_user_application_info
 
 _application_list_ = []
 _reversed_application_list_ = []
@@ -59,6 +60,11 @@ async def get_application_from_begin(query: CallbackQuery, state: FSMContext, ed
     application = await get_elem_from_application_list_()
     if not application:
         await auto_add_by_application(query, state)
+        await state.set_data({
+            'data': {},
+            'reversed': False
+        })
+        return
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
@@ -100,6 +106,8 @@ async def reject_application(query: CallbackQuery, state: FSMContext):
         await query.message.edit_text(f"Успешно удален:\n"
                                       f"{await build_application_info(application)}",
                                       reply_markup=back_inline_menu)
+        await send_user_application_info(telegram_id=application.id,
+                                         message=f"{application.initials}, к сожалению мы не можем дать вам доступ!")
         await state.reset_data()
         await get_application_from_begin(query=query, state=state, edit_message=False) if not \
             application_response_dict[
@@ -121,6 +129,11 @@ async def get_application_from_end(query: CallbackQuery, state: FSMContext, edit
     application = await get_elem_from_reversed_application_list_()
     if not application:
         await auto_add_by_application(query, state)
+        await state.set_data({
+            'data': {},
+            'reversed': False
+        })
+        return
     if edit_message:
         await query.message.edit_text(await build_application_info(application=application),
                                       reply_markup=application_change_menu)
@@ -179,6 +192,9 @@ async def approve_application(query: CallbackQuery, state: FSMContext):
     await query.message.edit_text(f"Успешно добавлен\n"
                                   f"{await build_application_info(application)}",
                                   reply_markup=back_inline_menu)
+    await send_user_application_info(telegram_id=application.id,
+                                     message=f"{application.initials}, выдан доступ. Для завершения настроек, "
+                                             f"введите сообщение: <b>/start</b>.")
     await drop_application(application=application)
     await state.reset_data()
 
