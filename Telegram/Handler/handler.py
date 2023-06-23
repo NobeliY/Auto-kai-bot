@@ -79,6 +79,8 @@ def register_handlers(dp: Dispatcher):
                                 state=__all_states__)
     dp.register_callback_query_handler(change_user_info, Text(equals="change_info_menu"),
                                        state=__all_states__)
+    dp.register_callback_query_handler(close_user_info, Text(equals="close_info"),
+                                       state=UserState.is_guest)
 
     """
     INFO -> Sector change application
