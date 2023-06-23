@@ -7,6 +7,7 @@ class UserState(StatesGroup):
     """
     in_active = State()
     is_admin = State()
+    is_guest = State()
 
 
 class UserChanges(StatesGroup):

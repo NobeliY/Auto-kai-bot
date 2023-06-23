@@ -41,7 +41,9 @@ async def get_user_info(message: Message, sec: int = -1) -> None:
     await message.delete()
 
 
-async def close_user_info(query: CallbackQuery) -> None:
+async def close_user_info(query: CallbackQuery, state: FSMContext) -> None:
+    if await state.get_state() is UserState.is_guest:
+        await UserState.in_active.set()
     try:
         await query.message.delete()
     except MessageToDeleteNotFound:
@@ -260,7 +262,7 @@ async def get_free_positions(message: Message) -> None:
     await message.delete()
 
 
-async def close_info(query: CallbackQuery) -> None:
+async def close_info(query: CallbackQuery, state: FSMContext) -> None:
     await UserState.in_active.set()
     try:
         await query.message.delete()
