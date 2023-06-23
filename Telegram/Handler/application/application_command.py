@@ -8,7 +8,7 @@ from aiogram.utils.exceptions import MessageNotModified, MessageCantBeEdited
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
 from Keyboard.Inline.application_keyboard import select_application_mode_kb
-from states import ApplicationSubmission
+from states import ApplicationSubmission, UserState
 from utils.database_api.quick_commands import add_application
 from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials
 
@@ -103,6 +103,7 @@ async def application_submission_state_number(message: Message, state: FSMContex
             await message.answer("<b>Данные были отправлены. Ожидайте письма с подтверждением на указанный вами "
                                  "почты.</b>",
                                  )
+            await UserState.in_active
         else:
             await message.answer("<b>Неправильно введён государственный номер.</b> \n"
                                  "Например: <b>А000АА|(регион)</b>")
