@@ -93,21 +93,36 @@ async def approve_application_from_list(query: CallbackQuery):
 
 
 async def submit_reject_application(query: CallbackQuery, state: FSMContext):
-    application_response_dict = await state.get_data()
+    response_dict = await state.get_data()
     await query.message.edit_text(f"Вы уверены, что хотите отклонить заявку:\n"
-                                  f"{await build_application_info(await get_serialized_application(application_response_dict['data']['__values__']))}",
+                                  f"{await build_application_info(await get_serialized_application(response_dict['data']['__values__']))}",
                                   reply_markup=application_reject_menu)
 
 
-async def reject_application(query: CallbackQuery, state: FSMContext):
+# todo: Add reason for reject application
+async def set_reason_for_reject(query: CallbackQuery, state: FSMContext) -> None:
+    global _linked_query_dict
+    temp = await state.get_data()
+    await state.set_state(Admins.reject_reason_state)
+    try:
+        await query.message.edit_text(f"Введите причину отказа!")
+    except MessageNotModified:
+        pass
+    _linked_query_dict['auto'][query.message.chat.id] = query
+    await state.set_data(temp)
+
+
+async def reject_application(message: Message, state: FSMContext):
     application_response_dict = await state.get_data()
+    query = _linked_query_dict['auto'][message.chat.id]
     application = await get_serialized_application(application_response_dict["data"]["__values__"])
     if await drop_application(application):
         await query.message.edit_text(f"Успешно удален:\n"
                                       f"{await build_application_info(application)}",
                                       reply_markup=back_inline_menu)
         await send_user_application_info(telegram_id=application.id,
-                                         message=f"{application.initials}, к сожалению мы не можем дать вам доступ!")
+                                         message=f"{application.initials}, к сожалению мы не можем дать вам доступ!\n"
+                                                 f"Причина: {message.text}")
         await state.reset_data()
         await get_application_from_begin(query=query, state=state, edit_message=False) if not \
             application_response_dict[

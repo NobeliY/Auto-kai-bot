@@ -5,12 +5,14 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from aiogram.utils.exceptions import MessageNotModified, MessageCantBeEdited
 
+from Handler.default.default import get_admins_id_list
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
 from Keyboard.Inline.application_keyboard import select_application_mode_kb
 from states import ApplicationSubmission, UserState
 from utils.database_api.quick_commands import add_application
-from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials
+from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials, \
+    send_user_application_info
 
 
 async def select_application_mode(message: Message, state: FSMContext) -> None:
@@ -103,7 +105,12 @@ async def application_submission_state_number(message: Message, state: FSMContex
             await message.answer("<b>Данные были отправлены. Ожидайте письма с подтверждением на указанный вами "
                                  "почты.</b>",
                                  )
-            await UserState.in_active
+            await UserState.in_active.set()
+            [
+                await send_user_application_info(telegram_id=admin_id,
+                                                 message=f"Добавлена новая заявка!")
+                for admin_id in await get_admins_id_list()
+            ]
         else:
             await message.answer("<b>Неправильно введён государственный номер.</b> \n"
                                  "Например: <b>А000АА|(регион)</b>")

@@ -13,6 +13,7 @@ class Admins(StatesGroup):
     add_menu_state = State()
     auto_add_state = State()
     manual_add_state = State()
+    reject_reason_state = State()
 
     delete_menu_state = State()
     searched_user_delete_state = State()

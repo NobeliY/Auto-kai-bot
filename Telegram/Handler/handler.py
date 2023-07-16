@@ -15,7 +15,8 @@ from Handler.admin.application_section import (
     submit_reject_application, reject_application, get_application_from_end, approve_student_level_from_application,
     approve_application_from_list, start_manual_add, get_user_id_from_manual_add, get_user_initials_from_manual_add,
     get_user_email_from_manual_add, get_user_phone_number_from_manual_add, get_academy_group_from_manual_add,
-    get_user_state_number_from_manual_add, get_user_access_from_manual_add, approve_manual_add_user
+    get_user_state_number_from_manual_add, get_user_access_from_manual_add, approve_manual_add_user,
+    set_reason_fo_reject, set_reason_for_reject
 )
 from Handler.admin.change_ap_command import get_change_application, get_change_application_from_begin, \
     get_change_application_from_end, next_change_application, approve_change_application, \
@@ -185,7 +186,7 @@ def register_handlers(dp: Dispatcher):
                                        state=Admins.auto_add_state)
     dp.register_callback_query_handler(submit_reject_application, Text(equals="submit_reject_application"),
                                        state=Admins.auto_add_state)
-    dp.register_callback_query_handler(reject_application, Text(equals="reject_application"),
+    dp.register_callback_query_handler(set_reason_for_reject, Text(equals="reject_application"),
                                        state=Admins.auto_add_state)
     dp.register_callback_query_handler(get_application_from_end, Text(equals="start_from_end"),
                                        state=Admins.auto_add_state)
