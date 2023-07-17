@@ -1,4 +1,5 @@
 import logging as logger
+from typing import List
 
 from app import bot
 from aiogram import types, Dispatcher
@@ -8,8 +9,8 @@ from colorama import Fore
 from Data import admins
 from Handler.handler import register_handlers
 from utils.database_api.database_gino import on_startup, on_close
-from utils.database_api.quick_commands import get_users_info
-from utils.shared_methods.default import set_on_startup_users
+from utils.database_api.quick_commands import get_users_info, get_admins_id
+# from utils.shared_methods.default import set_on_startup_users
 
 
 async def get_default_commands(dp: Dispatcher) -> None:
@@ -25,9 +26,9 @@ async def get_default_commands(dp: Dispatcher) -> None:
             types.BotCommand("help", "Инструкция по эксплуатации. 🧐")
         ]
     )
-    set_on_startup_users([
-        user.id for user in await get_users_info()
-    ])
+    # set_on_startup_users([
+    #     user.id for user in await get_users_info()
+    # ])
     logger.info(f"{Fore.GREEN}Бот запущен{Fore.RESET}!")
 
     for admin_id in admins:

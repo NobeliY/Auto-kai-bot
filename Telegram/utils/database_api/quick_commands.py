@@ -271,6 +271,13 @@ async def check_admin(admin_id: int) -> bool:
         return False
 
 
+async def get_admins_id() -> List[int]:
+    admins = await User.query.where(User.access == 'A').gino.all()
+    return [
+        admin.id for admin in admins
+    ]
+
+
 """ Aiogram save FSM states """
 
 
