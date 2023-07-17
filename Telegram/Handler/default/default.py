@@ -9,23 +9,16 @@ from colorama import Fore
 from Data import admins
 from Handler.handler import register_handlers
 from utils.database_api.database_gino import on_startup, on_close
-from utils.database_api.quick_commands import get_users_info
-from utils.shared_methods.default import set_on_startup_users
-
-__admins_id_list__: List[int] = []
-
-async def get_admins_id_list() -> List[int]:
-    global __admins_id_list__
-    return __admins_id_list__
+from utils.database_api.quick_commands import get_users_info, get_admins_id
+# from utils.shared_methods.default import set_on_startup_users
 
 
 async def get_default_commands(dp: Dispatcher) -> None:
-    global __admins_id_list__
     try:
         on_close()
     except Exception as _ex:
         logger.error(f"{Fore.LIGHTRED_EX}{_ex} | On Close Exception {Fore.RESET}")
-    __admins_id_list__ = await on_startup()
+    await on_startup()
     await bot.set_my_commands(
         [
             types.BotCommand("start", "Начало Работы / Обновить бота."),
@@ -33,9 +26,9 @@ async def get_default_commands(dp: Dispatcher) -> None:
             types.BotCommand("help", "Инструкция по эксплуатации. 🧐")
         ]
     )
-    set_on_startup_users([
-        user.id for user in await get_users_info()
-    ])
+    # set_on_startup_users([
+    #     user.id for user in await get_users_info()
+    # ])
     logger.info(f"{Fore.GREEN}Бот запущен{Fore.RESET}!")
 
     for admin_id in admins:
