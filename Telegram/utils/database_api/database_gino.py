@@ -41,5 +41,6 @@ async def on_startup():
     await database.set_bind(POSTGRES_URL)
 
 
+
 def on_close():
     database.pop_bind()
