@@ -5,7 +5,6 @@ from colorama import Fore
 import sqlalchemy as sa
 from gino import Gino
 from Data import POSTGRES_URL
-from utils.database_api.quick_commands import get_admins_id
 
 database: Gino = Gino()
 
@@ -40,7 +39,7 @@ class TimeDatabaseModel(BaseModel):
 async def on_startup():
     logger.info(f"{Fore.GREEN}Подключение к БД PostgreSQL Server{Fore.RESET}")
     await database.set_bind(POSTGRES_URL)
-    return await get_admins_id()
+
 
 
 def on_close():

@@ -1,8 +1,9 @@
 import logging
+from typing import Dict
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.exceptions import MessageNotModified
+from aiogram.utils.exceptions import MessageNotModified, MessageToDeleteNotFound
 from asyncpg import UniqueViolationError
 
 from Handler.admin.admin_command import preview_step
@@ -108,6 +109,8 @@ async def set_reason_for_reject(query: CallbackQuery, state: FSMContext) -> None
         await query.message.edit_text(f"Введите причину отказа!")
     except MessageNotModified:
         pass
+    if 'auto' not in _linked_query_dict.keys():
+        _linked_query_dict['auto']: Dict[int, CallbackQuery] = {}
     _linked_query_dict['auto'][query.message.chat.id] = query
     await state.set_data(temp)
 
@@ -124,6 +127,11 @@ async def reject_application(message: Message, state: FSMContext):
                                          message=f"{application.initials}, к сожалению мы не можем дать вам доступ!\n"
                                                  f"Причина: {message.text}")
         await state.reset_data()
+        await state.set_state(Admins.auto_add_state)
+        try:
+            await message.delete()
+        except MessageToDeleteNotFound:
+            pass
         await get_application_from_begin(query=query, state=state, edit_message=False) if not \
             application_response_dict[
                 'reversed'] else await get_application_from_end(query=query, state=state, edit_message=False)

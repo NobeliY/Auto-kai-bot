@@ -5,18 +5,18 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from aiogram.utils.exceptions import MessageNotModified, MessageCantBeEdited
 
-from Handler.default.default import get_admins_id_list
-from Handler.default.start_command import start
+from Handler.default.start_command import start, get_admins_id_list
 from Handler.help.help_fork import send_help_fork
 from Keyboard.Inline.application_keyboard import select_application_mode_kb
 from states import ApplicationSubmission, UserState
-from utils.database_api.quick_commands import add_application
-from utils.shared_methods.default import on_startup_users, check_phone, check_email, check_initials, \
+from utils.database_api.quick_commands import add_application, get_user
+from utils.shared_methods.default import check_phone, check_email, check_initials, \
     send_user_application_info
 
 
 async def select_application_mode(message: Message, state: FSMContext) -> None:
-    if message.from_id in on_startup_users():
+    user = await get_user(message.chat.id)
+    if user:
         await message.answer(f"Вы зарегистрированы в боте!\n"
                              f"Используйте команду: <b>/start</b>")
         return

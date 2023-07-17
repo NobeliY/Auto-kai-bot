@@ -1,9 +1,15 @@
+from typing import List
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 import utils.shared_methods.default
 from states import UserState
-from utils.database_api.quick_commands import get_user
+from utils.database_api.quick_commands import get_user, get_admins_id
+
+
+async def get_admins_id_list() -> List[int]:
+    return await get_admins_id()
 
 
 async def start(message: types.Message, state: FSMContext):
@@ -13,7 +19,7 @@ async def start(message: types.Message, state: FSMContext):
     if user is None:
         await message.answer(utils.shared_methods.default.return_user_checked(False), parse_mode=types.ParseMode.HTML,
                              reply_markup=types.ReplyKeyboardRemove())
-        await state.finish()
+        await UserState.is_guest.set()
     else:
         await message.answer(f"Добро пожаловать! \n"
                              f"|{utils.shared_methods.default.get_access_level(user.access)}| {user.initials}!\n"

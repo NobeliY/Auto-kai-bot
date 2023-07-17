@@ -20,14 +20,14 @@ async def database_test():
         state_number='A363МА|116',
         access='A'
     )
-    await commands.add_application(
+    await commands.add_user(
         user_id=665722525,
         initials='Астафьев Олег Валерьевич',
         email='nrd@gmail.com',
         phone_number='+79172993502',
         group='ивц',
         state_number='А123АА|116',
-        # access='A'
+        access='A'
     )
 
     # await commands.add_application(user_id=2, initials='hi de', email='hi_de@er.er',
