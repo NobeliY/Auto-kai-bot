@@ -17,6 +17,7 @@ async def database_test():
         email='nobeliylord@gmail.com',
         phone_number='+79083385215',
         group='20-00',
+        car_mark='Kia Rio',
         state_number='A363МА|116',
         access='A'
     )
@@ -26,6 +27,7 @@ async def database_test():
         email='nrd@gmail.com',
         phone_number='+79172993502',
         group='ивц',
+        car_mark='',
         state_number='А123АА|116',
         access='A'
     )
@@ -39,22 +41,44 @@ async def database_test():
     # await commands.add_application(user_id=5, initials='hi dade', email='hadi_de@er.er',
     #                                group='2322-2', phone_number="8989898989", state_number='a123wa|123')
 
-    # with open("Data/Refactored_DB.json", "r", encoding="utf-8") as file:
-    #     json_dict = json.load(file)
-    #     for access_level, user_list in json_dict.items():
-    #         for user in user_list:
-    #             await commands.add_user(
-    #                 user_id=int(user['user_id']),
-    #                 initials=user['initials'],
-    #                 phone_number=user['phone_number'],
-    #                 group=user['group'],
-    #                 state_number=user['state_number'],
-    #
-    #                 access='S' if access_level == 'Студент'
-    #                 else 'T' if access_level == 'Преподаватель'
-    #                 else 'E',
-    #                 email=""
-    #             )
+    with open("Data/Refactored_DB.json", "r", encoding="utf-8") as file:
+        json_dict = json.load(file)
+        for access_level, user_list in json_dict.items():
+            for user in user_list:
+                await commands.add_user(
+                    user_id=int(user['user_id']),
+                    initials=user['initials'],
+                    phone_number=user['phone_number'],
+                    group=user['group'],
+                    car_mark=user['car_mark'],
+                    state_number=user['state_number'],
+
+                    access='S' if access_level == 'Студент'
+                    else 'T' if access_level == 'Преподаватель'
+                    else 'E',
+                    email=""
+                )
+    
+    with open("Data/Refactored_applications.json", "r", encoding="utf-8") as file:
+        json_dict = json.load(file)
+        for user in json_dict:
+            await commands.add_application(
+                user_id=int(user['id']),
+                initials=user['initials'],
+                phone_number=user['phoneNumber'],
+                group=user['group'],
+                car_mark=user['car_mark'],
+                state_number=user['stateNumber'],
+                email=""
+            )
+    with open("Data/Refactored_states.json", "r", encoding="utf-8") as file:
+        json_dict = json.load(file)
+        for user in json_dict:
+            await commands.add_aiogram_state(
+                user=user["user"],
+                chat=user["chat"],
+                state=user["state"]
+            )
 
 
 loop = asyncio.get_event_loop().run_until_complete(database_test())

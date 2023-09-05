@@ -17,5 +17,6 @@ class UserChanges(StatesGroup):
     change_email = State()
     change_phone = State()
     change_group = State()
+    change_car_mark = State()
     change_state_number = State()
     accept = State()

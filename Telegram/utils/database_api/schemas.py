@@ -14,6 +14,7 @@ class User(TimeDatabaseModel):
     email = Column(String)
     phoneNumber = Column(String)
     group = Column(String)
+    car_mark = Column(String)
     stateNumber = Column(String)
     access = Column(String, primary_key=True)
 
@@ -32,6 +33,7 @@ class Application(TimeDatabaseModel):
     email = Column(String, primary_key=True)
     phoneNumber = Column(String, primary_key=True)
     group = Column(String, primary_key=True)
+    car_mark = Column(String, primary_key=True)
     stateNumber = Column(String, primary_key=True)
 
     query: select
@@ -48,6 +50,7 @@ class ApplicationChange(TimeDatabaseModel):
     email = Column(String, primary_key=True)
     phoneNumber = Column(String, primary_key=True)
     group = Column(String, primary_key=True)
+    car_mark = Column(String, primary_key=True)
     stateNumber = Column(String, primary_key=True)
 
     query: select
