@@ -34,6 +34,7 @@ async def get_user_info(message: Message, sec: int = -1) -> None:
         f"ФИО: <b>{user.initials}</b>\n"
         f"Почта: <b>{user.email}</b>\n"
         f"Номер телефона: <b>{user.phoneNumber}</b>\n"
+        f"Модель автомобиля: <b>{user.car_mark}</b>\n"
         f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
         f"Уровень: <b>{get_access_level(user.access)}</b>\n",
         reply_markup=change_info_menu
@@ -155,6 +156,16 @@ async def change_group(query: CallbackQuery, state: FSMContext) -> None:
 
 async def get_change_group(message: Message, state: FSMContext) -> None:
     await state.update_data(change_group=message.text)
+    await set_user_info_change(message=message, state=state)
+
+
+async def change_car_mark(query: CallbackQuery, state: FSMContext):
+    await UserChanges.change_car_mark.set()
+    await state.update_data(behind_message=query.message.message_id)
+    await send_change_text(message=query.message, state="модель автомобиля")
+
+async def get_change_car_mark(message: Message, state: FSMContext):
+    await state.update_data(change_car_mark=message.text)
     await set_user_info_change(message=message, state=state)
 
 

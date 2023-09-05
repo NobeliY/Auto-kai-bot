@@ -36,6 +36,9 @@ change_info_list_menu: InlineKeyboardMarkup = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Изменить группу", callback_data="change_group"),
         ],
         [
+            InlineKeyboardButton(text="Изменить модель автомобиля", callback_data="change_car_mark"),
+        ],
+        [
             InlineKeyboardButton(text="Изменить Гос. номер", callback_data="change_state_number"),
         ],
         [
