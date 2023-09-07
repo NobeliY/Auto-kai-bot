@@ -162,7 +162,7 @@ async def get_change_group(message: Message, state: FSMContext) -> None:
 async def change_car_mark(query: CallbackQuery, state: FSMContext):
     await UserChanges.change_car_mark.set()
     await state.update_data(behind_message=query.message.message_id)
-    await send_change_text(message=query.message, state=state)
+    await send_change_text(message=query.message, state="<b>модель автомобиля</b>")
 
 async def get_change_car_mark(message: Message, state: FSMContext):
     await state.update_data(change_car_mark=message.text)
@@ -188,7 +188,9 @@ async def get_change_state_number(message: Message, state: FSMContext) -> None:
                                     message_id=state_dict['behind_message'],
                                     reply_markup=preview_step_menu)
         await message.delete()
-    except MessageNotModified | MessageToDeleteNotFound:
+    except MessageNotModified:
+        pass
+    except MessageToDeleteNotFound:
         pass
 
 
@@ -200,6 +202,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
         'change_email',
         'change_phone',
         'change_group',
+        'change_car_mark',
         'change_state_number'
     ]
     for key in states_list:
@@ -212,6 +215,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
         'change_email': data['change_email'],
         'change_phone': data['change_phone'],
         'change_group': data['change_group'],
+        'change_car_mark': data['change_car_mark'],
         'change_state_number': data['change_state_number']
     })
     try:
@@ -220,6 +224,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
                                       f"Почта: {data['change_email']}\n"
                                       f"Номер телефона: {data['change_phone']}\n"
                                       f"Академическая группа: {data['change_group']}\n"
+                                      f"Модель ТС: {data['change_car_mark']}\n"
                                       f"Гос. номер: {data['change_state_number']}",
                                       reply_markup=accept_changes_menu)
     except MessageNotModified:
@@ -246,6 +251,7 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
         email=_application['change_email'],
         phone_number=_application['change_phone'],
         group=_application['change_group'],
+        car_mark=_application["change_car_mark"],
         state_number=_application['change_state_number'],
         change_ap=True
     )
