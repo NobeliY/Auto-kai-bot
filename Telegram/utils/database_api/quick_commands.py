@@ -51,6 +51,7 @@ async def get_serialized_application(application_dict: Dict, change_ap: bool = F
         email=application_dict["email"],
         phoneNumber=application_dict["phoneNumber"],
         group=application_dict["group"],
+        car_mark=application_dict["car_mark"],
         stateNumber=application_dict["stateNumber"]
     ) if not change_ap else \
         ApplicationChange(
@@ -59,6 +60,7 @@ async def get_serialized_application(application_dict: Dict, change_ap: bool = F
             email=application_dict["email"],
             phoneNumber=application_dict["phoneNumber"],
             group=application_dict["group"],
+            car_mark=application_dict["car_mark"],
             stateNumber=application_dict["stateNumber"]
         )
 
@@ -150,6 +152,7 @@ async def delete_user_by_initials_command(user: Union[User, Dict]) -> None:
             email=user["email"],
             phoneNumber=user["phoneNumber"],
             group=user["group"],
+            car_mark=user["car_mark"],
             stateNumber=user["stateNumber"],
             access=user["access"]
         )

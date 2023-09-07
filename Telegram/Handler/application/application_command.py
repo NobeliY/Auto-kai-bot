@@ -88,7 +88,7 @@ async def application_submission_academy_group(message: Message, state: FSMConte
 
 async def application_submission_car_mark(message: Message, state: FSMContext):
     if await check_message_text(message, state):
-        await state.update_data(user_car_mark=message.text)
+        await state.update_data(car_mark=message.text)
         await message.answer("<b>Введите Государственный номер: </b>"
                              "Например: <b>А000АА|(регион)</b>",
                              )
@@ -107,6 +107,7 @@ async def application_submission_state_number(message: Message, state: FSMContex
                 email=user_application['user_email'],
                 phone_number=user_application['user_phone_number'],
                 group=user_application['user_academy_group'],
+                car_mark=user_application['car_mark'],
                 state_number=user_application['user_state_number'],
 
             )
