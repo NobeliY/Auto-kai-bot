@@ -162,7 +162,7 @@ async def get_change_group(message: Message, state: FSMContext) -> None:
 async def change_car_mark(query: CallbackQuery, state: FSMContext):
     await UserChanges.change_car_mark.set()
     await state.update_data(behind_message=query.message.message_id)
-    await send_change_text(message=query.message, state="модель автомобиля")
+    await send_change_text(message=query.message, state=state)
 
 async def get_change_car_mark(message: Message, state: FSMContext):
     await state.update_data(change_car_mark=message.text)
@@ -178,6 +178,7 @@ async def change_state_number(query: CallbackQuery, state: FSMContext) -> None:
 async def get_change_state_number(message: Message, state: FSMContext) -> None:
     if check_state_number(message.text):
         await state.update_data(change_state_number=message.text)
+        await set_user_info_change(message=message, state=state)
         return
     try:
         state_dict: dict = await state.get_data()
