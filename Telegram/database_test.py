@@ -17,7 +17,7 @@ async def database_test():
         email='nobeliylord@gmail.com',
         phone_number='+79083385215',
         group='20-00',
-        car_mark='Kia Rio',
+        car_mark='INFINITY QX (2023)',
         state_number='A363МА|116',
         access='A'
     )

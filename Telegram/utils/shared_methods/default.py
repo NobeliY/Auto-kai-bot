@@ -6,7 +6,7 @@ from enum import Enum
 from aiogram import types
 
 import pandas as pd
-from aiogram.utils.exceptions import ChatNotFound
+from aiogram.utils.exceptions import ChatNotFound, CantTalkWithBots
 from beartype import beartype
 from beartype.typing import Dict, List
 
@@ -156,3 +156,5 @@ async def send_user_application_info(telegram_id: int, message: str) -> None:
         await bot.send_message(chat_id=telegram_id, text=message, reply_markup=close_inline_keyboard)
     except ChatNotFound:
         logging.error(f"Chat not found: {telegram_id} | Message: {message}")
+    except CantTalkWithBots:
+        logging.error(F"Can't talk with bot error: TG_id: {telegram_id} | Message: {message}")

@@ -208,6 +208,7 @@ async def approve_application(query: CallbackQuery, state: FSMContext):
         email=application.email,
         phone_number=application.phoneNumber,
         group=application.group,
+        car_mark=application.car_mark,
         state_number=application.stateNumber,
         access=level
     )
@@ -238,6 +239,7 @@ async def build_application_info(application: Application):
            f"Почта: <b>{application.email}</b>\n" \
            f"Группа: <b>{application.group}</b>\n" \
            f"Номер телефона: <b>{application.phoneNumber}</b>\n" \
+           f"Модель ТС: <b>{application.car_mark}</b>\n" \
            f"Гос. номер используемого транспорта: <b>{application.stateNumber}</b>\n"
 
 
