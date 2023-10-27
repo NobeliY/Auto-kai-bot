@@ -140,6 +140,7 @@ async def build_change_application_info(application: ApplicationChange):
            f"Почта: <b>{application.email}</b>\n" \
            f"Группа: <b>{application.group}</b>\n" \
            f"Номер телефона: <b>{application.phoneNumber}</b>\n" \
+           f"Модель автомобиля: <b>{application.car_mark}</b>\n" \
            f"Гос. номер используемого транспорта: <b>{application.stateNumber}</b>\n"
 
 

@@ -1,10 +1,11 @@
 import logging
 from enum import Enum
 from typing import Union, List
+import time
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
-from aiogram.utils.exceptions import MessageToDeleteNotFound, ChatNotFound
+from aiogram.utils.exceptions import MessageToDeleteNotFound, ChatNotFound, UserDeactivated
 
 from Keyboard.Inline.admin_keyboard import send_message_menu_kb, reject_send_message_kb, message_approve_menu_kb
 from app import bot
@@ -59,7 +60,7 @@ async def approve_send_message(query: CallbackQuery, state: FSMContext) -> None:
         case "send_employees":
             user_list: Union[List[User], None] = await get_users_by_access(access="T")
             user_list += await get_users_by_access(access="E")
-            await send_message_from_users(user_list, data["message"], level="сотрудника")
+            await send_message_from_users(user_list, data["message"], level="сотрудникам")
             return
         case "send_admins":
             user_list: Union[List[User], None] = await get_users_by_access(access="A")
@@ -75,18 +76,24 @@ async def send_message_from_users(user_list: Union[List[User], None], message: s
                                   level: Union[str, None] = None) -> None:
     level_sends: Union[str, None] = None
     if level:
-        level_sends = f"Данное сообщение отправлено только <b>{level}</b>"
+        level_sends = f"Данное сообщение отправлено <b>{level}</b>"
     if user_list:
+        counter = 0
         for user in user_list:
+            counter += 1
             try:
+                logging.info(f"send message to: {user.id}")
                 await bot.send_message(chat_id=user.id,
                                        text=f"Здравствуйте, <b>{user.initials}</b>! \n"
                                             f"Для вас уведомление от администратора!\n"
                                             f"{message}\n"
-                                            f"{level_sends}",
+                                            f"{level_sends if level_sends else ''}",
                                        reply_markup=reject_send_message_kb)
-            except ChatNotFound:
+            except Exception:
                 logging.error(f"Chat not found: {user.id}")
+            if counter == 5:
+                time.sleep(1.0)
+                counter = 0
 
 
 async def close_send_message_menu(query: CallbackQuery, state: FSMContext) -> None:

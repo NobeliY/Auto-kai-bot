@@ -11,4 +11,5 @@ class ApplicationSubmission(StatesGroup):
     user_email = State()
     user_phone_number = State()
     user_academy_group = State()
+    user_car_mark = State()
     user_state_number = State()
