@@ -8,6 +8,8 @@ from colorama import Fore
 
 from Keyboard.Inline import change_info_menu, change_info_list_menu
 from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyboard, preview_step_menu
+from Handler.default.start_command import get_admins_id_list
+from utils.shared_methods.default import send_user_application_info
 from app import bot
 from states import UserChanges, UserState
 
@@ -258,6 +260,11 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
     try:
         await query.message.edit_text(f"Данные отправлены. Ожидайте изменения информации!",
                                       reply_markup=close_inline_keyboard)
+        [
+                await send_user_application_info(telegram_id=admin_id,
+                                                 message=f"Добавлена новая заявка на обновление данных!")
+                for admin_id in await get_admins_id_list()
+            ]
     except MessageNotModified:
         pass
 

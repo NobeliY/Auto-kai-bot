@@ -8,7 +8,7 @@ from Data import admins
 from app import bot
 from utils.database_api.schemas import User
 
-request_uri, first_secret_key, second_secret_key = getenv("REQUEST_ESP").split()
+request_uri, open_path, first_secret_key, second_secret_key, reboot_path = getenv("REQUEST_ESP").split()
 
 
 def set_post_json_dict(user_id: User.id, level: str) -> dict:
@@ -34,8 +34,26 @@ async def send_level(user_id: int, first_level: bool = True) -> dict | str:
 def send_request_from_esp(post_json_data: dict) -> dict | str:
     try:
         with Session() as session:
-            with session.post(url=request_uri, data=post_json_data) as response:
+            with session.post(url=request_uri+open_path, data=post_json_data) as response:
                 return response.json()
+    except ConnectionError as connection_error:
+        # logger.error(f"{type(connection_error)} \n {connection_error.__str__()}")
+        return {
+            'error': connection_error.__str__()
+        }
+        # return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {connection_error.strerror}{Fore.RESET}"
+    except Timeout as server_error:
+        return {
+            'error': server_error.__str__()
+        }
+        # return f"{Fore.LIGHTRED_EX}User: {post_json_data['user_id']} | {server_error.strerror}{Fore.RESET}"
+
+
+def send_reboot_command_from_esp():
+    try:
+        with Session() as session:
+            with session.get(url=request_uri+reboot_path) as response:
+                return response.content
     except ConnectionError as connection_error:
         # logger.error(f"{type(connection_error)} \n {connection_error.__str__()}")
         return {
