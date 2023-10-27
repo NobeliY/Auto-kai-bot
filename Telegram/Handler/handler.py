@@ -33,7 +33,7 @@ from Handler.admin.user_section import (
 from Handler.application.application_command import (
     set_application, application_submission_initials, application_submission_email,
     application_submission_phone, application_submission_academy_group, application_submission_state_number,
-    select_application_mode
+    select_application_mode, application_submission_car_mark
 )
 from Handler.default.start_command import start
 from Handler.help.help_fork import send_help_fork
@@ -41,7 +41,7 @@ from Handler.user.info import (
     change_user_info, get_free_positions, get_user_info, close_user_info, change_initials, change_email,
     change_phone_number, change_group, change_state_number, accept_changes, cancel_changes, agree_changes,
     get_change_initials, get_change_email, get_change_group, get_change_phone, get_change_state_number, close_info,
-    preview_step_info
+    preview_step_info, change_car_mark, get_change_car_mark
 )
 from Handler.user.open_command import (
     open_from_all_registered_users, open_first_level_from_employee,
@@ -62,6 +62,7 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(application_submission_email, state=ApplicationSubmission.user_email)
     dp.register_message_handler(application_submission_phone, state=ApplicationSubmission.user_phone_number)
     dp.register_message_handler(application_submission_academy_group, state=ApplicationSubmission.user_academy_group)
+    dp.register_message_handler(application_submission_car_mark, state=ApplicationSubmission.user_car_mark)
     dp.register_message_handler(application_submission_state_number, state=ApplicationSubmission.user_state_number)
 
     """
@@ -102,6 +103,8 @@ def register_handlers(dp: Dispatcher):
                                        state=UserChanges.change_menu)
     dp.register_callback_query_handler(change_state_number, Text(equals="change_state_number"),
                                        state=UserChanges.change_menu)
+    dp.register_callback_query_handler(change_car_mark, Text(equals="change_car_mark"),
+                                       state=UserChanges.change_menu)
     dp.register_callback_query_handler(accept_changes, Text(equals="finish_changes"),
                                        state=UserChanges.change_menu)
     dp.register_callback_query_handler(cancel_changes, Text(equals="cancel_changes"),
@@ -115,6 +118,7 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(get_change_phone, state=UserChanges.change_phone)
     dp.register_message_handler(get_change_group, state=UserChanges.change_group)
     dp.register_message_handler(get_change_state_number, state=UserChanges.change_state_number)
+    dp.register_message_handler(get_change_car_mark, state=UserChanges.change_car_mark)
     dp.register_callback_query_handler(close_info, Text(equals="close_info"),
                                        state=UserChanges.change_menu)
     dp.register_callback_query_handler(preview_step_info, Text(equals="preview_step"),

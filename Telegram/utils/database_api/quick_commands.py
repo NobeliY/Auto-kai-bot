@@ -16,7 +16,7 @@ _offset = timezone(timedelta(hours=3))
 
 
 async def add_application(user_id: int, initials: str, email: str,
-                          phone_number: str, group: str, state_number: str, change_ap: bool = False) -> None:
+                          phone_number: str, group: str, car_mark: str, state_number: str, change_ap: bool = False) -> None:
     application: Union[Application, ApplicationChange, None] = None
     try:
         application = Application(
@@ -25,6 +25,7 @@ async def add_application(user_id: int, initials: str, email: str,
             email=email,
             phoneNumber=phone_number,
             group=group,
+            car_mark=car_mark,
             stateNumber=state_number
         ) if not change_ap else \
             ApplicationChange(
@@ -33,6 +34,7 @@ async def add_application(user_id: int, initials: str, email: str,
                 email=email,
                 phoneNumber=phone_number,
                 group=group,
+                car_mark=car_mark,
                 stateNumber=state_number
             )
         await application.create()
@@ -49,6 +51,7 @@ async def get_serialized_application(application_dict: Dict, change_ap: bool = F
         email=application_dict["email"],
         phoneNumber=application_dict["phoneNumber"],
         group=application_dict["group"],
+        car_mark=application_dict["car_mark"],
         stateNumber=application_dict["stateNumber"]
     ) if not change_ap else \
         ApplicationChange(
@@ -57,6 +60,7 @@ async def get_serialized_application(application_dict: Dict, change_ap: bool = F
             email=application_dict["email"],
             phoneNumber=application_dict["phoneNumber"],
             group=application_dict["group"],
+            car_mark=application_dict["car_mark"],
             stateNumber=application_dict["stateNumber"]
         )
 
@@ -148,6 +152,7 @@ async def delete_user_by_initials_command(user: Union[User, Dict]) -> None:
             email=user["email"],
             phoneNumber=user["phoneNumber"],
             group=user["group"],
+            car_mark=user["car_mark"],
             stateNumber=user["stateNumber"],
             access=user["access"]
         )
@@ -191,10 +196,11 @@ async def delete_users_by_group(users: List[User]) -> None:
 
 
 async def add_user(user_id: int, initials: str, email: str,
-                   phone_number: str, group: str, state_number: str, access: str) -> None:
+                   phone_number: str, group: str,
+                   car_mark:str, state_number: str, access: str) -> None:
     try:
         user = User(id=user_id, initials=initials, email=email, phoneNumber=phone_number, group=group,
-                    stateNumber=state_number, access=access)
+                    car_mark=car_mark, stateNumber=state_number, access=access)
         await user.create()
     except UniqueViolationError:
         logger.warning(f"{Fore.LIGHTGREEN_EX} User not created{Fore.RESET}!")

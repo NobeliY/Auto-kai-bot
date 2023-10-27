@@ -8,6 +8,8 @@ from colorama import Fore
 
 from Keyboard.Inline import change_info_menu, change_info_list_menu
 from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyboard, preview_step_menu
+from Handler.default.start_command import get_admins_id_list
+from utils.shared_methods.default import send_user_application_info
 from app import bot
 from states import UserChanges, UserState
 
@@ -34,6 +36,7 @@ async def get_user_info(message: Message, sec: int = -1) -> None:
         f"ФИО: <b>{user.initials}</b>\n"
         f"Почта: <b>{user.email}</b>\n"
         f"Номер телефона: <b>{user.phoneNumber}</b>\n"
+        f"Модель автомобиля: <b>{user.car_mark}</b>\n"
         f"Гос. номер используемого транспорта: <b>{user.stateNumber}</b>\n"
         f"Уровень: <b>{get_access_level(user.access)}</b>\n",
         reply_markup=change_info_menu
@@ -158,6 +161,16 @@ async def get_change_group(message: Message, state: FSMContext) -> None:
     await set_user_info_change(message=message, state=state)
 
 
+async def change_car_mark(query: CallbackQuery, state: FSMContext):
+    await UserChanges.change_car_mark.set()
+    await state.update_data(behind_message=query.message.message_id)
+    await send_change_text(message=query.message, state="<b>модель автомобиля</b>")
+
+async def get_change_car_mark(message: Message, state: FSMContext):
+    await state.update_data(change_car_mark=message.text)
+    await set_user_info_change(message=message, state=state)
+
+
 async def change_state_number(query: CallbackQuery, state: FSMContext) -> None:
     await UserChanges.change_state_number.set()
     await state.update_data(behind_message=query.message.message_id)
@@ -167,6 +180,7 @@ async def change_state_number(query: CallbackQuery, state: FSMContext) -> None:
 async def get_change_state_number(message: Message, state: FSMContext) -> None:
     if check_state_number(message.text):
         await state.update_data(change_state_number=message.text)
+        await set_user_info_change(message=message, state=state)
         return
     try:
         state_dict: dict = await state.get_data()
@@ -176,7 +190,9 @@ async def get_change_state_number(message: Message, state: FSMContext) -> None:
                                     message_id=state_dict['behind_message'],
                                     reply_markup=preview_step_menu)
         await message.delete()
-    except MessageNotModified | MessageToDeleteNotFound:
+    except MessageNotModified:
+        pass
+    except MessageToDeleteNotFound:
         pass
 
 
@@ -188,6 +204,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
         'change_email',
         'change_phone',
         'change_group',
+        'change_car_mark',
         'change_state_number'
     ]
     for key in states_list:
@@ -200,6 +217,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
         'change_email': data['change_email'],
         'change_phone': data['change_phone'],
         'change_group': data['change_group'],
+        'change_car_mark': data['change_car_mark'],
         'change_state_number': data['change_state_number']
     })
     try:
@@ -208,6 +226,7 @@ async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
                                       f"Почта: {data['change_email']}\n"
                                       f"Номер телефона: {data['change_phone']}\n"
                                       f"Академическая группа: {data['change_group']}\n"
+                                      f"Модель ТС: {data['change_car_mark']}\n"
                                       f"Гос. номер: {data['change_state_number']}",
                                       reply_markup=accept_changes_menu)
     except MessageNotModified:
@@ -234,12 +253,18 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
         email=_application['change_email'],
         phone_number=_application['change_phone'],
         group=_application['change_group'],
+        car_mark=_application["change_car_mark"],
         state_number=_application['change_state_number'],
         change_ap=True
     )
     try:
         await query.message.edit_text(f"Данные отправлены. Ожидайте изменения информации!",
                                       reply_markup=close_inline_keyboard)
+        [
+                await send_user_application_info(telegram_id=admin_id,
+                                                 message=f"Добавлена новая заявка на обновление данных!")
+                for admin_id in await get_admins_id_list()
+            ]
     except MessageNotModified:
         pass
 
