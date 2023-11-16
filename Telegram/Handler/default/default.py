@@ -1,6 +1,5 @@
 import logging as logger
 import os
-from typing import List
 import subprocess
 from multiprocessing import Process
 
@@ -8,19 +7,16 @@ from app import bot
 from aiogram import types, Dispatcher
 import aiogram.utils.exceptions as exceptions
 from colorama import Fore
-# import schedule
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.schedulers.background import BackgroundScheduler
 
-from Data import admins
 from Handler.handler import register_handlers
 from utils.database_api.database_gino import on_startup, on_close
-from utils.database_api.quick_commands import get_users_info, get_admins_id
 from utils.request_api.request_to_ESP import send_reboot_command_from_esp
-# from utils.shared_methods.default import set_on_startup_users
+
 
 def reboot_esp():
     send_reboot_command_from_esp()
+
 
 def run_computer_vision():
     desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -29,9 +25,9 @@ def run_computer_vision():
         computer_vision_process = subprocess.Popen([
             os.path.join(path, "run.bat")
         ],
-        shell=True,
-        stdout=f)
-        
+            shell=True,
+            stdout=f)
+
 
 def run_process_cv():
     process_cv = Process(target=run_computer_vision)
@@ -58,7 +54,7 @@ async def get_default_commands(dp: Dispatcher) -> None:
     logger.info(f"{Fore.GREEN}Бот запущен{Fore.RESET}!")
 
     try:
-        await bot.send_message(chat_id=834865678, text=" Бот возобновил работу.")
+        await bot.send_message(chat_id=834865678, text="<u<Бот</u> возобновил работу.")
     except exceptions.ChatNotFound:
         logger.warning(f"{Fore.RED}Нет чата с 834865678{Fore.RESET}!")
     register_handlers(dp=dp)

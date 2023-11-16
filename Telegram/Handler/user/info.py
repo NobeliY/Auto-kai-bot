@@ -291,6 +291,11 @@ async def get_free_positions(message: Message) -> None:
 
     try:
         template = await get_free_positions_on_parking()
+        user = await get_user(user_id=message.from_id)
+        if user.access == "I":
+            await message.answer(f"Свободно:\n"
+                                 f"<u>{1 - template['left']}</u> c левой стороны\n"
+                                 f"<u>{15 - template['right']}</u> с правой стороны")
         await message.answer(f"Свободно: {15 - template['right']}")
     except Exception as ex:
         logger.warn(ex)
