@@ -1,5 +1,8 @@
 import logging as logger
+import os
 from typing import List
+from pathlib import Path
+import json
 
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
@@ -283,7 +286,21 @@ async def continue_changes(query: CallbackQuery) -> None:
 
 
 async def get_free_positions(message: Message) -> None:
-    await message.answer(await soon_info())
+
+    try:
+        template = {}
+        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
+        with open(f"{path}\\outputs_right.json", "r", encoding="utf-8") as f:
+            json_obj = json.load(f)
+            template = json_obj
+        with open(f"{path}\\outputs_left.json", "r", encoding="utf-8") as f:
+            json_obj = json.load(f)
+            template["left"] = json_obj["left"]
+        await message.answer(f"Свободно: {15 - template['right']}")
+    except Exception as ex:
+        logger.warn(ex)
+        await message.answer(await soon_info())
     await message.delete()
 
 

@@ -1,0 +1,11 @@
+opencv-python~=4.7.0.72
+pandas~=2.0.2
+numpy~=1.25.0
+torch~=2.0.1
+ipython~=8.14.0
+ultralytics~=8.0.120
+Pillow~=9.5.0
+supervision~=0.10.0
+beartype~=0.14.1
+zeep~=4.2.1
+setuptools~=60.2.0
