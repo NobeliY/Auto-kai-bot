@@ -1,4 +1,6 @@
+import json
 import logging
+import os
 import re
 from enum import Enum
 # from typing import List, Dict
@@ -158,3 +160,21 @@ async def send_user_application_info(telegram_id: int, message: str) -> None:
         logging.error(f"Chat not found: {telegram_id} | Message: {message}")
     except CantTalkWithBots:
         logging.error(F"Can't talk with bot error: TG_id: {telegram_id} | Message: {message}")
+
+
+@beartype
+async def get_free_positions_on_parking() -> dict:
+    try:
+        template = {}
+        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
+        with open(f"{path}\\outputs_right.json", "r", encoding="utf-8") as f:
+            json_obj = json.load(f)
+            template = json_obj
+        with open(f"{path}\\outputs_left.json", "r", encoding="utf-8") as f:
+            json_obj = json.load(f)
+            template["left"] = json_obj["left"]
+        return template
+    except Exception as ex:
+        logging.error(ex)
+        return {}
