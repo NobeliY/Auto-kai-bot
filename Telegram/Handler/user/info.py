@@ -9,10 +9,12 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.utils.exceptions import MessageToDeleteNotFound, MessageNotModified
 from colorama import Fore
 
+from Handler.user.open_command import open_from_all_registered_users
 from Keyboard.Inline import change_info_menu, change_info_list_menu
 from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyboard, preview_step_menu
 from Handler.default.start_command import get_admins_id_list
-from utils.shared_methods.default import send_user_application_info
+from utils.database_api.schemas import User
+from utils.shared_methods.default import send_user_application_info, get_free_positions_on_parking
 from app import bot
 from states import UserChanges, UserState
 
@@ -288,15 +290,7 @@ async def continue_changes(query: CallbackQuery) -> None:
 async def get_free_positions(message: Message) -> None:
 
     try:
-        template = {}
-        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-        path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
-        with open(f"{path}\\outputs_right.json", "r", encoding="utf-8") as f:
-            json_obj = json.load(f)
-            template = json_obj
-        with open(f"{path}\\outputs_left.json", "r", encoding="utf-8") as f:
-            json_obj = json.load(f)
-            template["left"] = json_obj["left"]
+        template = await get_free_positions_on_parking()
         await message.answer(f"Свободно: {15 - template['right']}")
     except Exception as ex:
         logger.warn(ex)
