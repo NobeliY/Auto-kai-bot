@@ -54,7 +54,7 @@ async def get_default_commands(dp: Dispatcher) -> None:
     logger.info(f"{Fore.GREEN}Бот запущен{Fore.RESET}!")
 
     try:
-        await bot.send_message(chat_id=834865678, text="<u<Бот</u> возобновил работу.")
+        await bot.send_message(chat_id=834865678, text="<u>Бот</u> возобновил работу.")
     except exceptions.ChatNotFound:
         logger.warning(f"{Fore.RED}Нет чата с 834865678{Fore.RESET}!")
     register_handlers(dp=dp)
