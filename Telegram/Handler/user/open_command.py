@@ -31,7 +31,7 @@ async def open_from_all_registered_users(message: Message):
     if access is not None:
         template = await get_free_positions_on_parking()
         if access == "I":
-            if template["left"] >= 2 or template["right"] >= 15:
+            if template["left"] >= 2 and template["right"] >= 15:
                 await message.answer(f"Нет свободных мест")
                 return
         if access == "S":
