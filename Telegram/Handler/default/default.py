@@ -66,6 +66,6 @@ async def get_default_commands(dp: Dispatcher) -> None:
     # run_process_cv()
     # schedule.every(1).hour.do(run_process_cv)
     cv_scheduler = AsyncIOScheduler()
-    cv_scheduler.add_job(run_process_cv, 'interval', minutes=10)
+    cv_scheduler.add_job(run_process_cv, 'interval', minutes=5)
     cv_scheduler.start()
     reboot_scheduler.start()
