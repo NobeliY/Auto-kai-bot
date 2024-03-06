@@ -13,6 +13,7 @@ from beartype import beartype
 from beartype.typing import Dict, List
 
 from Data.config import USER_XLSX_PATH
+from Handler.default.default import run_detect_out
 from Keyboard.Inline.user_keyboard import close_inline_keyboard
 from Keyboard.Reply import student_menu, teacher_menu, employee_menu, admin_menu
 from app import bot
@@ -175,6 +176,23 @@ async def get_free_positions_on_parking() -> dict:
             json_obj = json.load(f)
             template["left"] = json_obj["left"]
         return template
+    except Exception as ex:
+        logging.error(ex)
+        return {}
+
+
+@beartype
+async def checkout() -> dict:
+    run_detect_out()
+    try:
+        template = {}
+        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
+        with open(f"{path}\\outputs_out.json", "r", encoding="utf-8") as f:
+            json_obj = json.load(f)
+            template = json_obj
+        return template
+
     except Exception as ex:
         logging.error(ex)
         return {}

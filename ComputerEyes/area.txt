@@ -12,3 +12,9 @@ Left side:
 770, 130 LU
 890, 145 RU
 800, 240 RD
+
+# Out Coords
+451, 299 LD
+551, 161 LU
+647, 217 RU
+409, 193 RD

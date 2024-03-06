@@ -59,9 +59,12 @@ class CustomYOLODetect:
                  videos_path: Union[str, None] = None,
                  required_videos: bool = False,
                  areas: str = 'right', cap: cv2.VideoCapture | None = None) -> None:
-        self.areas = areas
+        self.areas: str = areas
+        self._only_detect_: bool = False
+        if self.areas == "out":
+            self._only_detect_ = True
         self._cached_: Dict = {}
-        self.capture = cap
+        self.capture: cv2.VideoCapture | None = cap
 
         if required_videos:
             if videos_path is None:
@@ -97,7 +100,8 @@ class CustomYOLODetect:
             return
         self._cached_['detection_areas'] = {
             'right': [(120, 102), (190, 50), (342, 65), (574, 80), (558, 132), (458, 179), (281, 125)],
-            'left': [(700, 202), (770, 130), (890, 145), (800, 240)]
+            'left': [(700, 202), (770, 130), (890, 145), (800, 240)],
+            'out':[(450, 300), (550, 160), (650, 220), (410, 190)]
         }
 
     @property
@@ -204,7 +208,7 @@ class CustomYOLODetect:
             if k == 0:
                 self.count_area[self.areas] = k
                 save_output_on_json(self.count_area[self.areas], self.areas)
-                break   
+                break
             local_cache['cars'].append(k)
             cv2.putText(frame, str(k), (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
             # cv2.imshow('Video', frame)
@@ -214,7 +218,7 @@ class CustomYOLODetect:
             # Exit the loop when 'ESC' key is pressed
             if cv2.waitKey(1) & 0xFF == 27:
                 break
-            if local_cache['sec'] >= 10:
+            if local_cache['sec'] >= 10 | (k > 0 & self._only_detect_):
                 local_cache['sec'] = 0
                 self.count_area[self.areas] = max(local_cache['cars'])
                 print(F"{self.areas} | {self.count_area[self.areas]}")

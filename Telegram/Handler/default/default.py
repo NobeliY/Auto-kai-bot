@@ -18,12 +18,12 @@ def reboot_esp():
     send_reboot_command_from_esp()
 
 
-def run_computer_vision():
+def run_computer_vision(detect_out: bool = False):
     desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
     path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
     with open(os.path.join(path, "cv_log.log"), "w", encoding="utf-8") as f:
         computer_vision_process = subprocess.Popen([
-            os.path.join(path, "run.bat")
+            os.path.join(path, "run.bat", "detect" if detect_out else "")
         ],
             shell=True,
             stdout=f)
@@ -34,6 +34,11 @@ def run_process_cv():
     process_cv.start()
     process_cv.join()
 
+
+def run_detect_out():
+    proccess_cv = Process(target=run_computer_vision, args=(True,))
+    proccess_cv.start()
+    proccess_cv.join()
 
 async def get_default_commands(dp: Dispatcher) -> None:
     try:

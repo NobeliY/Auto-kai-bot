@@ -6,7 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from colorama import Fore
 
 from utils.database_api.quick_commands import add_parking_log, get_user
-from utils.shared_methods.default import soon_info, return_user_checked, get_free_positions_on_parking
+from utils.shared_methods.default import checkout, soon_info, return_user_checked, get_free_positions_on_parking
 from utils.request_api.Request_controller import RequestController
 from utils.request_api.request_to_ESP import send_level
 
@@ -18,6 +18,7 @@ def user_opened_task():
 
 
 opened_loop = Thread(target=user_opened_task)
+
 
 
 async def open_from_all_registered_users(message: Message):
@@ -32,12 +33,16 @@ async def open_from_all_registered_users(message: Message):
         template = await get_free_positions_on_parking()
         if access == "I":
             if template["left"] >= 1 and template["right"] >= 15:
-                await message.answer(f"Нет свободных мест")
-                return
+                checker = await checkout()
+                if not checker["out"]:
+                    await message.answer(f"Нет свободных мест")
+                    return
         if access == "S":
             if template["right"] >= 15:
-                await message.answer(f"Нет свободных мест")
-                return
+                checker = await checkout()
+                if not checker["out"]:
+                    await message.answer(f"Нет свободных мест")
+                    return
         if await request_controller.check_time(access):
             await request_controller.check_date_quality()
             request_data = await send_level(message.from_id)
