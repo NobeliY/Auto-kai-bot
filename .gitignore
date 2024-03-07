@@ -12,6 +12,7 @@ Telegram/test.py
 Telegram/.env
 Telegram/logs/
 Telegram/.idea/*
+Telegram/backups/*
 
 ComputerEyes/.idea/*
 ComputerEyes/python-onvif-zeep
