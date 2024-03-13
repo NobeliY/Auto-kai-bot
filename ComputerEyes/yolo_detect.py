@@ -208,7 +208,7 @@ class CustomYOLODetect:
             if k == 0:
                 self.count_area[self.areas] = k
                 save_output_on_json(self.count_area[self.areas], self.areas)
-                break
+                break  
             local_cache['cars'].append(k)
             cv2.putText(frame, str(k), (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
             # cv2.imshow('Video', frame)
@@ -219,6 +219,7 @@ class CustomYOLODetect:
             if cv2.waitKey(1) & 0xFF == 27:
                 break
             if local_cache['sec'] >= 10 or (k > 0 and self._only_detect_):
+
                 local_cache['sec'] = 0
                 self.count_area[self.areas] = max(local_cache['cars'])
                 print(F"{self.areas} | {self.count_area[self.areas]}")

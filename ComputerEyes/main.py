@@ -111,6 +111,7 @@ def main() -> None:
 async def sec():
     
     custom_yolo = CustomYOLODetect(
+
         model="yolov8s.pt",
         areas="right",
         cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
@@ -118,6 +119,14 @@ async def sec():
     custom_yolo_sec = CustomYOLODetect(
         model="yolov8s.pt",
         areas="left",
+        model='yolov8s.pt',
+        areas='right',
+        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
+    )
+    custom_yolo_sec = CustomYOLODetect(
+        model='yolov8s.pt',
+        areas='left',
+
         cap = cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
     )
     # thread_left = Thread(target=await custom_yolo.run(False, True))
@@ -145,4 +154,5 @@ if __name__ == '__main__':
 
     if (sys.argv):
         asyncio.run(detect_car_on_out())
-    asyncio.run(sec())
+    else:
+        asyncio.run(sec())

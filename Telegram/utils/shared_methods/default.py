@@ -196,3 +196,4 @@ def checkout() -> dict:
     except Exception as ex:
         logging.error(ex)
         return {}
+

@@ -26,7 +26,9 @@ async def open_from_all_registered_users(message: Message):
     if opened_loop.is_alive():
         await message.answer(f"Уже открыт")
         return
+
     from utils.shared_methods.default import checkout
+
     request_controller = RequestController(message.from_id)
     user_ = await get_user(user_id=message.from_id)
     access: str | None = await request_controller.check_user_on_database()
@@ -46,6 +48,14 @@ async def open_from_all_registered_users(message: Message):
                 if not checker["out"]:
                     await message.answer(f"Нет свободных мест")
                     return
+
+                await message.answer(f"Нет свободных мест")
+                return
+        if access == "S":
+            if template["right"] >= 15:
+                await message.answer(f"Нет свободных мест")
+                return
+
         if await request_controller.check_time(access):
             await request_controller.check_date_quality()
             request_data = await send_level(message.from_id)
