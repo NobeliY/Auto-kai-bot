@@ -13,7 +13,6 @@ from beartype import beartype
 from beartype.typing import Dict, List
 
 from Data.config import USER_XLSX_PATH
-from Handler.default.default import run_detect_out
 from Keyboard.Inline.user_keyboard import close_inline_keyboard
 from Keyboard.Reply import student_menu, teacher_menu, employee_menu, admin_menu
 from app import bot
@@ -182,7 +181,8 @@ async def get_free_positions_on_parking() -> dict:
 
 
 @beartype
-async def checkout() -> dict:
+def checkout() -> dict:
+    from Handler.default.default import run_detect_out
     run_detect_out()
     try:
         template = {}

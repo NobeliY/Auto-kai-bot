@@ -23,7 +23,7 @@ def run_computer_vision(detect_out: bool = False):
     path = os.path.join(desktop, "Auto-kai-bot", "ComputerEyes")
     with open(os.path.join(path, "cv_log.log"), "w", encoding="utf-8") as f:
         computer_vision_process = subprocess.Popen([
-            os.path.join(path, "run.bat", "detect" if detect_out else "")
+            os.path.join(path, "run.bat"), "detect" if detect_out else ""
         ],
             shell=True,
             stdout=f)
@@ -71,6 +71,6 @@ async def get_default_commands(dp: Dispatcher) -> None:
     # run_process_cv()
     # schedule.every(1).hour.do(run_process_cv)
     cv_scheduler = AsyncIOScheduler()
-    cv_scheduler.add_job(run_process_cv, 'interval', minutes=5)
+    cv_scheduler.add_job(run_process_cv, 'interval', minutes=3)
     cv_scheduler.start()
     reboot_scheduler.start()

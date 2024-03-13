@@ -218,7 +218,7 @@ class CustomYOLODetect:
             # Exit the loop when 'ESC' key is pressed
             if cv2.waitKey(1) & 0xFF == 27:
                 break
-            if local_cache['sec'] >= 10 | (k > 0 & self._only_detect_):
+            if local_cache['sec'] >= 10 or (k > 0 and self._only_detect_):
                 local_cache['sec'] = 0
                 self.count_area[self.areas] = max(local_cache['cars'])
                 print(F"{self.areas} | {self.count_area[self.areas]}")
