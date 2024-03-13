@@ -1,0 +1,7 @@
+venv
+venv/*
+python-onvif-zeep/*
+__pycache__/*
+.idea/*
+cv_log.log
+data/*

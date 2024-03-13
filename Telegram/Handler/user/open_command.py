@@ -20,11 +20,15 @@ def user_opened_task():
 opened_loop = Thread(target=user_opened_task)
 
 
+
 async def open_from_all_registered_users(message: Message):
     global opened_loop
     if opened_loop.is_alive():
         await message.answer(f"Уже открыт")
         return
+
+    from utils.shared_methods.default import checkout
+
     request_controller = RequestController(message.from_id)
     user_ = await get_user(user_id=message.from_id)
     access: str | None = await request_controller.check_user_on_database()
@@ -32,12 +36,26 @@ async def open_from_all_registered_users(message: Message):
         template = await get_free_positions_on_parking()
         if access == "I":
             if template["left"] >= 1 and template["right"] >= 15:
+                checker = checkout()
+                if not checker["out"]:
+                    await message.answer(f"Нет свободных мест")
+                    return
+        if access == "S":
+            # Testing function >= 15
+            if template["right"] >= 15:
+                checker = checkout()
+                logger.info(checker)
+                if not checker["out"]:
+                    await message.answer(f"Нет свободных мест")
+                    return
+
                 await message.answer(f"Нет свободных мест")
                 return
         if access == "S":
             if template["right"] >= 15:
                 await message.answer(f"Нет свободных мест")
                 return
+
         if await request_controller.check_time(access):
             await request_controller.check_date_quality()
             request_data = await send_level(message.from_id)

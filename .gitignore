@@ -12,10 +12,12 @@ Telegram/test.py
 Telegram/.env
 Telegram/logs/
 Telegram/.idea/*
+Telegram/backups/*
+*/__pycache__
 
 ComputerEyes/.idea/*
 ComputerEyes/python-onvif-zeep
 ComputerEyes/venv/*
-ComputerEyes/outputs.json
+ComputerEyes/output*.json
 ComputerEyes/data/*
 ComputerEyes/yolov8s.pt
