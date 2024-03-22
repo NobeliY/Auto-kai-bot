@@ -15,6 +15,7 @@ from PIL import Image
 from beartype import beartype
 from beartype.typing import List, Dict, Tuple
 from ultralytics import YOLO
+import logging
 
 
 @beartype
@@ -39,8 +40,11 @@ class Video:
 
 
 def save_output_on_json(value_to_save: int, area: str = 'right') -> None:
+    logging.warning(F"JSON: {value_to_save} | {area}")
+    logging.warning(F"PAth: {os.path.abspath(__file__)}")
     if not os.path.exists(f'outputs_{area}.json'):
         with open(f'outputs_{area}.json', 'w', encoding='utf-8') as f:
+            logging.warning(F"JSON PATH: {os.path.abspath(f)}")
             json.dump({
                 area: 0
             }, f, indent=4, ensure_ascii=False)
@@ -60,9 +64,6 @@ class CustomYOLODetect:
                  required_videos: bool = False,
                  areas: str = 'right', cap: cv2.VideoCapture | None = None) -> None:
         self.areas: str = areas
-        self._only_detect_: bool = False
-        if self.areas == "out":
-            self._only_detect_ = True
         self._cached_: Dict = {}
         self.capture: cv2.VideoCapture | None = cap
 
@@ -101,7 +102,7 @@ class CustomYOLODetect:
         self._cached_['detection_areas'] = {
             'right': [(120, 102), (190, 50), (342, 65), (574, 80), (558, 132), (458, 179), (281, 125)],
             'left': [(700, 202), (770, 130), (890, 145), (800, 240)],
-            'out':[(450, 300), (550, 160), (650, 220), (410, 190)]
+            # 'out':[(450, 300), (550, 160), (650, 220), (410, 190)]
         }
 
     @property
@@ -190,13 +191,17 @@ class CustomYOLODetect:
                 x2 = int(row[2])
                 y2 = int(row[3])
                 d = int(row[5])
-                c = self.required_classes[d]
-
+                try:
+                    c = self.required_classes[d]
+                except Exception as ex:
+                    print(ex)
+                    continue
                 if 'car' in c:
                     cx = int(x1 + x2) // 2
                     cy = int(y1 + y2) // 2
                     results = cv2.pointPolygonTest(np.array(self.detection_areas[self.areas], np.int32),
                                                    ((cx, cy)), False)
+                    # logging.warning(F"RESULT: {results}")
                     if results >= 0:
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                         cv2.circle(frame, (cx, cy), 4, (255, 0, 255), -1)
@@ -205,11 +210,13 @@ class CustomYOLODetect:
             cv2.polylines(frame, [np.array(self.detection_areas[self.areas], np.int32)],
                           True, (255, 0, 2), 2)
             k = len(car_list)
+            logging.warning(F"CARS: {k}")
             if k == 0:
                 self.count_area[self.areas] = k
                 save_output_on_json(self.count_area[self.areas], self.areas)
                 break  
             local_cache['cars'].append(k)
+            
             cv2.putText(frame, str(k), (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
             # cv2.imshow('Video', frame)
             clear_output(wait=True)
@@ -218,8 +225,7 @@ class CustomYOLODetect:
             # Exit the loop when 'ESC' key is pressed
             if cv2.waitKey(1) & 0xFF == 27:
                 break
-            if local_cache['sec'] >= 10 or (k > 0 and self._only_detect_):
-
+            if local_cache['sec'] >= 10:
                 local_cache['sec'] = 0
                 self.count_area[self.areas] = max(local_cache['cars'])
                 print(F"{self.areas} | {self.count_area[self.areas]}")

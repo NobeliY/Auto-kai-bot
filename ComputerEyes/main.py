@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import os.path
+import os
 from threading import Thread
 
 import cv2
@@ -114,20 +115,20 @@ async def sec():
 
         model="yolov8s.pt",
         areas="right",
-        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
+        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/1")
     )
-    custom_yolo_sec = CustomYOLODetect(
-        model="yolov8s.pt",
-        areas="left",
-        model='yolov8s.pt',
-        areas='right',
-        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
-    )
+    # custom_yolo_sec = CustomYOLODetect(
+    #     model="yolov8s.pt",
+    #     areas="left",
+    #     # model='yolov8s.pt',
+    #     # areas='right',
+    #     cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
+    # )
     custom_yolo_sec = CustomYOLODetect(
         model='yolov8s.pt',
         areas='left',
 
-        cap = cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/")
+        cap = cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/1")
     )
     # thread_left = Thread(target=await custom_yolo.run(False, True))
     # thread_right = Thread(target=await custom_yolo_sec.run(False, True))
@@ -139,20 +140,21 @@ async def sec():
     await custom_yolo.run(False, True)
     await custom_yolo_sec.run(False, True)
 
-async def detect_car_on_out():
-    custom_yolo = CustomYOLODetect(
-        model="yolov8s.pt",
-        areas="out",
-        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/"),
-    )
+# async def detect_car_on_out():
+#     custom_yolo = CustomYOLODetect(
+#         model="yolov8s.pt",
+#         areas="out",
+#         cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/"),
+#     )
     
-    await custom_yolo.run(False, True)
+#     await custom_yolo.run(False, True)
 
 if __name__ == '__main__':
 
-    import sys
+    # import sys
 
-    if (sys.argv):
-        asyncio.run(detect_car_on_out())
-    else:
-        asyncio.run(sec())
+    # if (sys.argv):
+    #     asyncio.run(detect_car_on_out())
+    # else:
+    os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
+    asyncio.run(sec())
