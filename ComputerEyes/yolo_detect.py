@@ -223,7 +223,7 @@ class CustomYOLODetect:
             cv2.imshow('Video', frame)
             # sleep(30)
             clear_output(wait=True)
-            display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            # display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
             # self.output.write(frame)
             # Exit the loop when 'ESC' key is pressed
             if cv2.waitKey(1) & 0xFF == 27:
