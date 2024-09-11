@@ -30,6 +30,7 @@ def run_computer_vision(detect_out: bool = False):
 
 
 def run_process_cv():
+    # print("DDDD")
     process_cv = Process(target=run_computer_vision)
     process_cv.start()
     process_cv.join()
@@ -74,3 +75,4 @@ async def get_default_commands(dp: Dispatcher) -> None:
     cv_scheduler.add_job(run_process_cv, 'interval', minutes=5)
     cv_scheduler.start()
     reboot_scheduler.start()
+    # run_process_cv()

@@ -115,7 +115,7 @@ async def sec():
 
         model="yolov8s.pt",
         areas="right",
-        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/1")
+        cap=cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/H264")
     )
     # custom_yolo_sec = CustomYOLODetect(
     #     model="yolov8s.pt",
@@ -128,7 +128,7 @@ async def sec():
         model='yolov8s.pt',
         areas='left',
 
-        cap = cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/1")
+        cap = cv2.VideoCapture("rtsp://admin:zer0vide0@192.168.6.6/H264")
     )
     # thread_left = Thread(target=await custom_yolo.run(False, True))
     # thread_right = Thread(target=await custom_yolo_sec.run(False, True))

@@ -63,6 +63,7 @@ class CustomYOLODetect:
                  videos_path: Union[str, None] = None,
                  required_videos: bool = False,
                  areas: str = 'right', cap: cv2.VideoCapture | None = None) -> None:
+        sleep(10)
         self.areas: str = areas
         self._cached_: Dict = {}
         self.capture: cv2.VideoCapture | None = cap
@@ -168,6 +169,7 @@ class CustomYOLODetect:
 
         count: int = 0
         cap: Any = self.capture
+        # cap.open()
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -217,8 +219,9 @@ class CustomYOLODetect:
                 break  
             local_cache['cars'].append(k)
             
-            cv2.putText(frame, str(k), (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
-            # cv2.imshow('Video', frame)
+            cv2.putText(frame, f"{str(k)}/15", (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
+            cv2.imshow('Video', frame)
+            # sleep(30)
             clear_output(wait=True)
             display(Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
             # self.output.write(frame)
