@@ -1,24 +1,17 @@
 import logging as logger
-import os
 from typing import List
-from pathlib import Path
-import json
 
+from Handler.default.start_command import get_admins_id_list
+from Keyboard.Inline import change_info_menu, change_info_list_menu
+from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyboard, preview_step_menu
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.exceptions import MessageToDeleteNotFound, MessageNotModified
-from colorama import Fore
-
-from Handler.user.open_command import open_from_all_registered_users
-from Keyboard.Inline import change_info_menu, change_info_list_menu
-from Keyboard.Inline.user_keyboard import accept_changes_menu, close_inline_keyboard, preview_step_menu
-from Handler.default.start_command import get_admins_id_list
-from utils.database_api.schemas import User
-from utils.shared_methods.default import send_user_application_info, get_free_positions_on_parking
 from app import bot
+from colorama import Fore
 from states import UserChanges, UserState
-
 from utils.database_api.quick_commands import get_user, add_application
+from utils.shared_methods.default import send_user_application_info, get_free_positions_on_parking
 from utils.shared_methods.default import soon_info, get_access_level, check_initials, check_email, check_phone, \
     check_state_number
 
@@ -39,6 +32,7 @@ async def get_user_info(message: Message, sec: int = -1) -> None:
         f"Информация о Вас! \n"
         f"Ваш Telegram ID: <b>{user.id}</b>\n"
         f"ФИО: <b>{user.initials}</b>\n"
+        f"Академическая группа: <b>{user.group}</b>\n"
         f"Почта: <b>{user.email}</b>\n"
         f"Номер телефона: <b>{user.phoneNumber}</b>\n"
         f"Модель автомобиля: <b>{user.car_mark}</b>\n"
@@ -171,6 +165,7 @@ async def change_car_mark(query: CallbackQuery, state: FSMContext):
     await state.update_data(behind_message=query.message.message_id)
     await send_change_text(message=query.message, state="<b>модель автомобиля</b>")
 
+
 async def get_change_car_mark(message: Message, state: FSMContext):
     await state.update_data(change_car_mark=message.text)
     await set_user_info_change(message=message, state=state)
@@ -203,7 +198,7 @@ async def get_change_state_number(message: Message, state: FSMContext) -> None:
 
 async def accept_changes(query: CallbackQuery, state: FSMContext) -> None:
     data: dict = await state.get_data()
-    print(data)
+    # print(data)
     states_list: List[str] = [
         'change_initials',
         'change_email',
@@ -247,6 +242,7 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
         'change_email',
         'change_phone',
         'change_group',
+        'change_car_mark',
         'change_state_number'
     ]
     for key in states_list:
@@ -266,10 +262,10 @@ async def agree_changes(query: CallbackQuery, state: FSMContext) -> None:
         await query.message.edit_text(f"Данные отправлены. Ожидайте изменения информации!",
                                       reply_markup=close_inline_keyboard)
         [
-                await send_user_application_info(telegram_id=admin_id,
-                                                 message=f"Добавлена новая заявка на обновление данных!")
-                for admin_id in await get_admins_id_list()
-            ]
+            await send_user_application_info(telegram_id=admin_id,
+                                             message=f"Добавлена новая заявка на обновление данных!")
+            for admin_id in await get_admins_id_list()
+        ]
     except MessageNotModified:
         pass
 
@@ -288,7 +284,6 @@ async def continue_changes(query: CallbackQuery) -> None:
 
 
 async def get_free_positions(message: Message) -> None:
-
     try:
         template = await get_free_positions_on_parking()
         user = await get_user(user_id=message.from_id)
@@ -320,6 +315,7 @@ async def preview_step_info(query: CallbackQuery, state: FSMContext) -> None:
             'UserChanges:change_email',
             'UserChanges:change_phone',
             'UserChanges:change_group',
+            'UserChanges:change_car_mark',
             'UserChanges:change_state_number',
             'UserChanges:accept'
         ]
