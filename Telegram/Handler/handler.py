@@ -28,7 +28,11 @@ from Handler.admin.user_section import (
     delete_user_by_initials, delete_all_from_group,
     delete_user_by_initials_searched, send_all_searched_users_for_delete,
     delete_user_question, delete_user, decline_delete_user, get_group_for_delete, accept_delete_group,
-    decline_delete_group
+    decline_delete_group, show_change_user_info_panel, change_user_info_by_id, get_user_by_id_for_change,
+    change_user_info, change_initials_for_admin, get_change_initials_for_admin, change_email_for_admin,
+    get_change_email_for_admin, change_phone_number_for_admin, get_change_phone_for_admin, change_group_for_admin,
+    get_change_group_for_admin, change_car_mark_for_admin, get_change_car_mark_for_admin, change_state_number_for_admin,
+    get_change_state_number_for_admin, accept_changes_for_admin, agree_changes_for_admin, cancel_changes_for_admin
 )
 from Handler.application.application_command import (
     set_application, application_submission_initials, application_submission_email,
@@ -48,6 +52,7 @@ from Handler.user.open_command import (
     open_second_level_from_employee
 )
 from states import UserState, ApplicationSubmission, Admins, ManualAdd, UserChanges
+from states.admins import UserChangesForAdmin
 
 
 def register_handlers(dp: Dispatcher):
@@ -223,6 +228,49 @@ def register_handlers(dp: Dispatcher):
     """
         Admin User Section
     """
+    dp.register_callback_query_handler(show_change_user_info_panel, Text(equals="change_user_info_menu"),
+                                       state=Admins.main_state)
+    dp.register_callback_query_handler(change_user_info_by_id, Text(equals="get_user_by_id"),
+                                state=Admins.change_user_info_state)
+    dp.register_message_handler(get_user_by_id_for_change, content_types=ContentType.TEXT,
+                                state=Admins.change_user_info_state_by_id)
+    dp.register_callback_query_handler(change_user_info, Text(equals="selected_change_user_info"),
+                                       state=UserChangesForAdmin.user_id_for_admin)
+    dp.register_callback_query_handler(change_initials_for_admin, Text(equals="change_initials_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_initials_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_initials_for_admin)
+    dp.register_callback_query_handler(change_email_for_admin, Text(equals="change_email_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_email_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_email_for_admin)
+    dp.register_callback_query_handler(change_phone_number_for_admin, Text(equals="change_phone_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_phone_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_phone_for_admin)
+    dp.register_callback_query_handler(change_group_for_admin, Text(equals="change_group_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_group_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_group_for_admin)
+    dp.register_callback_query_handler(change_car_mark_for_admin, Text(equals="change_car_mark_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_car_mark_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_car_mark_for_admin)
+    dp.register_callback_query_handler(change_state_number_for_admin, Text(equals="change_state_number_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_message_handler(get_change_state_number_for_admin, content_types=ContentType.TEXT,
+                                state=UserChangesForAdmin.change_state_number_for_admin)
+    dp.register_callback_query_handler(accept_changes_for_admin, Text(equals="finish_changes_admin"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_callback_query_handler(agree_changes_for_admin, Text(equals="select_accept"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+    dp.register_callback_query_handler(cancel_changes_for_admin, Text(equals="decline_accept"),
+                                       state=UserChangesForAdmin.change_menu_for_admin)
+
+
+    """
+           Admin User Section for change info
+       """
     dp.register_callback_query_handler(delete_user_by_initials, Text(equals="delete_by_initials"),
                                        state=Admins.delete_menu_state)
     dp.register_message_handler(delete_user_by_initials_searched, content_types=ContentType.TEXT,

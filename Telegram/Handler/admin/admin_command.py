@@ -71,6 +71,9 @@ async def preview_step(query: CallbackQuery, state: FSMContext):
         'show_change_application': [
             "Admins:show_selected_change_application"
         ],
+        'change_user_info_state': [
+            "Admins:change_user_info_state_by_id",
+        ],
     }
     if state_level in _state_list['main']:
         await return_call_admin_panel(query=query, state=state)

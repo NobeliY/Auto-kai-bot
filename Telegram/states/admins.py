@@ -24,6 +24,13 @@ class Admins(StatesGroup):
     show_change_application = State()
     show_selected_change_application = State()
 
+    change_user_info_state = State()
+    change_user_info_state_by_id = State()
+    # change_user_info_state_by_initials = State()
+    # change_user_info_state_by_phone = State()
+    # change_user_info_state_by_group = State()
+    # change_user_info_state_by_state_number = State()
+
 
 class ManualAdd(StatesGroup):
     """
@@ -38,3 +45,14 @@ class ManualAdd(StatesGroup):
     level = State()
     approve = State()
 
+
+class UserChangesForAdmin(StatesGroup):
+    change_menu_for_admin = State()
+    user_id_for_admin = State()
+    change_initials_for_admin = State()
+    change_email_for_admin = State()
+    change_phone_for_admin = State()
+    change_group_for_admin = State()
+    change_car_mark_for_admin = State()
+    change_state_number_for_admin = State()
+    accept_for_admin = State()

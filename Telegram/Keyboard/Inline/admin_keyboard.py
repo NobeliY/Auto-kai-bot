@@ -11,6 +11,7 @@ main_admin_menu = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton("Просмотреть заявки", callback_data="show_applications"),
+            InlineKeyboardButton("Изменить пользователя", callback_data="change_user_info_menu"),
         ],
     ],
 )

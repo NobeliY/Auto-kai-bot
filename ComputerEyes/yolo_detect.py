@@ -82,9 +82,9 @@ class CustomYOLODetect:
         with open(dataset, 'r', encoding='utf-8') as f:
             self.data: str = f.read()
         self.required_classes: List = self.data.strip().split('\n')
-        
+
         self.count_area: Dict = {
-            areas: 0 
+            areas: 0
         }
         # save_output_on_json(0, areas)
 
@@ -216,9 +216,9 @@ class CustomYOLODetect:
             if k == 0:
                 self.count_area[self.areas] = k
                 save_output_on_json(self.count_area[self.areas], self.areas)
-                break  
+                break
             local_cache['cars'].append(k)
-            
+
             cv2.putText(frame, f"{str(k)}/15", (50, 60), cv2.FONT_HERSHEY_PLAIN, 5, (255, 0, 0), 3)
             cv2.imshow('Video', frame)
             # sleep(30)
@@ -233,7 +233,7 @@ class CustomYOLODetect:
                 self.count_area[self.areas] = max(local_cache['cars'])
                 print(F"{self.areas} | {self.count_area[self.areas]}")
                 save_output_on_json(self.count_area[self.areas], self.areas)
-                break   
+                break
             sleep(0.5)
             local_cache['sec'] += 1
 
@@ -249,4 +249,4 @@ class CustomYOLODetect:
             self.capture = self.videos
         # while True:
         self.detection_thread()
-            # sleep(3600)
+        # sleep(3600)

@@ -16,7 +16,8 @@ _offset = timezone(timedelta(hours=3))
 
 
 async def add_application(user_id: int, initials: str, email: str,
-                          phone_number: str, group: str, car_mark: str, state_number: str, change_ap: bool = False) -> None:
+                          phone_number: str, group: str, car_mark: str, state_number: str,
+                          change_ap: bool = False) -> None:
     application: Union[Application, ApplicationChange, None] = None
     try:
         application = Application(
@@ -168,6 +169,22 @@ async def get_users_by_group(group: str) -> Union[List[User], None]:
     return await User.query.where(User.group == group).gino.all()
 
 
+async def get_users_by_car_mark(car_mark: str) -> Union[List[User], None]:
+    return await User.query.where(User.car_mark == car_mark).gino.all()
+
+
+async def get_user_by_state_number(state_number: str) -> Union[List[User], None]:
+    return await User.query.where(User.stateNumber == state_number).gino.first()
+
+
+async def get_user_by_id(user_id: int) -> Union[User, None]:
+    return await User.query.where(User.id == user_id).gino.first()
+
+
+async def get_users_by_phone_number(phone_number: str) -> Union[List[User], None]:
+    return await User.query.where(User.phoneNumber == phone_number).gino.all()
+
+
 async def get_all_users() -> Union[List[User], None]:
     return await User.query.gino.all()
 
@@ -197,7 +214,7 @@ async def delete_users_by_group(users: List[User]) -> None:
 
 async def add_user(user_id: int, initials: str, email: str,
                    phone_number: str, group: str,
-                   car_mark:str, state_number: str, access: str) -> None:
+                   car_mark: str, state_number: str, access: str) -> None:
     try:
         user = User(id=user_id, initials=initials, email=email, phoneNumber=phone_number, group=group,
                     car_mark=car_mark, stateNumber=state_number, access=access)

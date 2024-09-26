@@ -127,6 +127,7 @@ async def get_fully_info() -> None:
         "Группа": [],
         "Номер телефона": [],
         "Гос. номер используемого транспорта": [],
+        "Модель автомобиля": [],
         "Уровень": []
     }
     for user in users:
@@ -136,9 +137,12 @@ async def get_fully_info() -> None:
         data_dict["Группа"].append(user.group)
         data_dict["Номер телефона"].append(user.phoneNumber)
         data_dict["Гос. номер используемого транспорта"].append(user.stateNumber)
+        data_dict["Модель автомобиля"].append(user.car_mark)
         data_dict["Уровень"].append(get_access_level(user.access))
 
     df: pd.DataFrame = pd.DataFrame(data=data_dict)
+    if os.path.exists(USER_XLSX_PATH):
+        os.remove(USER_XLSX_PATH)
     df.to_excel(USER_XLSX_PATH, sheet_name='Users', index=False)
 
 
