@@ -19,10 +19,13 @@ main_change_user_info_menu = InlineKeyboardMarkup(
     ]
 )
 select_searched_user_button = InlineKeyboardMarkup(
-    inline_keyboard=[[
-InlineKeyboardButton("Изменить", callback_data="selected_change_user_info")
-    ],
-        InlineKeyboardButton("Назад", callback_data="preview_step")
+    inline_keyboard=[
+        [
+            InlineKeyboardButton("Изменить", callback_data="selected_change_user_info")
+        ], [
+            InlineKeyboardButton("Назад", callback_data="preview_step")
+
+        ],
 
     ]
 )
