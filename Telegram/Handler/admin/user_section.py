@@ -140,7 +140,7 @@ async def change_user_info_by_id(query: CallbackQuery, state: FSMContext):
 
 
 async def get_user_by_id_for_change(message: Message, state: FSMContext):
-    user = await get_user_by_id(user_id=message.text)
+    user = await get_user_by_id(user_id=int(message.text))
     if not user:
         await message.answer("Нет такого пользователя.", reply_markup=back_inline_menu)
         return
